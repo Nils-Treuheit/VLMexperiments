@@ -1,0 +1,145 @@
+import argparse
+import json
+import subprocess
+import sys
+from pathlib import Path
+
+SCRIPTS_DIR = Path(__file__).resolve().parent
+RESULTS_DIR = SCRIPTS_DIR.parent / "results"
+
+TASKS = {
+    "od": {
+        "script": "benchmark_od.py",
+        "title": "Object Detection (COCO)",
+        "models": ["locate_anything", "qwen3_native", "qwen3_thinking", "yolo26"],
+        "dataset": "coco",
+    },
+    "od_dota": {
+        "script": "benchmark_od.py",
+        "title": "Object Detection (DOTA)",
+        "models": ["locate_anything", "qwen3_native", "qwen3_thinking"],
+        "dataset": "dota",
+    },
+    "pose": {
+        "script": "benchmark_pose.py",
+        "title": "Pose Estimation (COCO Keypoints)",
+        "models": ["yolo26_pose"],
+        "dataset": None,
+    },
+    "obb": {
+        "script": "benchmark_obb.py",
+        "title": "OBB Detection (DOTA-v1.0)",
+        "models": ["yolo26_obb"],
+        "dataset": None,
+    },
+    "grounding": {
+        "script": "benchmark_grounding.py",
+        "title": "Phrase Grounding (COCO)",
+        "models": ["locate_anything", "qwen3_native", "qwen3_thinking"],
+        "dataset": None,
+    },
+}
+
+MODEL_VENV = {
+    "locate_anything": "/mnt/HDD1/Project_Code/vlm_det_test/locate_anything/.venv/bin/python",
+    "qwen3_native": "/mnt/HDD1/Project_Code/vlm_det_test/qwen3-vl_instruct/.venv/bin/python",
+    "qwen3_thinking": "/mnt/HDD1/Project_Code/vlm_det_test/qwen3-vl_thinking/.venv/bin/python",
+    "yolo26": "/mnt/HDD1/Project_Code/vlm_det_test/yolo11-26/.venv/bin/python",
+    "yolo26_pose": "/mnt/HDD1/Project_Code/vlm_det_test/yolo11-26/.venv/bin/python",
+    "yolo26_obb": "/mnt/HDD1/Project_Code/vlm_det_test/yolo11-26/.venv/bin/python",
+}
+
+
+def run_model(model, script, max_images, dataset=None):
+    venv_python = MODEL_VENV.get(model)
+    if not venv_python:
+        print(f"  [SKIP] No venv configured for {model}")
+        return None
+
+    script_path = SCRIPTS_DIR / script
+    cmd = [venv_python, str(script_path), "--model", model, "--max-images", str(max_images)]
+    if dataset:
+        cmd += ["--dataset", dataset]
+
+    print(f"\n  ── Running: {model} via {venv_python.split('/')[-3]} ──")
+    sys.stdout.flush()
+    result = subprocess.run(cmd, capture_output=True, text=True, timeout=3600)
+    if result.stdout:
+        print(result.stdout)
+    if result.stderr:
+        print(result.stderr[-2000:] if len(result.stderr) > 2000 else result.stderr)
+    if result.returncode != 0:
+        print(f"  [ERROR] {model} failed (code {result.returncode})")
+        return None
+
+    return extract_stats(model, script)
+
+
+def extract_stats(model, script):
+    prefix = model.replace("/", "_").replace(" ", "_")
+    if "obb" in script:
+        glob_pattern = f"{prefix}_obb_stats.json"
+    elif "pose" in script:
+        glob_pattern = f"{prefix}_pose_stats.json"
+    elif "grounding" in script:
+        glob_pattern = f"{prefix}_grounding_stats.json"
+    else:
+        for ds in ["coco", "dota"]:
+            fp = RESULTS_DIR / f"{prefix}_{ds}_od_stats.json"
+            if fp.exists():
+                with open(fp) as f:
+                    return json.load(f)
+        return None
+
+    fp = RESULTS_DIR / glob_pattern
+    if fp.exists():
+        with open(fp) as f:
+            return json.load(f)
+    return None
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Run all benchmarks")
+    parser.add_argument("--max-images", type=int, default=25,
+                        help="Images per model per task")
+    parser.add_argument("--tasks", nargs="+",
+                        choices=list(TASKS) + ["all"],
+                        default=["all"],
+                        help="Tasks to run (default: all)")
+    args = parser.parse_args()
+
+    RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+
+    tasks_to_run = list(TASKS) if "all" in args.tasks else args.tasks
+
+    all_comparisons = {}
+
+    for task_key in tasks_to_run:
+        task = TASKS[task_key]
+        print(f"\n{'#' * 70}")
+        print(f"# TASK: {task['title']}")
+        print(f"{'#' * 70}")
+
+        task_stats = {}
+        for model in task["models"]:
+            stats = run_model(model, task["script"], args.max_images, task.get("dataset"))
+            if stats:
+                task_stats[model] = stats
+
+        if task_stats:
+            all_comparisons[task_key] = task_stats
+
+    print(f"\n{'=' * 70}")
+    print("ALL BENCHMARKS COMPLETE")
+    print(f"{'=' * 70}")
+    for task_key, stats in all_comparisons.items():
+        print(f"\n  {TASKS[task_key]['title']}: {len(stats)} models run")
+
+    summary_path = RESULTS_DIR / "all_benchmarks_summary.json"
+    with open(summary_path, "w") as f:
+        json.dump(all_comparisons, f, indent=2)
+    print(f"\n  Full summary saved to: {summary_path}")
+
+
+if __name__ == "__main__":
+    main()

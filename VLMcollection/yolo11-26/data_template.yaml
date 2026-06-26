@@ -1,0 +1,40 @@
+# YOLO26 Dataset Configuration
+# Copy this file, edit paths and classes, then pass to train.py --data your_data.yaml
+
+# Dataset root directory
+path: /path/to/dataset
+
+# Training and validation image directories (relative to path)
+train: images/train
+val: images/val
+
+# Optional test directory
+# test: images/test
+
+# Number of classes
+nc: 80
+
+# Class names (index must match label IDs in annotation files)
+names:
+  0: person
+  1: bicycle
+  2: car
+  3: motorcycle
+  4: airplane
+  5: bus
+  6: train
+  7: truck
+  8: boat
+  9: traffic light
+  10: fire hydrant
+  11: stop sign
+  12: parking meter
+  13: bench
+  14: bird
+  15: cat
+  16: dog
+  17: horse
+  18: sheep
+  19: cow
+  20: elephant
+  # ... add your classes here

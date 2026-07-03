@@ -15,7 +15,8 @@ from common import (
     RESULTS_DIR, COCO_DIR, DOTA_DIR,
     MODEL_LOADERS, MODEL_ALIASES, MODEL_DISPLAY,
     parse_box_tags, parse_json_detections, extract_narrative_boxes,
-    scale_la, scale_qwen, scale_thinking,
+    scale_la, scale_qwen, scale_thinking, scale_florence2,
+    COCO_CAT_NAME_TO_ID,
     load_dota_coco_gt, build_prompt, print_comparison, save_stats,
 )
 
@@ -29,6 +30,8 @@ def benchmark(model_name, dataset="coco", max_images=100, verbose=True):
     is_q3 = mn == "qwen3_native"
     is_th = mn == "qwen3_thinking"
     is_yolo = mn.startswith("yolo")
+    is_f2 = mn == "florence2"
+    is_pg = mn == "paligemma"
 
     if dataset not in ("coco", "dota"):
         raise ValueError(f"Unknown dataset {dataset!r}")
@@ -46,6 +49,10 @@ def benchmark(model_name, dataset="coco", max_images=100, verbose=True):
         detector = obj
     elif is_yolo:
         model = obj
+    elif is_f2:
+        model, processor = obj
+    elif is_pg:
+        model, processor = obj
     else:
         processor, model = obj
 
@@ -166,6 +173,37 @@ def benchmark(model_name, dataset="coco", max_images=100, verbose=True):
                 if not raw_boxes:
                     raw_boxes = extract_narrative_boxes(decoded)
                 boxes = scale_thinking(raw_boxes, ow, oh)
+            elif is_f2:
+                prompt = f"<OD>"
+                inputs = processor(text=prompt, images=image, return_tensors="pt")
+                inputs = {k: v.to(model.device) if hasattr(v, 'to') else v for k, v in inputs.items()}
+                with torch.no_grad():
+                    out = model.generate(
+                        input_ids=inputs["input_ids"],
+                        pixel_values=inputs["pixel_values"],
+                        max_new_tokens=512, num_beams=3,
+                    )
+                text = processor.batch_decode(out, skip_special_tokens=False)[0]
+                parsed = processor.post_process_generation(text, task="<OD>", image_size=(ow, oh))
+                raw_boxes = parsed.get("bboxes", [])
+                labels = parsed.get("labels", [])
+                boxes = scale_florence2(raw_boxes, ow, oh)
+                for bx, lbl in zip(raw_boxes, labels):
+                    x1, y1, x2, y2 = scale_florence2([bx], ow, oh)[0]
+                    cid = COCO_CAT_NAME_TO_ID.get(lbl, primary_cat_id)
+                    results.append({
+                        "image_id": img_id,
+                        "category_id": cid,
+                        "bbox": [x1, y1, x2 - x1, y2 - y1],
+                        "score": 0.9,
+                    })
+            elif is_pg:
+                prompt = f"detect {primary_cat_name}"
+                inputs = processor(image, prompt, return_tensors="pt").to(model.device)
+                with torch.no_grad():
+                    out = model.generate(**inputs, max_new_tokens=128)
+                text = processor.decode(out[0], skip_special_tokens=True)
+                boxes = scale_qwen(parse_box_tags(text), ow, oh)
             elif is_yolo:
                 yolo_out = model(image, verbose=False)[0]
                 boxes = []
@@ -199,7 +237,7 @@ def benchmark(model_name, dataset="coco", max_images=100, verbose=True):
         total_gt += len(anns)
         total_det += len(boxes)
 
-        if not is_yolo:
+        if not is_yolo and not is_f2:
             for x1, y1, x2, y2 in boxes:
                 results.append({
                     "image_id": img_id,

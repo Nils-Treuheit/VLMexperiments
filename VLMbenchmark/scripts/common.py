@@ -3,6 +3,7 @@ import os
 import re
 import sys
 import warnings
+from collections import Counter
 from pathlib import Path
 
 from PIL import Image
@@ -14,7 +15,7 @@ RESULTS_DIR = BASE_DIR / "results"
 DATA_DIR = Path("/mnt/HDD1/Project_Data/public_datasets")
 COCO_DIR = DATA_DIR / "coco"
 DOTA_DIR = DATA_DIR / "dotav1"
-PROJECT_DIR = BASE_DIR.parent
+PROJECT_DIR = Path("/mnt/HDD1/Project_Code/VLMexperiments/VLMcollection")
 
 DOTA_CATEGORIES = [
     "plane", "baseball-diamond", "bridge", "ground-track-field",
@@ -113,6 +114,129 @@ def scale_qwen(boxes, ow, oh):
 
 def scale_thinking(boxes, ow, oh):
     return scale_la(boxes, ow, oh)
+
+
+def scale_florence2(boxes, ow, oh):
+    return [[x1 / 999 * ow, y1 / 999 * oh, x2 / 999 * ow, y2 / 999 * oh]
+            for x1, y1, x2, y2 in boxes]
+
+
+COCO_CAT_NAME_TO_ID = {
+    "person": 1, "bicycle": 2, "car": 3, "motorcycle": 4, "airplane": 5,
+    "bus": 6, "train": 7, "truck": 8, "boat": 9, "traffic light": 10,
+    "fire hydrant": 11, "stop sign": 13, "parking meter": 14, "bench": 15,
+    "bird": 16, "cat": 17, "dog": 18, "horse": 19, "sheep": 20,
+    "cow": 21, "elephant": 22, "bear": 23, "zebra": 24, "giraffe": 25,
+    "backpack": 27, "umbrella": 28, "handbag": 31, "tie": 32, "suitcase": 33,
+    "frisbee": 34, "skis": 35, "snowboard": 36, "sports ball": 37, "kite": 38,
+    "baseball bat": 39, "baseball glove": 40, "skateboard": 41, "surfboard": 42,
+    "tennis racket": 43, "bottle": 44, "wine glass": 46, "cup": 47, "fork": 48,
+    "knife": 49, "spoon": 50, "bowl": 51, "banana": 52, "apple": 53,
+    "sandwich": 54, "orange": 55, "broccoli": 56, "carrot": 57, "hot dog": 58,
+    "pizza": 59, "donut": 60, "cake": 61, "chair": 62, "couch": 63,
+    "potted plant": 64, "bed": 65, "dining table": 67, "toilet": 70, "tv": 72,
+    "laptop": 73, "mouse": 74, "remote": 75, "keyboard": 76, "cell phone": 77,
+    "microwave": 78, "oven": 79, "toaster": 80, "sink": 81, "refrigerator": 82,
+    "book": 84, "clock": 85, "vase": 86, "scissors": 87, "teddy bear": 88,
+    "hair drier": 89, "toothbrush": 90,
+}
+
+
+def tokenize(text):
+    return text.lower().split()
+
+
+def bleu_score(candidate, references, max_n=4):
+    c_tok = tokenize(candidate)
+    max_n = min(max_n, len(c_tok))
+    scores = []
+    for n in range(1, max_n + 1):
+        c_ngrams = Counter(zip(*[c_tok[i:] for i in range(n)]))
+        ref_counts = Counter()
+        for ref in references:
+            r_tok = tokenize(ref)
+            if len(r_tok) < n:
+                continue
+            r_ngrams = Counter(zip(*[r_tok[i:] for i in range(n)]))
+            for ng in r_ngrams:
+                ref_counts[ng] = max(ref_counts.get(ng, 0), r_ngrams[ng])
+        matches = sum(min(c_ngrams.get(ng, 0), ref_counts.get(ng, 0)) for ng in c_ngrams)
+        total = sum(c_ngrams.values())
+        precision = matches / total if total > 0 else 0
+        scores.append(precision)
+    if len(scores) < 4:
+        scores += [0] * (4 - len(scores))
+    bp = min(1, len(c_tok) / max((min(len(tokenize(r)) for r in references) if references else 1), 1))
+    return bp * (scores[0] * scores[1] * scores[2] * scores[3]) ** 0.25 if all(s > 0 for s in scores[:4]) else 0.0
+
+
+def lcs(x, y):
+    m, n = len(x), len(y)
+    dp = [[0] * (n + 1) for _ in range(m + 1)]
+    for i in range(1, m + 1):
+        for j in range(1, n + 1):
+            if x[i - 1] == y[j - 1]:
+                dp[i][j] = dp[i - 1][j - 1] + 1
+            else:
+                dp[i][j] = max(dp[i - 1][j], dp[i][j - 1])
+    return dp[m][n]
+
+
+def rouge_l(candidate, references):
+    c_tok = tokenize(candidate)
+    best = 0
+    for ref in references:
+        r_tok = tokenize(ref)
+        l = lcs(c_tok, r_tok)
+        prec = l / len(c_tok) if c_tok else 0
+        rec = l / len(r_tok) if r_tok else 0
+        f = 2 * prec * rec / (prec + rec + 1e-12)
+        best = max(best, f)
+    return best
+
+
+def cider(candidate, references):
+    c_tok = tokenize(candidate)
+    scores = []
+    for n in [1, 2, 3, 4]:
+        c_ngrams = Counter(zip(*[c_tok[i:] for i in range(n)]))
+        if not c_ngrams:
+            scores.append(0)
+            continue
+        ref_avg = Counter()
+        for ref in references:
+            r_tok = tokenize(ref)
+            if len(r_tok) < n:
+                continue
+            r_ngrams = Counter(zip(*[r_tok[i:] for i in range(n)]))
+            for ng in r_ngrams:
+                ref_avg[ng] = ref_avg.get(ng, 0) + r_ngrams[ng]
+        for ng in ref_avg:
+            ref_avg[ng] /= len(references)
+        score = sum(min(c_ngrams.get(ng, 0), ref_avg.get(ng, 0)) for ng in c_ngrams)
+        total = sum(c_ngrams.values())
+        scores.append(score / total if total > 0 else 0)
+    return sum(scores) / len(scores) * 10 if scores else 0
+
+
+def load_coco_captions(max_images=None):
+    ap = COCO_DIR / "annotations" / "captions_val2017.json"
+    if not ap.exists():
+        print(f"Error: COCO captions not found at {ap}")
+        return None, None
+    with open(ap) as f:
+        data = json.load(f)
+    img_id_to_captions = {}
+    for ann in data["annotations"]:
+        iid = ann["image_id"]
+        if iid not in img_id_to_captions:
+            img_id_to_captions[iid] = []
+        img_id_to_captions[iid].append(ann["caption"])
+    img_infos = {im["id"]: im for im in data["images"]}
+    img_ids = sorted(img_id_to_captions.keys())
+    if max_images:
+        img_ids = img_ids[:max_images]
+    return img_ids, (img_infos, img_id_to_captions)
 
 
 def load_dota_coco_gt(dota_dir, max_images=None):
@@ -223,6 +347,97 @@ def load_yolo26(model_name="yolo26n"):
     return YOLO(model_name), {}
 
 
+def load_florence2():
+    sys.path.insert(0, str(PROJECT_DIR / "florence-2"))
+    from transformers import AutoProcessor, Florence2ForConditionalGeneration
+    dev = "cuda" if torch.cuda.is_available() else "cpu"
+    dtype = torch.float16 if torch.cuda.is_available() else torch.float32
+    model = Florence2ForConditionalGeneration.from_pretrained(
+        "microsoft/Florence-2-large-ft", torch_dtype=dtype, trust_remote_code=True
+    ).to(dev)
+    processor = AutoProcessor.from_pretrained("microsoft/Florence-2-large-ft", trust_remote_code=True)
+    return (model, processor), {}
+
+
+def load_paligemma():
+    from transformers import AutoProcessor, PaliGemmaForConditionalGeneration
+    model = PaliGemmaForConditionalGeneration.from_pretrained(
+        "google/paligemma2-3b-mix-224", torch_dtype=torch.bfloat16, device_map="auto",
+    ).eval()
+    processor = AutoProcessor.from_pretrained("google/paligemma2-3b-mix-224")
+    return (model, processor), {}
+
+
+def load_llama_vision():
+    from transformers import MllamaForConditionalGeneration, AutoProcessor
+    model = MllamaForConditionalGeneration.from_pretrained(
+        "meta-llama/Llama-3.2-11B-Vision-Instruct", torch_dtype=torch.bfloat16, device_map="auto",
+    )
+    processor = AutoProcessor.from_pretrained("meta-llama/Llama-3.2-11B-Vision-Instruct")
+    return (model, processor), {}
+
+
+def load_phi_vision():
+    from transformers import AutoModelForCausalLM, AutoProcessor
+    model = AutoModelForCausalLM.from_pretrained(
+        "microsoft/Phi-3.5-vision-instruct", trust_remote_code=True,
+        torch_dtype="auto", device_map="auto",
+    )
+    processor = AutoProcessor.from_pretrained("microsoft/Phi-3.5-vision-instruct", trust_remote_code=True)
+    return (model, processor), {}
+
+
+def load_cosmos_nemotron():
+    from transformers import AutoModelForMultimodalLM, AutoProcessor
+    model = AutoModelForMultimodalLM.from_pretrained(
+        "nvidia/Cosmos-Reason1-7B", torch_dtype=torch.bfloat16,
+        device_map="auto", attn_implementation="sdpa",
+    )
+    processor = AutoProcessor.from_pretrained("nvidia/Cosmos-Reason1-7B")
+    return (model, processor), {}
+
+
+def load_diffusion_gemma():
+    # DiffusionGemma inference is via subprocess to run.py (YOLO+llama-diffusion-cli).
+    # Return a sentinel so benchmark scripts can detect this model type.
+    return ("diffusion_gemma",), {}
+
+
+def load_diffusion_gemma_yolo():
+    return ("diffusion_gemma_yolo",), {}
+
+
+def load_diffusion_gemma_yolo_pose():
+    return ("diffusion_gemma_yolo_pose",), {}
+
+
+def load_diffusion_gemma_yolo_obb():
+    return ("diffusion_gemma_yolo_obb",), {}
+
+
+def load_diffusion_gemma_siglip2():
+    return ("diffusion_gemma_siglip2",), {}
+
+
+def load_diffusion_gemma_moonvit():
+    return ("diffusion_gemma_moonvit",), {}
+
+
+def load_siglip2():
+    # SigLIP2 inference is via subprocess to siglip2/run.py.
+    return ("siglip2",), {}
+
+
+def load_moonvit():
+    # MoonViT inference is via subprocess to moonvit/run.py.
+    return ("moonvit",), {}
+
+
+def load_dinov3():
+    # DINOv3 inference is via subprocess to dinov3/run.py.
+    return ("dinov3",), {}
+
+
 MODEL_LOADERS = {
     "locate_anything": load_la,
     "qwen3_native": load_qwen3,
@@ -251,6 +466,23 @@ MODEL_LOADERS = {
     # YOLO11 OBB
     "yolo11_obb": lambda: load_yolo26("yolo11n-obb"),
     "yolo11s_obb": lambda: load_yolo26("yolo11s-obb"),
+    # Edge VLM models (captioning / VQA)
+    "florence2": load_florence2,
+    "paligemma": load_paligemma,
+    "llama_vision": load_llama_vision,
+    "phi_vision": load_phi_vision,
+    "cosmos_nemotron": load_cosmos_nemotron,
+    # DiffusionGemma (YOLO feeder + text-only diffusion model)
+    "diffusion_gemma": load_diffusion_gemma,
+    "diffusion_gemma_yolo": load_diffusion_gemma_yolo,
+    "diffusion_gemma_yolo_pose": load_diffusion_gemma_yolo_pose,
+    "diffusion_gemma_yolo_obb": load_diffusion_gemma_yolo_obb,
+    "diffusion_gemma_siglip2": load_diffusion_gemma_siglip2,
+    "diffusion_gemma_moonvit": load_diffusion_gemma_moonvit,
+    # Vision encoders (zero-shot structured description via subprocess)
+    "dinov3": load_dinov3,
+    "siglip2": load_siglip2,
+    "moonvit": load_moonvit,
 }
 
 MODEL_ALIASES = {
@@ -265,6 +497,30 @@ MODEL_ALIASES = {
     "ultralytics": "yolo26",
     "yolo_pose": "yolo26_pose",
     "yolo_obb": "yolo26_obb",
+    "f2": "florence2",
+    "florence": "florence2",
+    "pg": "paligemma",
+    "gemma": "paligemma",
+    "llama": "llama_vision",
+    "llama3": "llama_vision",
+    "phi": "phi_vision",
+    "phi3": "phi_vision",
+    "cosmos": "cosmos_nemotron",
+    "nemotron": "cosmos_nemotron",
+    "dg": "diffusion_gemma",
+    "diffusion_gemma_vl": "diffusion_gemma",
+    "dg_yolo": "diffusion_gemma_yolo",
+    "dg_pose": "diffusion_gemma_yolo_pose",
+    "dg_obb": "diffusion_gemma_yolo_obb",
+    "dg_siglip2": "diffusion_gemma_siglip2",
+    "dg_moonvit": "diffusion_gemma_moonvit",
+    "d3": "dinov3",
+    "dino": "dinov3",
+    "dinov3": "dinov3",
+    "s2": "siglip2",
+    "siglip": "siglip2",
+    "mv": "moonvit",
+    "moon": "moonvit",
 }
 
 MODEL_DISPLAY = {
@@ -289,6 +545,20 @@ MODEL_DISPLAY = {
     "yolo11s_pose": "YOLO11s (Pose)",
     "yolo11_obb": "YOLO11n (OBB)",
     "yolo11s_obb": "YOLO11s (OBB)",
+    "florence2": "Florence-2-large-ft",
+    "paligemma": "PaliGemma2-3B-mix",
+    "llama_vision": "Llama-3.2-11B-Vision",
+    "phi_vision": "Phi-3.5-Vision-4.2B",
+    "cosmos_nemotron": "Cosmos-Reason1-7B",
+    "diffusion_gemma": "DiffusionGemma-26B (YOLO)",
+    "diffusion_gemma_yolo": "DiffusionGemma-26B (YOLO)",
+    "diffusion_gemma_yolo_pose": "DiffusionGemma-26B (YOLO+pose)",
+    "diffusion_gemma_yolo_obb": "DiffusionGemma-26B (YOLO+pose+obb)",
+    "diffusion_gemma_siglip2": "DiffusionGemma-26B (SigLIP2)",
+    "diffusion_gemma_moonvit": "DiffusionGemma-26B (MoonViT)",
+    "dinov3": "DINOv3 (Zero-shot Description)",
+    "siglip2": "SigLIP2 (Zero-shot Description)",
+    "moonvit": "MoonViT (Zero-shot Description)",
 }
 
 
@@ -307,6 +577,10 @@ def build_prompt(category_name, model_type):
             f"Be exhaustive - do not miss any. Output each as <box>x1,y1,x2,y2</box>. "
             f"Place each box on its own line."
         )
+    if model_type == "florence2":
+        return f"<OD>{category_name}"
+    if model_type == "paligemma":
+        return f"detect {category_name}"
     return category_name
 
 
@@ -345,6 +619,20 @@ TASK_ROWS = {
         ("images", "Images processed", "{}"),
         ("total_gt", "Total GT phrases", "{}"),
         ("total_detected", "Total detected", "{}"),
+    ],
+    "captioning": [
+        ("fps", "FPS", "{:.2f}"),
+        ("avg_inference_ms", "Avg inference (ms)", "{:.1f}"),
+        ("bleu_4", "BLEU-4", "{:.4f}"),
+        ("rouge_l", "ROUGE-L", "{:.4f}"),
+        ("cider", "CIDEr", "{:.4f}"),
+        ("images", "Images processed", "{}"),
+    ],
+    "vqa": [
+        ("fps", "FPS", "{:.2f}"),
+        ("avg_inference_ms", "Avg inference (ms)", "{:.1f}"),
+        ("accuracy", "Accuracy", "{:.4f}"),
+        ("images", "Questions answered", "{}"),
     ],
 }
 

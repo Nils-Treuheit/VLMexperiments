@@ -1,7 +1,7 @@
 from pathlib import Path
 
-PROJECT_DIR = Path("/mnt/HDD1/Project_Code/vlm_det_test")
-SHOWCASE_DIR = Path("/mnt/HDD1/Project_Code/VLMshowcase")
+PROJECT_DIR = Path("/mnt/HDD1/Project_Code/VLMexperiments/VLMcollection")
+SHOWCASE_DIR = Path("/mnt/HDD1/Project_Code/VLMexperiments/VLMshowcase")
 DATA_DIR = Path("/mnt/HDD1/Project_Data")
 PUBLIC_DATASETS = DATA_DIR / "public_datasets"
 DEMO_MATERIAL = DATA_DIR / "demoMaterial"
@@ -39,6 +39,71 @@ MODELS = {
         "display": "YOLO11/26",
         "capabilities": ["detection", "pose", "obb", "tracking"],
     },
+    "florence2": {
+        "path": PROJECT_DIR / "florence-2",
+        "venv_python": str(PROJECT_DIR / "florence-2" / ".venv" / "bin" / "python"),
+        "display": "Florence-2-large",
+        "capabilities": ["caption", "detailed_caption", "detection", "ocr"],
+    },
+    "paligemma": {
+        "path": PROJECT_DIR / "paligemma",
+        "venv_python": str(PROJECT_DIR / "paligemma" / ".venv" / "bin" / "python"),
+        "display": "PaliGemma2-3B",
+        "capabilities": ["caption", "detection", "segmentation", "vqa"],
+    },
+    "cosmos_nemotron": {
+        "path": PROJECT_DIR / "cosmos-nemotron",
+        "venv_python": str(PROJECT_DIR / "cosmos-nemotron" / ".venv" / "bin" / "python"),
+        "display": "Cosmos-Reason1-7B",
+        "capabilities": ["physical_reasoning", "vqa", "scene_description", "video"],
+    },
+    "phi_vision": {
+        "path": PROJECT_DIR / "phi-vision",
+        "venv_python": str(PROJECT_DIR / "phi-vision" / ".venv" / "bin" / "python"),
+        "display": "Phi-3.5-Vision-4B",
+        "capabilities": ["description", "document_understanding", "chart_qa", "vqa"],
+    },
+    "llama_vision": {
+        "path": PROJECT_DIR / "llama-vision",
+        "venv_python": str(PROJECT_DIR / "llama-vision" / ".venv" / "bin" / "python"),
+        "display": "Llama-3.2-11B-Vision",
+        "capabilities": ["description", "reasoning", "vqa"],
+    },
+    "diffusion_gemma_vl": {
+        "path": PROJECT_DIR / "diffusion_gemma_vl",
+        "venv_python": str(PROJECT_DIR / "diffusion_gemma_vl" / ".venv" / "bin" / "python"),
+        "script": str(PROJECT_DIR / "diffusion_gemma_vl" / "run.py"),
+        "display": "DiffusionGemma-26B",
+        "capabilities": ["caption", "vqa", "detect", "pose", "obb"],
+    },
+    "phi4_multimodal": {
+        "path": PROJECT_DIR / "phi-4_multimodal",
+        "venv_python": str(PROJECT_DIR / "phi-4_multimodal" / ".venv" / "bin" / "python"),
+        "script": str(PROJECT_DIR / "phi-4_multimodal" / "run.py"),
+        "display": "Phi-4-Multimodal",
+        "capabilities": ["description", "document_understanding", "vqa"],
+    },
+    "dinov3": {
+        "path": PROJECT_DIR / "dinov3",
+        "venv_python": str(PROJECT_DIR / "dinov3" / ".venv" / "bin" / "python"),
+        "script": str(PROJECT_DIR / "dinov3" / "run.py"),
+        "display": "DINOv3 (Vision Encoder)",
+        "capabilities": ["description", "encode"],
+    },
+    "siglip2": {
+        "path": PROJECT_DIR / "siglip2",
+        "venv_python": str(PROJECT_DIR / "siglip2" / ".venv" / "bin" / "python"),
+        "script": str(PROJECT_DIR / "siglip2" / "run.py"),
+        "display": "SigLIP2 (Vision Encoder)",
+        "capabilities": ["description", "encode"],
+    },
+    "moonvit": {
+        "path": PROJECT_DIR / "moonvit",
+        "venv_python": str(PROJECT_DIR / "moonvit" / ".venv" / "bin" / "python"),
+        "script": str(PROJECT_DIR / "moonvit" / "run.py"),
+        "display": "MoonViT (Vision Encoder)",
+        "capabilities": ["description", "encode"],
+    },
 }
 
 YOLO_MODEL_PATHS = {
@@ -74,3 +139,11 @@ COCO_CATEGORIES = [
     "remote", "keyboard", "cell phone", "microwave", "oven", "toaster", "sink", "refrigerator",
     "book", "clock", "vase", "scissors", "teddy bear", "hair drier", "toothbrush",
 ]
+
+VLM_MODEL_KEYS = {
+    "locate_anything", "qwen3_instruct", "qwen3_thinking",
+    "florence2", "paligemma", "cosmos_nemotron", "phi_vision", "llama_vision",
+    "diffusion_gemma_vl", "phi4_multimodal",
+}
+
+VISION_ENCODER_KEYS = {"dinov3", "siglip2", "moonvit"}

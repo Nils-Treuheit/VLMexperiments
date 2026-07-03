@@ -7,7 +7,7 @@ def describe_with_qwen3_instruct(image_path, prompt="Describe this image in deta
     cfg = MODELS["qwen3_instruct"]
     result = run_with_timer(
         [cfg["venv_python"], cfg["script"], image_path, prompt, "--json"],
-        timeout=300, label="Loading Qwen3-VL-Instruct",
+        timeout=1000, label="Loading Qwen3-VL-Instruct",
     )
     try:
         data = json.loads(result.stdout.strip())
@@ -21,7 +21,7 @@ def describe_with_qwen3_thinking(image_path, prompt="Describe this image in deta
     wrapper = cfg["script_wrapper"]
     result = run_with_timer(
         [cfg["venv_python"], wrapper, image_path, prompt, "--describe"],
-        timeout=300, label="Loading Qwen3-VL-Thinking",
+        timeout=1000, label="Loading Qwen3-VL-Thinking",
     )
     return result.stdout.strip() or result.stderr.strip()
 
@@ -30,7 +30,7 @@ def detect_with_qwen3_instruct(image_path, query="Detect all objects. Output eac
     cfg = MODELS["qwen3_instruct"]
     result = run_with_timer(
         [cfg["venv_python"], cfg["script"], image_path, query, "--json"],
-        timeout=300, label="Loading Qwen3-VL-Instruct",
+        timeout=1000, label="Loading Qwen3-VL-Instruct",
     )
     try:
         return json.loads(result.stdout.strip())

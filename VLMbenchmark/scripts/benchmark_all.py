@@ -11,7 +11,8 @@ TASKS = {
     "od": {
         "script": "benchmark_od.py",
         "title": "Object Detection (COCO)",
-        "models": ["locate_anything", "qwen3_native", "qwen3_thinking", "yolo26"],
+        "models": ["locate_anything", "qwen3_native", "qwen3_thinking", "yolo26",
+                    "florence2", "paligemma"],
         "dataset": "coco",
     },
     "od_dota": {
@@ -35,19 +36,57 @@ TASKS = {
     "grounding": {
         "script": "benchmark_grounding.py",
         "title": "Phrase Grounding (COCO)",
-        "models": ["locate_anything", "qwen3_native", "qwen3_thinking"],
+        "models": ["locate_anything", "qwen3_native", "qwen3_thinking", "florence2"],
+        "dataset": None,
+    },
+    "captioning": {
+        "script": "benchmark_caption.py",
+        "title": "Image Captioning (COCO Captions)",
+        "models": ["florence2", "paligemma", "llama_vision", "phi_vision", "cosmos_nemotron",
+                    "qwen3_native", "qwen3_thinking", "diffusion_gemma",
+                    "diffusion_gemma_yolo", "diffusion_gemma_yolo_pose",
+                    "diffusion_gemma_yolo_obb", "diffusion_gemma_siglip2",
+                    "diffusion_gemma_moonvit",
+                    "siglip2", "moonvit", "dinov3"],
+        "dataset": None,
+    },
+    "vqa": {
+        "script": "benchmark_vqa.py",
+        "title": "Visual Question Answering (COCO)",
+        "models": ["florence2", "paligemma", "llama_vision", "phi_vision", "cosmos_nemotron",
+                    "qwen3_native", "qwen3_thinking",
+                    "diffusion_gemma", "diffusion_gemma_yolo", "diffusion_gemma_yolo_pose",
+                    "diffusion_gemma_yolo_obb", "diffusion_gemma_siglip2",
+                    "diffusion_gemma_moonvit"],
         "dataset": None,
     },
 }
 
-MODEL_VENV = {
-    "locate_anything": "/mnt/HDD1/Project_Code/vlm_det_test/locate_anything/.venv/bin/python",
-    "qwen3_native": "/mnt/HDD1/Project_Code/vlm_det_test/qwen3-vl_instruct/.venv/bin/python",
-    "qwen3_thinking": "/mnt/HDD1/Project_Code/vlm_det_test/qwen3-vl_thinking/.venv/bin/python",
-    "yolo26": "/mnt/HDD1/Project_Code/vlm_det_test/yolo11-26/.venv/bin/python",
-    "yolo26_pose": "/mnt/HDD1/Project_Code/vlm_det_test/yolo11-26/.venv/bin/python",
-    "yolo26_obb": "/mnt/HDD1/Project_Code/vlm_det_test/yolo11-26/.venv/bin/python",
-}
+COLLECTION_DIR = Path("/mnt/HDD1/Project_Code/VLMexperiments/VLMcollection")
+
+MODEL_VENV = {k: str(COLLECTION_DIR / v / ".venv" / "bin" / "python")
+    for k, v in {
+        "locate_anything": "locate_anything",
+        "qwen3_native": "qwen3-vl_instruct",
+        "qwen3_thinking": "qwen3-vl_thinking",
+        "yolo26": "yolo11-26",
+        "yolo26_pose": "yolo11-26",
+        "yolo26_obb": "yolo11-26",
+        "florence2": "florence-2",
+        "paligemma": "paligemma",
+        "llama_vision": "llama-vision",
+        "phi_vision": "phi-vision",
+        "cosmos_nemotron": "cosmos-nemotron",
+        "diffusion_gemma": "diffusion_gemma_vl",
+        "diffusion_gemma_yolo": "diffusion_gemma_vl",
+        "diffusion_gemma_yolo_pose": "diffusion_gemma_vl",
+        "diffusion_gemma_yolo_obb": "diffusion_gemma_vl",
+        "diffusion_gemma_siglip2": "diffusion_gemma_vl",
+        "diffusion_gemma_moonvit": "diffusion_gemma_vl",
+        "dinov3": "dinov3",
+        "siglip2": "siglip2",
+        "moonvit": "moonvit",
+    }.items()}
 
 
 def run_model(model, script, max_images, dataset=None):
@@ -57,7 +96,10 @@ def run_model(model, script, max_images, dataset=None):
         return None
 
     script_path = SCRIPTS_DIR / script
-    cmd = [venv_python, str(script_path), "--model", model, "--max-images", str(max_images)]
+    if "vqa" in script:
+        cmd = [venv_python, str(script_path), "--model", model, "--max-questions", str(max_images * 4)]
+    else:
+        cmd = [venv_python, str(script_path), "--model", model, "--max-images", str(max_images)]
     if dataset:
         cmd += ["--dataset", dataset]
 
@@ -77,12 +119,16 @@ def run_model(model, script, max_images, dataset=None):
 
 def extract_stats(model, script):
     prefix = model.replace("/", "_").replace(" ", "_")
-    if "obb" in script:
-        glob_pattern = f"{prefix}_obb_stats.json"
+    if "caption" in script:
+        fp = RESULTS_DIR / f"{prefix}_caption_stats.json"
+    elif "vqa" in script:
+        fp = RESULTS_DIR / f"{prefix}_vqa_stats.json"
+    elif "obb" in script:
+        fp = RESULTS_DIR / f"{prefix}_obb_stats.json"
     elif "pose" in script:
-        glob_pattern = f"{prefix}_pose_stats.json"
+        fp = RESULTS_DIR / f"{prefix}_pose_stats.json"
     elif "grounding" in script:
-        glob_pattern = f"{prefix}_grounding_stats.json"
+        fp = RESULTS_DIR / f"{prefix}_grounding_stats.json"
     else:
         for ds in ["coco", "dota"]:
             fp = RESULTS_DIR / f"{prefix}_{ds}_od_stats.json"
@@ -91,7 +137,6 @@ def extract_stats(model, script):
                     return json.load(f)
         return None
 
-    fp = RESULTS_DIR / glob_pattern
     if fp.exists():
         with open(fp) as f:
             return json.load(f)

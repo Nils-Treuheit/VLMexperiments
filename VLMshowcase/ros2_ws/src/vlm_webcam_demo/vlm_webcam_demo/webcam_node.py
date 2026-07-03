@@ -4,7 +4,7 @@ import sys
 import os
 from pathlib import Path
 
-sys.path.insert(0, str(Path("/mnt/HDD1/Project_Code/VLMshowcase")))
+sys.path.insert(0, str(Path("/mnt/HDD1/Project_Code/VLMexperiments/VLMshowcase")))
 
 import cv2
 import numpy as np
@@ -14,8 +14,8 @@ from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 from ultralytics import YOLO
 
-SHOWCASE_DIR = Path("/mnt/HDD1/Project_Code/VLMshowcase")
-YOLO_DIR = Path("/mnt/HDD1/Project_Code/vlm_det_test/yolo11-26/models")
+SHOWCASE_DIR = Path("/mnt/HDD1/Project_Code/VLMexperiments/VLMshowcase")
+YOLO_DIR = Path("/mnt/HDD1/Project_Code/VLMexperiments/VLMcollection/yolo11-26/models")
 AVAILABLE_MODELS = sorted(YOLO_DIR.glob("yolo2[16]*.pt")) + sorted(YOLO_DIR.glob("yolo11*.pt"))
 
 

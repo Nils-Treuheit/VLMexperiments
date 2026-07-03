@@ -4,11 +4,15 @@
 **/install/
 **/logs/
 **/*.egg-info/
+**/model_cache/
+**/blobs/
+**/*.pt
 
 *.png
 *.jpeg
 *.jpg
 *.mp4
+*.deb
 
 
 ### Python gitignore ###

@@ -13,11 +13,11 @@ from common import (
     RESULTS_DIR, COCO_DIR,
     MODEL_LOADERS, MODEL_ALIASES, MODEL_DISPLAY,
     parse_box_tags, parse_json_detections, extract_narrative_boxes,
-    scale_la, scale_qwen, scale_thinking,
+    scale_la, scale_qwen, scale_thinking, scale_florence2,
     build_prompt, print_comparison, save_stats,
 )
 
-GROUNDING_MODELS = {"locate_anything", "qwen3_native", "qwen3_thinking"}
+GROUNDING_MODELS = {"locate_anything", "qwen3_native", "qwen3_thinking", "florence2"}
 
 
 def benchmark_grounding(model_name, max_images=100, verbose=True):
@@ -30,6 +30,7 @@ def benchmark_grounding(model_name, max_images=100, verbose=True):
     is_la = mn == "locate_anything"
     is_q3 = mn == "qwen3_native"
     is_th = mn == "qwen3_thinking"
+    is_f2 = mn == "florence2"
 
     display = MODEL_DISPLAY.get(mn, mn)
 
@@ -43,6 +44,8 @@ def benchmark_grounding(model_name, max_images=100, verbose=True):
         worker = obj
     elif is_th:
         detector = obj
+    elif is_f2:
+        model, processor = obj
     else:
         processor, model = obj
 
@@ -103,6 +106,32 @@ def benchmark_grounding(model_name, max_images=100, verbose=True):
                 text = worker.predict(image, prompt, max_new_tokens=512,
                                       temperature=0.1, generation_mode="fast")
                 boxes = scale_la(parse_box_tags(text), ow, oh)
+            elif is_f2:
+                f2_prompt = f"<REFERRING_EXPRESSION_SEGMENTATION>\n{primary_cat_name}"
+                inputs = processor(text=f2_prompt, images=image, return_tensors="pt")
+                inputs = {k: v.to(model.device) if hasattr(v, 'to') else v for k, v in inputs.items()}
+                with torch.no_grad():
+                    out = model.generate(
+                        input_ids=inputs["input_ids"],
+                        pixel_values=inputs["pixel_values"],
+                        max_new_tokens=512, num_beams=3,
+                    )
+                text = processor.batch_decode(out, skip_special_tokens=False)[0]
+                parsed = processor.post_process_generation(
+                    text, task=f2_prompt, image_size=(ow, oh)
+                )
+                poly_boxes = parsed.get("polygons", [])
+                labels = parsed.get("labels", [])
+                boxes = []
+                for pb in poly_boxes:
+                    xs = [p[0] for p in pb]
+                    ys = [p[1] for p in pb]
+                    if xs and ys:
+                        x1 = min(xs) / 999 * ow
+                        y1 = min(ys) / 999 * oh
+                        x2 = max(xs) / 999 * ow
+                        y2 = max(ys) / 999 * oh
+                        boxes.append([x1, y1, x2, y2])
             elif is_q3:
                 msgs = [{"role": "user", "content": [
                     {"type": "image", "image": image},

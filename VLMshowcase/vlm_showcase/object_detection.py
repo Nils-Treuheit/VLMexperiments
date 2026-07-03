@@ -47,7 +47,7 @@ def ground_with_locate_anything(image_path, query):
     result = run_with_timer(
         [cfg["venv_python"], cfg["script"], image_path, query,
          "--json", "--output", out_path],
-        timeout=300, label="Loading LocateAnything",
+        timeout=1000, label="Loading LocateAnything",
     )
     try:
         return json.loads(result.stdout.strip())

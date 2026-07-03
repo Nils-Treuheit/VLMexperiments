@@ -15,7 +15,7 @@ def analyze_intent(image_path, aspect="action"):
     wrapper = cfg["script_wrapper"]
     result = run_with_timer(
         [cfg["venv_python"], wrapper, image_path, prompt, "--describe"],
-        timeout=600, label="Analyzing intent with Qwen3-Thinking",
+        timeout=1000, label="Analyzing intent with Qwen3-Thinking",
     )
     return result.stdout.strip() or result.stderr.strip()
 

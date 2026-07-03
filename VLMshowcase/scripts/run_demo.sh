@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-SHOWCASE_DIR="/mnt/HDD1/Project_Code/VLMshowcase"
+SHOWCASE_DIR="/mnt/HDD1/Project_Code/VLMexperiments/VLMshowcase"
 VENV="$SHOWCASE_DIR/.venv/bin/activate"
 TMPDIR="/tmp/vlm_demo"
 mkdir -p "$TMPDIR"
@@ -21,11 +21,19 @@ usage() {
     echo "  intent    <image>             Human intent analysis (Qwen3-Thinking)"
     echo "  track     <video>             Object tracking (YOLO)"
     echo "  compare   <image>             Side-by-side model comparison"
+    echo "  vlm       <model> <img> <p>   Run any VLM with custom prompt"
+    echo "  run       <folder>            Process folder of images (--model, --batch)"
+    echo "  obb       <image>             Oriented bounding boxes (aerial)"
+    echo "  batch     <model> <imgs..>    Load-once batch processing"
     echo "  webcam    [--model yolo26n]   Live webcam detection"
     echo "  all       <image>             Run ALL capabilities on one image"
     echo ""
-    echo "Images: bus.jpg, zidane.jpg, person.jpg, coco_*.jpg, or any path"
-    echo "Videos: vtest.avi, walking_people.mp4, car_traffic.mp4, or any path"
+    echo "Images: any COCO ID or path to image"
+    echo "Videos: vtest.avi, walking_people.mp4, car_traffic.mp4, people_crossing.mp4, ..."
+    echo ""
+    echo "New models: florence2, paligemma, cosmos_nemotron, phi_vision, llama_vision"
+    echo "  vlm-demo vlm florence2 img.jpg   'describe the scene'"
+    echo "  vlm-demo run /path/to/folder     --model florence2 --batch"
     exit 1
 }
 
@@ -54,6 +62,18 @@ case "$CMD" in
     compare)
         vlm-demo compare "$@"
         ;;
+    vlm)
+        vlm-demo vlm "$@"
+        ;;
+    run)
+        vlm-demo run "$@"
+        ;;
+    batch)
+        vlm-demo batch "$@"
+        ;;
+    obb)
+        vlm-demo obb "$@"
+        ;;
     webcam)
         vlm-demo webcam "$@"
         ;;
@@ -80,6 +100,9 @@ case "$CMD" in
         echo ""
         echo "--- MODEL COMPARISON ---"
         vlm-demo compare "$IMAGE" 2>/dev/null
+        echo ""
+        echo "--- VLM (Florence-2) ---"
+        vlm-demo vlm florence2 "$IMAGE" "Describe this scene" 2>/dev/null
         echo ""
         echo "All outputs saved to /tmp/vlm_demo/"
         ;;

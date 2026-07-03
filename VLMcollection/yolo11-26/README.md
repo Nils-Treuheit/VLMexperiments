@@ -103,3 +103,21 @@ python3 scripts/convert_dota.py --obb  # OBB format (default: horizontal bbox)
 ## Benchmark
 
 See `../Benchmark/` for multi-model comparison (YOLO11, YOLO26, Qwen3, LocateAnything).
+
+## Tested & Working (2026-07-03)
+
+All tasks verified on RTX 5090:
+- `predict.py --model models/yolo11n.pt --source <image>` — detection
+- `predict.py --model models/yolo11n-pose.pt --source <image>` — pose estimation
+- `predict.py --model models/yolo11n-obb.pt --source <image>` — oriented bounding boxes
+- Same for `yolo26n.pt` variants
+
+Programmatic usage (for benchmark/showcase integration):
+```python
+from ultralytics import YOLO
+model = YOLO("models/yolo11n.pt")
+results = model("image.jpg", verbose=False)
+boxes = results[0].boxes        # detection
+keypoints = results[0].keypoints # pose
+obb = results[0].obb            # oriented bbox
+```

@@ -6,7 +6,7 @@ import os
 from contextlib import redirect_stdout, redirect_stderr
 import io
 
-sys.path.insert(0, "/mnt/HDD1/Project_Code/vlm_det_test/qwen3-vl_thinking")
+sys.path.insert(0, "/mnt/HDD1/Project_Code/VLMexperiments/VLMcollection/qwen3-vl_thinking")
 
 _suppress = io.StringIO()
 with redirect_stdout(_suppress), redirect_stderr(_suppress):

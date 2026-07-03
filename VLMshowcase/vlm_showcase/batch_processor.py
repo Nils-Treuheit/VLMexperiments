@@ -3,9 +3,8 @@ import subprocess
 import time
 import sys
 from pathlib import Path
-from .config import MODELS, YOLO_MODEL_PATHS
+from .config import MODELS, YOLO_MODEL_PATHS, VLM_MODEL_KEYS, VISION_ENCODER_KEYS
 
-VLM_KEYS = {"locate_anything", "qwen3_instruct", "qwen3_thinking"}
 SERVER_SCRIPT = str(Path(__file__).parent.parent / "scripts" / "_model_server.py")
 
 
@@ -30,6 +29,8 @@ def _server_process(proc, image_path, prompt=None):
     proc.stdin.flush()
     line = proc.stdout.readline()
     resp = json.loads(line)
+    if "error" in resp:
+        raise RuntimeError(resp["error"])
     return resp["result"], resp["time_sec"]
 
 
@@ -110,8 +111,36 @@ def _batch_yolo_pose(model_key, images, conf=0.25):
     return round(load_time, 2), results
 
 
+def _batch_vision_encoder(model_key, images, prompts=None):
+    cfg = MODELS.get(model_key)
+    if not cfg:
+        raise KeyError(f"Unknown model: {model_key}")
+    script = cfg.get("script")
+    if not script:
+        raise FileNotFoundError(f"No script defined for {model_key}")
+    venv = Path(cfg["venv_python"])
+    t0 = time.time()
+    results = []
+    for img in images:
+        t1 = time.time()
+        p = prompts[0] if prompts else "describe"
+        result = subprocess.run(
+            [str(venv), str(Path(script)), "--image", str(img), "--task", p],
+            capture_output=True, text=True, timeout=180,
+        )
+        inf_time = time.time() - t1
+        output = result.stdout.strip()
+        results.append({"image": str(img), "result": output, "time_sec": round(inf_time, 3)})
+    load_time = time.time() - t0
+    return round(load_time, 2), results
+
+
 def batch_process(model_key, images, prompts=None, conf=0.25, mode=None):
-    is_vlm = model_key in VLM_KEYS
+    is_vlm = model_key in VLM_MODEL_KEYS
+    is_vision_encoder = model_key in VISION_ENCODER_KEYS
+
+    if is_vision_encoder:
+        return _batch_vision_encoder(model_key, images, prompts)
 
     if not is_vlm and mode == "pose":
         return _batch_yolo_pose(model_key, images, conf)
@@ -119,7 +148,7 @@ def batch_process(model_key, images, prompts=None, conf=0.25, mode=None):
     if not is_vlm:
         return _batch_yolo(model_key, images, conf)
 
-    server_mode = mode or ("detect" if model_key == "locate_anything" else "describe")
+    server_mode = mode or "describe"
     proc = None
     try:
         proc, load_time = _start_server(model_key, server_mode)
@@ -131,3 +160,8 @@ def batch_process(model_key, images, prompts=None, conf=0.25, mode=None):
         return load_time, results
     finally:
         _stop_server(proc)
+
+
+def run_vlm(model_key, image_path, prompt="", mode=None):
+    """Single-shot VLM inference via subprocess (loads model each call)."""
+    return batch_process(model_key, [image_path], [prompt], mode=mode)

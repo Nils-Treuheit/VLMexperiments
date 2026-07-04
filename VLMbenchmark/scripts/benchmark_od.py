@@ -177,6 +177,8 @@ def benchmark(model_name, dataset="coco", max_images=100, verbose=True):
                 prompt = f"<OD>"
                 inputs = processor(text=prompt, images=image, return_tensors="pt")
                 inputs = {k: v.to(model.device) if hasattr(v, 'to') else v for k, v in inputs.items()}
+                if "pixel_values" in inputs:
+                    inputs["pixel_values"] = inputs["pixel_values"].to(dtype=model.dtype)
                 with torch.no_grad():
                     out = model.generate(
                         input_ids=inputs["input_ids"],

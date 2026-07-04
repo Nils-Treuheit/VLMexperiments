@@ -61,3 +61,17 @@ The model natively supports video input with temporal reasoning. See the script 
 - https://github.com/nvidia-cosmos/cosmos-reason1
 - https://developer.nvidia.com/blog/visual-language-intelligence-and-edge-ai-2-0/
 - https://research.nvidia.com/labs/nemotron/
+
+## Tested & Working (2026-07-04)
+
+Verified on RTX 5090 (32 GB VRAM):
+- `python run.py` — single-image description with default prompt
+- VQA with custom prompts (`--prompt "What physical interactions do you see?"`)
+- Benchmark integration: `benchmark_caption.py --model cosmos_nemotron --max-images 2` — 4.3s/image avg
+- Benchmark integration: `benchmark_vqa.py --model cosmos_nemotron --max-questions 8` — works
+- VLMshowcase: `vlm-demo vlm cosmos_nemotron img.jpg "Describe this scene"` — works
+
+Notes:
+- Model loads slowly (~30-60s for first inference on RTX 5090)
+- ~16 GB VRAM at BF16
+- Loading from HuggingFace cache on first run may take time

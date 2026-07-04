@@ -84,3 +84,22 @@ structured text description to `llama-diffusion-cli`.
 | `google/siglip2-large-patch16-naflex` | NaFlex | 0.9B | dynamic |
 
 All models are Apache 2.0 licensed.
+
+## Tested & Working (2026-07-03)
+
+Verified on RTX 5090:
+- `--task describe` — zero-shot classification with structured text output
+- `--task encode+describe` — both modes
+
+Note: `--task encode` standalone requires text input (`input_ids`) and is not supported for standalone image encoding. Use `--task encode+describe` or `--task describe` instead.
+
+Programmatic usage:
+```python
+import subprocess, json, sys
+result = subprocess.run(
+    [sys.executable, "run.py", "--image", img_path, "--task", "describe"],
+    capture_output=True, text=True, timeout=60,
+)
+data = json.loads(result.stdout)
+scene_text = data.get("description_text", "")
+```

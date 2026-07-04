@@ -46,6 +46,30 @@ Note: These are **gated models** — you must accept the license on Hugging Face
 - Labels: COCO objects (80) + scene types (20) + image attributes (15)
 - Outputs structured text like: `"Objects detected: person (92.3%), chair (87.1%), ... Scene: indoor scene. Attributes: daytime, bright."`
 
+## Tested & Working (2026-07-03)
+
+Verified on RTX 5090:
+- `--task describe` — zero-shot classification (uses `sentence-transformers/all-MiniLM-L6-v2` text encoder, 384-dim matching DINOv3 vits16/vitb16)
+- `--task encode` — extract patch features + pooled embedding
+- Both `encode+describe` also works
+
+Notes:
+- Default DINOv3 model: `facebook/dinov3-vits16-pretrain-lvd1689m` (384-dim)
+- Default text model: `sentence-transformers/all-MiniLM-L6-v2` (384-dim, matches)
+- For larger DINOv3 variants, use a matching text model via `--text-model`
+- Gated models: requires `HF_TOKEN`
+
+Programmatic usage:
+```python
+import subprocess, json, sys
+result = subprocess.run(
+    [sys.executable, "run.py", "--image", img_path, "--task", "describe"],
+    capture_output=True, text=True, timeout=60,
+)
+data = json.loads(result.stdout)
+scene_text = data["description_text"]
+```
+
 ## Integration
 
 This project is designed to be called as a subprocess from `diffusion_gemma_vl/run.py`:

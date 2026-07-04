@@ -76,6 +76,24 @@ structured text description to `llama-diffusion-cli`.
 | Output heads | 4 |
 | License | MIT |
 
+## Tested & Working (2026-07-03)
+
+Verified on RTX 5090:
+- `--task describe` — zero-shot classification with structured text output
+- `--task encode` — extract patch features + global embedding (JSON, base64)
+- `--task encode+describe` — both
+
+Programmatic usage:
+```python
+import subprocess, json, sys
+result = subprocess.run(
+    [sys.executable, "run.py", "--image", img_path, "--task", "describe"],
+    capture_output=True, text=True, timeout=60,
+)
+data = json.loads(result.stdout)
+scene_text = data["description_text"]
+```
+
 ## Notes
 
 - MoonViT uses `trust_remote_code=True` (custom model architecture)

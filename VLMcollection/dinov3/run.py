@@ -75,8 +75,14 @@ def describe(vision_model, processor, text_model, text_tokenizer, image, top_k=8
         return_tensors="pt", truncation=True,
     ).to(device)
     with torch.no_grad():
-        text_outputs = text_model.text_model(**text_inputs)
-        if hasattr(text_outputs, "pooler_output"):
+        has_pooler = False
+        if hasattr(text_model, 'text_model'):
+            text_outputs = text_model.text_model(**text_inputs)
+            has_pooler = hasattr(text_outputs, "pooler_output") and text_outputs.pooler_output is not None
+        else:
+            text_outputs = text_model(**text_inputs)
+            has_pooler = hasattr(text_outputs, "pooler_output") and text_outputs.pooler_output is not None
+        if has_pooler:
             text_embs = text_outputs.pooler_output
         else:
             text_embs = text_outputs.last_hidden_state.mean(dim=1)
@@ -124,8 +130,8 @@ def main():
         help="DINOv3 model variant (default: facebook/dinov3-vits16-pretrain-lvd1689m)",
     )
     parser.add_argument(
-        "--text-model", type=str, default="google/siglip2-so400m-patch14-384",
-        help="SigLIP2 model for text encoding (default: google/siglip2-so400m-patch14-384)",
+        "--text-model", type=str, default="sentence-transformers/all-MiniLM-L6-v2",
+        help="Text model for encoding labels (default: sentence-transformers/all-MiniLM-L6-v2, 384-dim, matches DINOv3 small/medium)",
     )
 
     args = parser.parse_args()
@@ -150,14 +156,10 @@ def main():
     result = {"model": args.model, "image": str(img_path)}
 
     if args.task in ("describe", "encode+describe"):
-        print(f"Loading SigLIP2 text encoder ({args.text_model})...", file=sys.stderr)
-        if args.text_model == "google/siglip2-so400m-patch14-384":
-            attn_impl = None
-        else:
-            attn_impl = "sdpa"
+        print(f"Loading text encoder ({args.text_model})...", file=sys.stderr)
         text_model = AutoModel.from_pretrained(
             args.text_model, torch_dtype=dtype,
-            attn_implementation=attn_impl,
+            trust_remote_code=True,
         ).eval().to(device)
         text_tokenizer = AutoTokenizer.from_pretrained(args.text_model)
 

@@ -44,6 +44,34 @@ ollama pull llama3.2-vision:11b
 ollama run llama3.2-vision:11b
 ```
 
+## Tested & Working (2026-07-03)
+
+Verified on RTX 5090 with `unsloth/Llama-3.2-11B-Vision-Instruct-bnb-4bit` (quantized, ~7GB VRAM):
+- `python run.py --image <path> --task describe` — scene description
+
+Notes:
+- Uses `unsloth/Llama-3.2-11B-Vision-Instruct-bnb-4bit` by default (4-bit quantized, fast loading)
+- Falls back to `meta-llama/Llama-3.2-11B-Vision-Instruct` if `--model` is specified
+
+Programmatic usage (for benchmark/showcase integration):
+```python
+from transformers import AutoProcessor, AutoModelForMultimodalLM
+from PIL import Image
+
+processor = AutoProcessor.from_pretrained("unsloth/Llama-3.2-11B-Vision-Instruct-bnb-4bit")
+model = AutoModelForMultimodalLM.from_pretrained(
+    "unsloth/Llama-3.2-11B-Vision-Instruct-bnb-4bit",
+    device_map="auto", torch_dtype=torch.bfloat16,
+).eval()
+
+img = Image.open("image.jpg").convert("RGB")
+messages = [{"role": "user", "content": [{"type": "image"}, {"type": "text", "text": "Describe this image."}]}]
+prompt = processor.apply_chat_template(messages, add_generation_prompt=True)
+inputs = processor(text=prompt, images=img, return_tensors="pt").to(model.device)
+output = model.generate(**inputs, max_new_tokens=256)
+caption = processor.decode(output[0][inputs["input_ids"].shape[-1]:], skip_special_tokens=True)
+```
+
 ## References
 
 - https://huggingface.co/meta-llama/Llama-3.2-11B-Vision-Instruct

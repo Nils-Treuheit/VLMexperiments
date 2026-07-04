@@ -349,10 +349,10 @@ def load_yolo26(model_name="yolo26n"):
 
 def load_florence2():
     sys.path.insert(0, str(PROJECT_DIR / "florence-2"))
-    from transformers import AutoProcessor, Florence2ForConditionalGeneration
+    from transformers import AutoModelForCausalLM, AutoProcessor
     dev = "cuda" if torch.cuda.is_available() else "cpu"
     dtype = torch.float16 if torch.cuda.is_available() else torch.float32
-    model = Florence2ForConditionalGeneration.from_pretrained(
+    model = AutoModelForCausalLM.from_pretrained(
         "microsoft/Florence-2-large-ft", torch_dtype=dtype, trust_remote_code=True
     ).to(dev)
     processor = AutoProcessor.from_pretrained("microsoft/Florence-2-large-ft", trust_remote_code=True)
@@ -369,19 +369,21 @@ def load_paligemma():
 
 
 def load_llama_vision():
-    from transformers import MllamaForConditionalGeneration, AutoProcessor
-    model = MllamaForConditionalGeneration.from_pretrained(
-        "meta-llama/Llama-3.2-11B-Vision-Instruct", torch_dtype=torch.bfloat16, device_map="auto",
+    from transformers import AutoModelForMultimodalLM, AutoProcessor
+    model = AutoModelForMultimodalLM.from_pretrained(
+        "unsloth/Llama-3.2-11B-Vision-Instruct-bnb-4bit", device_map="auto", torch_dtype=torch.bfloat16,
     )
-    processor = AutoProcessor.from_pretrained("meta-llama/Llama-3.2-11B-Vision-Instruct")
+    processor = AutoProcessor.from_pretrained("unsloth/Llama-3.2-11B-Vision-Instruct-bnb-4bit")
     return (model, processor), {}
 
 
 def load_phi_vision():
-    from transformers import AutoModelForCausalLM, AutoProcessor
+    from transformers import AutoConfig, AutoModelForCausalLM, AutoProcessor
+    config = AutoConfig.from_pretrained("microsoft/Phi-3.5-vision-instruct", trust_remote_code=True)
+    config._attn_implementation = "eager"
     model = AutoModelForCausalLM.from_pretrained(
-        "microsoft/Phi-3.5-vision-instruct", trust_remote_code=True,
-        torch_dtype="auto", device_map="auto",
+        "microsoft/Phi-3.5-vision-instruct", config=config, trust_remote_code=True,
+        dtype="auto", device_map="auto",
     )
     processor = AutoProcessor.from_pretrained("microsoft/Phi-3.5-vision-instruct", trust_remote_code=True)
     return (model, processor), {}

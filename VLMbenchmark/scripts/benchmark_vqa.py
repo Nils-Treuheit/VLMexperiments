@@ -143,6 +143,8 @@ def benchmark_vqa(model_name, max_questions=200, verbose=True):
                     prompt = f"<VQA>\n{question}"
                     inputs = processor(text=prompt, images=image, return_tensors="pt")
                     inputs = {k: v.to(model.device) if hasattr(v, 'to') else v for k, v in inputs.items()}
+                    if "pixel_values" in inputs:
+                        inputs["pixel_values"] = inputs["pixel_values"].to(dtype=model.dtype)
                     with torch.no_grad():
                         out = model.generate(
                             input_ids=inputs["input_ids"],
@@ -164,7 +166,7 @@ def benchmark_vqa(model_name, max_questions=200, verbose=True):
                         {"type": "text", "text": f"Answer the following question with one word: {question}"}
                     ]}]
                     prompt = processor.apply_chat_template(messages, add_generation_prompt=True, tokenize=False)
-                    inputs = processor(prompt, image, return_tensors="pt").to(model.device)
+                    inputs = processor(text=prompt, images=image, return_tensors="pt").to(model.device)
                     with torch.no_grad():
                         out = model.generate(**inputs, temperature=0.1, max_new_tokens=20)
                     answer = processor.decode(out[0], skip_special_tokens=True)
@@ -174,10 +176,8 @@ def benchmark_vqa(model_name, max_questions=200, verbose=True):
                     prompt = f"<|user|>\n<|image_1|>\nAnswer briefly: {question}<|end|>\n<|assistant|>\n"
                     inputs = processor(prompt, image, return_tensors="pt").to(model.device)
                     with torch.no_grad():
-                        out = model.generate(**inputs, max_new_tokens=32, temperature=0.1)
-                    answer = processor.batch_decode(out, skip_special_tokens=True)[0]
-                    if "<|assistant|>" in answer:
-                        answer = answer.split("<|assistant|>")[-1].strip()
+                        out = model.generate(**inputs, max_new_tokens=32, temperature=0.1, use_cache=False)
+                    answer = processor.tokenizer.decode(out[0][inputs["input_ids"].shape[1]:], skip_special_tokens=True)
                 elif is_q3:
                     messages = [{"role": "user", "content": [
                         {"type": "image", "image": image},

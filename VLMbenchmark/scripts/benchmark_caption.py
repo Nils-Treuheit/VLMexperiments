@@ -55,7 +55,7 @@ def benchmark_caption(model_name, max_images=100, verbose=True):
         detector = obj
     elif is_q3:
         processor, model = obj
-    elif is_dg or is_s2 or is_mv:
+    elif is_dg or is_s2 or is_mv or is_dv:
         pass  # subprocess-based; model/processor unused
     else:
         model, processor = obj
@@ -98,6 +98,8 @@ def benchmark_caption(model_name, max_images=100, verbose=True):
                 prompt = "<DETAILED_CAPTION>"
                 inputs = processor(text=prompt, images=image, return_tensors="pt")
                 inputs = {k: v.to(model.device) if hasattr(v, 'to') else v for k, v in inputs.items()}
+                if "pixel_values" in inputs:
+                    inputs["pixel_values"] = inputs["pixel_values"].to(dtype=model.dtype)
                 with torch.no_grad():
                     out = model.generate(
                         input_ids=inputs["input_ids"],
@@ -121,7 +123,7 @@ def benchmark_caption(model_name, max_images=100, verbose=True):
                     {"type": "text", "text": "Describe this image in detail."}
                 ]}]
                 prompt = processor.apply_chat_template(messages, add_generation_prompt=True, tokenize=False)
-                inputs = processor(prompt, image, return_tensors="pt").to(model.device)
+                inputs = processor(text=prompt, images=image, return_tensors="pt").to(model.device)
                 with torch.no_grad():
                     out = model.generate(**inputs, temperature=0.7, top_p=0.9, max_new_tokens=256)
                 caption = processor.decode(out[0], skip_special_tokens=True)
@@ -131,10 +133,8 @@ def benchmark_caption(model_name, max_images=100, verbose=True):
                 prompt = "<|user|>\n<|image_1|>\nDescribe this image in detail.<|end|>\n<|assistant|>\n"
                 inputs = processor(prompt, image, return_tensors="pt").to(model.device)
                 with torch.no_grad():
-                    out = model.generate(**inputs, max_new_tokens=200)
-                caption = processor.batch_decode(out, skip_special_tokens=True)[0]
-                if "<|assistant|>" in caption:
-                    caption = caption.split("<|assistant|>")[-1].strip()
+                    out = model.generate(**inputs, max_new_tokens=200, use_cache=False)
+                caption = processor.tokenizer.decode(out[0][inputs["input_ids"].shape[1]:], skip_special_tokens=True)
             elif is_q3:
                 messages = [{"role": "user", "content": [
                     {"type": "image", "image": image},

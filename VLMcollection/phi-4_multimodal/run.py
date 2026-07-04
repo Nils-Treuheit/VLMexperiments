@@ -53,19 +53,11 @@ def main():
     )
     processor = AutoProcessor.from_pretrained(model_id, trust_remote_code=True)
 
-    messages = [
-        {"role": "user", "content": [
-            {"type": "image", "image": image},
-            {"type": "text", "text": args.prompt},
-        ]},
-    ]
-    inputs = processor.apply_chat_template(
-        messages, tokenize=True, add_generation_prompt=True,
-        return_dict=True, return_tensors="pt",
-    ).to(model.device)
+    prompt = f"<|user|><|image_1|>{args.prompt}<|end|><|assistant|>"
+    inputs = processor(text=prompt, images=image, return_tensors="pt").to(model.device)
 
     with torch.no_grad():
-        output = model.generate(**inputs, max_new_tokens=args.max_tokens, temperature=0.7)
+        output = model.generate(**inputs, max_new_tokens=args.max_tokens, temperature=0.7, num_logits_to_keep=0)
 
     response = processor.decode(output[0][inputs["input_ids"].shape[1]:], skip_special_tokens=True)
     print(response)

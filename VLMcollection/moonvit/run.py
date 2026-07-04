@@ -127,7 +127,7 @@ def encode(vision_model, image, device="cuda"):
 
 def _tensor_to_b64(t):
     buf = io.BytesIO()
-    np.save(buf, t.cpu().numpy())
+    np.save(buf, t.detach().cpu().numpy())
     return base64.b64encode(buf.getvalue()).decode()
 
 

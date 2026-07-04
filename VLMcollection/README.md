@@ -1,35 +1,67 @@
-# Edge-Device Compatible Vision-Language Models (VLMs)
+# VLMcollection — Vision-Language Models
 
-Ready-to-run implementations of lightweight VLMs for edge deployment (NVIDIA Jetson, Orin NX/AGX, etc.)
+Ready-to-run implementations of 14 vision-language models for edge deployment (NVIDIA Jetson, Orin NX/AGX, etc.) and server inference.
 
 ## Models
 
-| Model | Params | Folder | Description |
-|-------|--------|--------|-------------|
-| **Microsoft Florence-2** | 0.23B–0.77B | `florence-2/` | Captioning, OD, grounding, OCR — extremely fast |
-| **Google PaliGemma 2** | 3B | `paligemma/` | SigLIP + Gemma-2B decoder, versatile VLM |
-| **Llama 3.2 Vision** | 11B | `llama-vision/` | Strong reasoning, needs 16GB+ VRAM (quantized) |
-| **Phi-3.5 Vision** | 4.2B | `phi-vision/` | 128K context, excellent image understanding |
-| **NVIDIA Cosmos Reason1** | 7B | `cosmos-nemotron/` | Physical AI reasoning, robotics & AV |
+| Model | Params | Folder | Type | Capabilities |
+|-------|--------|--------|------|-------------|
+| **YOLO11/26** (Ultralytics) | 2.7M–68M | `yolo11-26/` | CNN detector | Detection, pose, OBB, tracking |
+| **Florence-2** (Microsoft) | 0.23B–0.77B | `florence-2/` | Task-prompt VLM | Captioning, OD, grounding, OCR |
+| **PaliGemma 2** (Google) | 3B | `paligemma/` | Encoder-decoder VLM | Caption, detection, VQA, segmentation |
+| **LocateAnything-3B** (NVIDIA) | 3B | `locate_anything/` | Grounding VLM | Visual grounding, detection |
+| **Phi-3.5 Vision** (Microsoft) | 4.2B | `phi-vision/` | Decoder VLM | Caption, VQA, document/chart QA |
+| **Cosmos Reason1** (NVIDIA) | 7B | `cosmos-nemotron/` | Reasoning VLM | Physical AI reasoning, VQA |
+| **Qwen3-VL-8B Instruct** (Alibaba) | 8.8B | `qwen3-vl_instruct/` | General VLM | Description, detection, VQA, OCR |
+| **Qwen3-VL-8B Thinking** (Unsloth 4-bit) | ~9B | `qwen3-vl_thinking/` | Reasoning VLM | CoT reasoning, intent, detection |
+| **Llama 3.2 Vision** (Meta, 4-bit) | 11B | `llama-vision/` | Multimodal LM | Description, reasoning, VQA |
+| **Phi-4 Multimodal** (Microsoft) | ~14B | `phi-4_multimodal/` | Multimodal VLM | Image + audio + text, video, webcam |
+| **DiffusionGemma-26B** (Google) | 26B | `diffusion_gemma_vl/` | Diffusion + YOLO | Caption, VQA (text-only diffusion) |
+| **DINOv3** (Meta) | 22M–7B | `dinov3/` | Vision encoder | Zero-shot structured description |
+| **SigLIP2** (Google) | 0.4B | `siglip2/` | Vision encoder | Zero-shot structured description |
+| **MoonViT** (Moonshot AI) | 0.4B | `moonvit/` | Vision encoder | Zero-shot structured description |
 
 ## Quick Start
 
-Each project has its own venv and run script:
+Each model has its own venv and entry script:
 
 ```bash
 cd <model-folder>
-uv venv --system-site-packages .venv
 source .venv/bin/activate
-uv pip install -U torch transformers pillow requests accelerate bitsandbytes
-python run.py
+python run.py  # or inference.py / predict.py for task-specific scripts
 ```
 
-## Quantization for Edge
+See each model's README for detailed usage instructions.
 
-All models support 4/8-bit quantization via `bitsandbytes`:
+## Tested Platform
 
-```python
-model = AutoModel.from_pretrained(..., load_in_4bit=True, device_map="auto")
+- **GPU:** RTX 5090 (32 GB VRAM, ~16 GB free)
+- **CUDA:** 13.2
+- **Python:** 3.10.12 / 3.13
+- **Package manager:** uv 0.11.17
+- **Model cache:** `/mnt/HDD1/unsloth_and_hugging_face_models/huggingface/`
+
+## Model Cache
+
+All HuggingFace models are cached at:
+```
+/mnt/HDD1/unsloth_and_hugging_face_models/huggingface/
 ```
 
-For TensorRT-LLM or AWQ quantization, see each project's README for specific instructions.
+Set `HF_HOME` to this path before running any model:
+```bash
+export HF_HOME=/mnt/HDD1/unsloth_and_hugging_face_models/huggingface
+```
+
+## Quick Reference
+
+| Task | Best Model | Reason |
+|------|-----------|--------|
+| Object detection | YOLO26n | Fastest, most accurate for 80-class COCO |
+| Visual grounding | LocateAnything-3B | Specialized for free-form text queries |
+| Image captioning | Florence-2 | Fast (<1s), good quality |
+| Physical reasoning | Cosmos-Reason1-7B | Trained for physics/robotics |
+| Chain-of-thought | Qwen3-Thinking | Built-in reasoning tokens |
+| Document/chart QA | Phi-3.5 Vision | 128K context, strong at documents |
+| Multimodal (image+audio) | Phi-4 Multimodal | Native audio understanding |
+| Zero-shot description | SigLIP2 / MoonViT / DINOv3 | Vision encoders, no LLM needed |

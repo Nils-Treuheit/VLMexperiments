@@ -48,17 +48,19 @@ vlm-demo compare image.jpg
 | **SigLIP2** (Google) | 0.4B | Vision encoder (zero-shot) | <1 GB | <8s | ✅ Ready |
 | **MoonViT** (Moonshot AI) | 0.4B | Vision encoder (native res) | <1 GB | <8s | ✅ Ready |
 
-All models pre-installed at `/mnt/HDD1/Project_Code/to_be_merged/VLMexperiments/VLMcollection/`. Heavy VLMs called via subprocess
+All models pre-installed at `/mnt/HDD1/Project_Code/VLMexperiments/VLMcollection/`. Heavy VLMs called via subprocess
 through their own venvs; YOLO loaded directly via `ultralytics`.
 
 ## Model Status Notes
 
-- **Florence-2**: Transformers 5.x compatibility issue with remote code. Use the original
-  `run.py` in `vlm_det_test/florence-2/` directly for now.
-- **PaliGemma2 & Llama-Vision**: Gated models — run `huggingface-cli login` and accept
-  the license on HuggingFace to enable.
-- **Phi-3.5-Vision**: Remote code needs patching for transformers 5.x DynamicCache API.
-  A fix is in `/mnt/HDD1/Project_Code/VLMshowcase/scripts/_phi_wrapper.py`
+- **Florence-2**: Uses `AutoModelForCausalLM` with `trust_remote_code=True` (compatible with transformers 5.x).
+  All benchmark scripts updated for dtype cast. See `VLMcollection/florence-2/` for standalone usage.
+- **PaliGemma2**: Gated model — run `huggingface-cli login` with a token that has accepted the license.
+  Works once authenticated (`HF_TOKEN` env var).
+- **Llama-3.2-Vision**: Uses 4-bit quantized version (`unsloth/Llama-3.2-11B-Vision-Instruct-bnb-4bit`)
+  instead of gated meta-llama original. No login required.
+- **Phi-3.5-Vision**: Patched for transformers 5.x — uses `_attn_implementation="eager"` via config
+  and `use_cache=False` in `generate()`. Works correctly.
 
 ---
 

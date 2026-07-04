@@ -123,3 +123,18 @@ Convert to pixel coordinates: `x / 1000 * image_width`
 | `server.py` | FastAPI server (keeps model alive) |
 | `live_feed.py` | Folder watcher / named pipe consumer |
 | `requirements.txt` | Python dependencies |
+
+## Tested & Working (2026-07-04)
+
+Verified on RTX 5090 (32 GB VRAM):
+- `QwenVLDetector().describe(img.jpg)` — chain-of-thought description with visual reasoning
+- `QwenVLDetector().detect(img.jpg)` — object detection with JSON `bbox_2d` output
+- Benchmark integration: `benchmark_caption.py --model qwen3_thinking --max-images 2` — 29.4s/image avg
+- Benchmark integration: `benchmark_vqa.py --model qwen3_thinking --max-questions 8` — works
+- Benchmark integration: `benchmark_od.py --model qwen3_thinking --max-images 100` — works
+- VLMshowcase: `vlm-demo intent img.jpg --all` — human intent/action/emotion analysis
+
+Notes:
+- 4-bit BnB quantized model (~6 GB VRAM), loads in ~45s
+- Longer inference time due to chain-of-thought reasoning tokens
+- `python` in `.venv/bin/` correctly resolves to Python 3.13

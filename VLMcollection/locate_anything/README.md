@@ -90,3 +90,19 @@ locate-anything ~/photo.jpg "cat"
 - Model licensed under **NVIDIA AI Foundation Models Community License** — non-commercial / research use only.
 - The model supports images up to ~2.5K resolution and text prompts up to ~24K tokens.
 - Output format: `<box>x1,y1,x2,y2</box>` for bounding boxes, `<box>x,y</box>` for points (coordinates normalized 0–1).
+
+## Tested & Working (2026-07-04)
+
+Verified on RTX 5090 (32 GB VRAM):
+- `python infer.py img.jpg "person"` — basic detection
+- `python infer.py img.jpg "person" --json` — JSON output for scripting
+- `python infer.py img.jpg "person</c>car</c>dog"` — multi-class detection
+- `python infer.py img.jpg "person" -o output.jpg` — annotated image output
+- Benchmark integration: `benchmark_od.py --model locate_anything --max-images 100` — 4.7 FPS, mAP@50:95 0.170
+- Benchmark integration: `benchmark_grounding.py --model locate_anything --max-images 100` — works
+- VLMshowcase: `vlm-demo detect img.jpg --grounding person car` — works
+
+Notes:
+- Model must be downloaded first via `huggingface-cli download nvidia/LocateAnything-3B --local-dir model`
+- ~8 GB VRAM at inference
+- Three generation modes: `--mode fast` (faster, less accurate), `--mode hybrid` (balanced), `--mode slow` (most accurate)

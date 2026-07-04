@@ -42,88 +42,88 @@ Multi-task benchmark for visual models on COCO and DOTA-v1.0.
 
 Each model must be run with **its own virtual environment**.
 
-All models are located under `/mnt/HDD1/Project_Code/to_be_merged/VLMexperiments/VLMcollection/`.
+All models are located under `../VLMcollection/` (relative to `VLMbenchmark/`) or at the absolute path `/mnt/HDD1/Project_Code/VLMexperiments/VLMcollection/`.
 
 ### Object Detection (COCO)
 ```bash
 # LocateAnything-3B
-/mnt/HDD1/Project_Code/to_be_merged/VLMexperiments/VLMcollection/locate_anything/.venv/bin/python \
+../VLMcollection/locate_anything/.venv/bin/python \
     scripts/benchmark_od.py --model locate_anything --max-images 100
 
 # Florence-2 (native <OD> task, multi-label)
-/mnt/HDD1/Project_Code/to_be_merged/VLMexperiments/VLMcollection/florence-2/.venv/bin/python \
+../VLMcollection/florence-2/.venv/bin/python \
     scripts/benchmark_od.py --model florence2 --max-images 100
 
-# YOLO11n
-/mnt/HDD1/Project_Code/to_be_merged/VLMexperiments/VLMcollection/yolo11-26/.venv/bin/python \
+# YOLO26n
+../VLMcollection/yolo11-26/.venv/bin/python \
     scripts/benchmark_od.py --model yolo26 --max-images 100
 ```
 
 ### Phrase Grounding
 ```bash
 # Florence-2 (referring expression segmentation)
-/mnt/HDD1/Project_Code/to_be_merged/VLMexperiments/VLMcollection/florence-2/.venv/bin/python \
+../VLMcollection/florence-2/.venv/bin/python \
     scripts/benchmark_grounding.py --model florence2 --max-images 100
 
 # LocateAnything
-/mnt/HDD1/Project_Code/to_be_merged/VLMexperiments/VLMcollection/locate_anything/.venv/bin/python \
+../VLMcollection/locate_anything/.venv/bin/python \
     scripts/benchmark_grounding.py --model locate_anything --max-images 100
 ```
 
 ### Image Captioning
 ```bash
 # Florence-2
-/mnt/HDD1/Project_Code/to_be_merged/VLMexperiments/VLMcollection/florence-2/.venv/bin/python \
+../VLMcollection/florence-2/.venv/bin/python \
     scripts/benchmark_caption.py --model florence2 --max-images 100
 
 # Qwen3-VL-Instruct
-/mnt/HDD1/Project_Code/to_be_merged/VLMexperiments/VLMcollection/qwen3-vl_instruct/.venv/bin/python \
+../VLMcollection/qwen3-vl_instruct/.venv/bin/python \
     scripts/benchmark_caption.py --model qwen3_native --max-images 100
 
 # Llama-3.2-Vision
-/mnt/HDD1/Project_Code/to_be_merged/VLMexperiments/VLMcollection/llama-vision/.venv/bin/python \
+../VLMcollection/llama-vision/.venv/bin/python \
     scripts/benchmark_caption.py --model llama_vision --max-images 100
 
 # DiffusionGemma (YOLO feeder + text diffusion)
-/mnt/HDD1/Project_Code/to_be_merged/VLMexperiments/VLMcollection/diffusion_gemma_vl/.venv/bin/python \
+../VLMcollection/diffusion_gemma_vl/.venv/bin/python \
     scripts/benchmark_caption.py --model diffusion_gemma --max-images 100
 
 # SigLIP2 (zero-shot structured description)
-/mnt/HDD1/Project_Code/to_be_merged/VLMexperiments/VLMcollection/siglip2/.venv/bin/python \
+../VLMcollection/siglip2/.venv/bin/python \
     scripts/benchmark_caption.py --model siglip2 --max-images 100
 
 # MoonViT (zero-shot structured description)
-/mnt/HDD1/Project_Code/to_be_merged/VLMexperiments/VLMcollection/moonvit/.venv/bin/python \
+../VLMcollection/moonvit/.venv/bin/python \
     scripts/benchmark_caption.py --model moonvit --max-images 100
 
-# DINOv3 (zero-shot structured description, requires HF login + license)
-/mnt/HDD1/Project_Code/to_be_merged/VLMexperiments/VLMcollection/dinov3/.venv/bin/python \
+# DINOv3 (zero-shot structured description)
+../VLMcollection/dinov3/.venv/bin/python \
     scripts/benchmark_caption.py --model dinov3 --max-images 100
 ```
 
 ### Visual Question Answering
 ```bash
 # PaliGemma2
-/mnt/HDD1/Project_Code/to_be_merged/VLMexperiments/VLMcollection/paligemma/.venv/bin/python \
+../VLMcollection/paligemma/.venv/bin/python \
     scripts/benchmark_vqa.py --model paligemma --max-questions 200
 
 # Phi-3.5-Vision
-/mnt/HDD1/Project_Code/to_be_merged/VLMexperiments/VLMcollection/phi-vision/.venv/bin/python \
+../VLMcollection/phi-vision/.venv/bin/python \
     scripts/benchmark_vqa.py --model phi_vision --max-questions 200
 
 # DiffusionGemma
-/mnt/HDD1/Project_Code/to_be_merged/VLMexperiments/VLMcollection/diffusion_gemma_vl/.venv/bin/python \
+../VLMcollection/diffusion_gemma_vl/.venv/bin/python \
     scripts/benchmark_vqa.py --model diffusion_gemma --max-questions 200
 ```
 
 ### Run Everything
 ```bash
-# Uses yolo venv (has pycocotools); spawns subprocesses with each model's venv
-/mnt/HDD1/Project_Code/to_be_merged/VLMexperiments/VLMcollection/yolo11-26/.venv/bin/python \
+# Uses any model's venv (has pycocotools); spawns subprocesses with each model's venv
+../VLMcollection/yolo11-26/.venv/bin/python \
     scripts/benchmark_all.py --max-images 25
 
 # Run only specific tasks
-/mnt/HDD1/Project_Code/to_be_merged/VLMexperiments/VLMcollection/yolo11-26/.venv/bin/python \
+../VLMcollection/yolo11-26/.venv/bin/python \
     scripts/benchmark_all.py --tasks captioning vqa --max-images 50
 ```
 

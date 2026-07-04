@@ -106,3 +106,22 @@ python ../Benchmark/scripts/benchmark_all.py --tasks captioning vqa --max-images
 - Vision quality limited by encoder accuracy
 - Persistent engine multi-image stability in progress
 - CUDA acceleration requires system CUDA toolkit install
+
+## Tested & Working (2026-07-04)
+
+Verified on RTX 5090 (32 GB VRAM, CPU-only for diffusion):
+- `python run.py --image img.jpg --task caption` — YOLO + DiffusionGemma captioning (~80s/image)
+- `python run.py --image img.jpg --task caption --encoder siglip2` — SigLIP2 encoder variant
+- `python run.py --image img.jpg --task caption --encoder moonvit` — MoonViT encoder variant
+- `python run.py --image img.jpg --task caption --yolo-tasks aabb,pose,obb` — multi-task YOLO input
+- `python run.py --image img.jpg --task detect` — YOLO-only detection (fast, no LLM)
+- `python run.py --image img.jpg --task pose` — YOLO-only pose estimation
+- `python run.py --image img.jpg --task obb` — YOLO-only oriented bounding boxes
+- `python run.py --image img.jpg --task vqa --prompt "Is the person sitting?"` — visual QA
+- `python run.py --task chat --prompt "What is 2+2?"` — pure text chat
+- Benchmark integration: all 6 DiffusionGemma variants work in `benchmark_caption.py` and `benchmark_vqa.py`
+
+Notes:
+- Requires `llama-diffusion-cli` binary built from `ggml-org/llama.cpp` PR #24423
+- DiffusionGemma 26B Q8_0 GGUF (~26 GiB) at default `GGUF_PATH`
+- First inference loads the GGUF file (~60s cold start); use `--persist` to keep it loaded

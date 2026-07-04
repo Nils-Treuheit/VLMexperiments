@@ -55,3 +55,20 @@ RTX 5090 (32 GB VRAM). At BF16, the model uses ~16 GB leaving room for KV cache 
 ## License
 
 See `model_vl/README.md` (Qwen3-VL-8B-Instruct) and `model/README.md` (Qwen3.6-35B-A3B).
+
+## Tested & Working (2026-07-04)
+
+Verified on RTX 5090 (32 GB VRAM):
+- `python infer_qwen3.py img.jpg` — image description
+- `python infer_qwen3.py img.jpg "What color is the car?" --no-thinking` — VQA without thinking tokens
+- `python infer_qwen3.py img.jpg "Find all people" --json` — detection with `<box>` output
+- Benchmark integration: `benchmark_caption.py --model qwen3_native --max-images 2` — 5.4s/image avg
+- Benchmark integration: `benchmark_vqa.py --model qwen3_native --max-questions 8` — works
+- Benchmark integration: `benchmark_od.py --model qwen3_native --max-images 100` — mAP@50:95 0.078
+- Benchmark integration: `benchmark_grounding.py --model qwen3_native --max-images 100` — works
+- VLMshowcase: `vlm-demo scene img.jpg` — scene analysis with YOLO
+
+Notes:
+- Model is ~16 GB at BF16, loads in ~2 min on first run
+- Python 3.10 venv (venv was created with Python 3.10, `python` symlink points to system python3)
+- Set `HF_HOME` to the shared HuggingFace cache before running

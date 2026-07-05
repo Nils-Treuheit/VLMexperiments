@@ -21,7 +21,7 @@ CAPTION_MODELS = {"florence2", "paligemma", "llama_vision", "phi_vision", "cosmo
                   "qwen3_native", "qwen3_thinking",
                   "diffusion_gemma", "diffusion_gemma_yolo", "diffusion_gemma_yolo_pose",
                   "diffusion_gemma_yolo_obb", "diffusion_gemma_siglip2", "diffusion_gemma_moonvit",
-                  "siglip2", "moonvit", "dinov3"}
+                  "siglip2", "moonvit", "dinov3", "dinotool"}
 
 
 def benchmark_caption(model_name, max_images=100, verbose=True):
@@ -42,6 +42,7 @@ def benchmark_caption(model_name, max_images=100, verbose=True):
     is_s2 = mn == "siglip2"
     is_mv = mn == "moonvit"
     is_dv = mn == "dinov3"
+    is_dt = mn == "dinotool"
 
     display = MODEL_DISPLAY.get(mn, mn)
 
@@ -55,7 +56,7 @@ def benchmark_caption(model_name, max_images=100, verbose=True):
         detector = obj
     elif is_q3:
         processor, model = obj
-    elif is_dg or is_s2 or is_mv or is_dv:
+    elif is_dg or is_s2 or is_mv or is_dv or is_dt:
         pass  # subprocess-based; model/processor unused
     else:
         model, processor = obj
@@ -214,6 +215,19 @@ def benchmark_caption(model_name, max_images=100, verbose=True):
                 result = subprocess.run(
                     [sys.executable, str(run_py), "--image", str(img_path),
                      "--task", "describe"],
+                    capture_output=True, text=True, timeout=120,
+                )
+                try:
+                    data = json.loads(result.stdout)
+                    caption = data.get("description_text", result.stdout)
+                except json.JSONDecodeError:
+                    caption = result.stdout
+            elif is_dt:
+                run_py = PROJECT_DIR / "DINOtool" / "run.py"
+                venv_py = str(PROJECT_DIR / "DINOtool" / ".venv" / "bin" / "python")
+                result = subprocess.run(
+                    [venv_py, str(run_py), "--image", str(img_path),
+                     "--task", "describe", "--model", "dinov2-s"],
                     capture_output=True, text=True, timeout=120,
                 )
                 try:

@@ -47,7 +47,7 @@ TASKS = {
                     "diffusion_gemma_yolo", "diffusion_gemma_yolo_pose",
                     "diffusion_gemma_yolo_obb", "diffusion_gemma_siglip2",
                     "diffusion_gemma_moonvit",
-                    "siglip2", "moonvit", "dinov3"],
+                    "siglip2", "moonvit", "dinov3", "dinotool"],
         "dataset": None,
     },
     "vqa": {
@@ -86,6 +86,7 @@ MODEL_VENV = {k: str(COLLECTION_DIR / v / ".venv" / "bin" / "python")
         "dinov3": "dinov3",
         "siglip2": "siglip2",
         "moonvit": "moonvit",
+        "dinotool": "DINOtool",
     }.items()}
 
 

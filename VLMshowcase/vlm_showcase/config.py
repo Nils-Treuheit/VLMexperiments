@@ -104,6 +104,13 @@ MODELS = {
         "display": "MoonViT (Vision Encoder)",
         "capabilities": ["description", "encode"],
     },
+    "dinotool": {
+        "path": PROJECT_DIR / "DINOtool",
+        "venv_python": str(PROJECT_DIR / "DINOtool" / ".venv" / "bin" / "python"),
+        "script": str(PROJECT_DIR / "DINOtool" / "run.py"),
+        "display": "DINOtool (Multi-ViT Encoder)",
+        "capabilities": ["description", "encode", "features"],
+    },
 }
 
 YOLO_MODEL_PATHS = {
@@ -146,4 +153,4 @@ VLM_MODEL_KEYS = {
     "diffusion_gemma_vl", "phi4_multimodal",
 }
 
-VISION_ENCODER_KEYS = {"dinov3", "siglip2", "moonvit"}
+VISION_ENCODER_KEYS = {"dinov3", "siglip2", "moonvit", "dinotool"}

@@ -440,6 +440,11 @@ def load_dinov3():
     return ("dinov3",), {}
 
 
+def load_dinotool():
+    # DINOtool inference is via subprocess to DINOtool/run.py.
+    return ("dinotool",), {}
+
+
 MODEL_LOADERS = {
     "locate_anything": load_la,
     "qwen3_native": load_qwen3,
@@ -485,6 +490,7 @@ MODEL_LOADERS = {
     "dinov3": load_dinov3,
     "siglip2": load_siglip2,
     "moonvit": load_moonvit,
+    "dinotool": load_dinotool,
 }
 
 MODEL_ALIASES = {
@@ -519,6 +525,8 @@ MODEL_ALIASES = {
     "d3": "dinov3",
     "dino": "dinov3",
     "dinov3": "dinov3",
+    "dinotool": "dinotool",
+    "dt": "dinotool",
     "s2": "siglip2",
     "siglip": "siglip2",
     "mv": "moonvit",
@@ -561,6 +569,7 @@ MODEL_DISPLAY = {
     "dinov3": "DINOv3 (Zero-shot Description)",
     "siglip2": "SigLIP2 (Zero-shot Description)",
     "moonvit": "MoonViT (Zero-shot Description)",
+    "dinotool": "DINOtool (Zero-shot Description)",
 }
 
 

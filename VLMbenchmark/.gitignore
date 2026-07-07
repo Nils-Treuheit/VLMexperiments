@@ -2,8 +2,6 @@ __pycache__/
 *.pyc
 *.pyo
 .DS_Store
-results/
 datasets/
-*.json
 *.zip
 *.tar.gz

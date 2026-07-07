@@ -1,0 +1,18 @@
+{
+  "model": "Florence-2-large-ft",
+  "model_key": "florence2",
+  "task": "scene_analysis",
+  "dataset": "COCO",
+  "images": 50,
+  "skipped": 0,
+  "total_inference_time_s": 12.913,
+  "avg_inference_ms": 258.25,
+  "fps": 3.87,
+  "scene_type_accuracy": 0.9231,
+  "scene_type_correct": 12,
+  "scene_type_total": 13,
+  "object_recall": 0.4106,
+  "objects_recalled": 62,
+  "objects_total": 151,
+  "description_quality": 35.6
+}

@@ -1,0 +1,14 @@
+{
+  "model": "DINOv3 (Zero-shot Description)",
+  "model_key": "dinov3",
+  "task": "captioning",
+  "dataset": "coco",
+  "images": 50,
+  "skipped": 0,
+  "total_inference_time_s": 314.583,
+  "avg_inference_ms": 6291.66,
+  "fps": 0.16,
+  "bleu_4": 0.0,
+  "rouge_l": 0.0129,
+  "cider": 0.0146
+}

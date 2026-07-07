@@ -1,0 +1,15 @@
+{
+  "model": "YOLO26n (Detect)",
+  "model_key": "yolo26",
+  "dataset": "coco",
+  "task": "object_detection",
+  "images": 50,
+  "skipped": 0,
+  "total_inference_time_s": 3.38,
+  "avg_inference_ms": 67.6,
+  "fps": 14.79,
+  "total_gt": 382,
+  "total_detected": 245,
+  "mAP@50:95": 0.38196752771792225,
+  "mAP@50": 0.47413063144420325
+}

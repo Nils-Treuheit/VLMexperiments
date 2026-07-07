@@ -1,0 +1,13 @@
+{
+  "model": "locate_anything",
+  "dataset": "coco",
+  "images": 2,
+  "skipped": 1,
+  "total_inference_time_s": 1.685,
+  "avg_inference_ms": 842.36,
+  "fps": 1.19,
+  "total_gt": 22,
+  "total_detected": 42,
+  "mAP@50:95": 0.07904977838971236,
+  "mAP@50": 0.1271347508971271
+}

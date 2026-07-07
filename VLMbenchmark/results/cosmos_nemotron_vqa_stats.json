@@ -1,0 +1,12 @@
+{
+  "model": "Cosmos-Reason1-7B",
+  "model_key": "cosmos_nemotron",
+  "task": "vqa",
+  "dataset": "coco",
+  "questions": 100,
+  "skipped": 0,
+  "total_inference_time_s": 12.427,
+  "avg_inference_ms": 124.27,
+  "fps": 8.05,
+  "accuracy": 0.35
+}

@@ -1,0 +1,15 @@
+{
+  "model": "Qwen3-VL-8B-Instruct",
+  "model_key": "qwen3_native",
+  "dataset": "coco",
+  "task": "object_detection",
+  "images": 48,
+  "skipped": 2,
+  "total_inference_time_s": 94.04,
+  "avg_inference_ms": 1959.16,
+  "fps": 0.51,
+  "total_gt": 382,
+  "total_detected": 248,
+  "mAP@50:95": 0.013395886318508009,
+  "mAP@50": 0.027527684352911187
+}

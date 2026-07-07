@@ -1,0 +1,13 @@
+{
+  "model": "qwen3_thinking",
+  "dataset": "coco",
+  "images": 2,
+  "skipped": 1,
+  "total_inference_time_s": 13.489,
+  "avg_inference_ms": 6744.69,
+  "fps": 0.15,
+  "total_gt": 22,
+  "total_detected": 4,
+  "mAP@50:95": 0.19306930693069307,
+  "mAP@50": 0.400990099009901
+}

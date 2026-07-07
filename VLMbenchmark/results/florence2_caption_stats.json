@@ -1,0 +1,14 @@
+{
+  "model": "Florence-2-large-ft",
+  "model_key": "florence2",
+  "task": "captioning",
+  "dataset": "coco",
+  "images": 50,
+  "skipped": 0,
+  "total_inference_time_s": 13.209,
+  "avg_inference_ms": 264.17,
+  "fps": 3.79,
+  "bleu_4": 0.0435,
+  "rouge_l": 0.2471,
+  "cider": 0.4999
+}

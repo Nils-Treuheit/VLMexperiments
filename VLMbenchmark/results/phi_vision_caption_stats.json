@@ -1,0 +1,14 @@
+{
+  "model": "Phi-3.5-Vision-4.2B",
+  "model_key": "phi_vision",
+  "task": "captioning",
+  "dataset": "coco",
+  "images": 50,
+  "skipped": 0,
+  "total_inference_time_s": 781.302,
+  "avg_inference_ms": 15626.04,
+  "fps": 0.06,
+  "bleu_4": 0.0208,
+  "rouge_l": 0.1364,
+  "cider": 0.2245
+}

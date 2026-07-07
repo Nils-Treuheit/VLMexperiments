@@ -1,0 +1,14 @@
+{
+  "model": "MoonViT (Zero-shot Description)",
+  "model_key": "moonvit",
+  "task": "captioning",
+  "dataset": "coco",
+  "images": 50,
+  "skipped": 0,
+  "total_inference_time_s": 529.025,
+  "avg_inference_ms": 10580.51,
+  "fps": 0.09,
+  "bleu_4": 0.0,
+  "rouge_l": 0.0041,
+  "cider": 0.005
+}

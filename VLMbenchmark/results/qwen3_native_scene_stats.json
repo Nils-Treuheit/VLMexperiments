@@ -1,0 +1,18 @@
+{
+  "model": "Qwen3-VL-8B-Instruct",
+  "model_key": "qwen3_native",
+  "task": "scene_analysis",
+  "dataset": "COCO",
+  "images": 50,
+  "skipped": 0,
+  "total_inference_time_s": 241.162,
+  "avg_inference_ms": 4823.24,
+  "fps": 0.21,
+  "scene_type_accuracy": 0.9583,
+  "scene_type_correct": 46,
+  "scene_type_total": 48,
+  "object_recall": 0.543,
+  "objects_recalled": 82,
+  "objects_total": 151,
+  "description_quality": 196.4
+}

@@ -1,0 +1,18 @@
+{
+  "model": "Cosmos-Reason1-7B",
+  "model_key": "cosmos_nemotron",
+  "task": "scene_analysis",
+  "dataset": "COCO",
+  "images": 50,
+  "skipped": 0,
+  "total_inference_time_s": 160.635,
+  "avg_inference_ms": 3212.71,
+  "fps": 0.31,
+  "scene_type_accuracy": 0.8837,
+  "scene_type_correct": 38,
+  "scene_type_total": 43,
+  "object_recall": 0.5232,
+  "objects_recalled": 79,
+  "objects_total": 151,
+  "description_quality": 197.6
+}

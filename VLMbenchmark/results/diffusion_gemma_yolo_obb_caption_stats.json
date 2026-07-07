@@ -1,0 +1,14 @@
+{
+  "model": "DiffusionGemma-26B (YOLO+pose+obb)",
+  "model_key": "diffusion_gemma_yolo_obb",
+  "task": "captioning",
+  "dataset": "coco",
+  "images": 2,
+  "skipped": 0,
+  "total_inference_time_s": 165.552,
+  "avg_inference_ms": 82775.86,
+  "fps": 0.01,
+  "bleu_4": 0.0,
+  "rouge_l": 0.0807,
+  "cider": 0.1018
+}

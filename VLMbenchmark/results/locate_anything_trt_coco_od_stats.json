@@ -1,0 +1,15 @@
+{
+  "model": "LocateAnything-3B (TRT)",
+  "model_key": "locate_anything_trt",
+  "dataset": "coco",
+  "task": "object_detection",
+  "images": 48,
+  "skipped": 2,
+  "total_inference_time_s": 8.734,
+  "avg_inference_ms": 181.95,
+  "fps": 5.5,
+  "total_gt": 382,
+  "total_detected": 221,
+  "mAP@50:95": 0.12633854630360727,
+  "mAP@50": 0.17467386888636788
+}

@@ -1,0 +1,112 @@
+{
+  "model": "LocateAnything-3B (TRT)",
+  "model_key": "locate_anything_trt",
+  "task": "segmentation",
+  "dataset": "coco",
+  "images": 48,
+  "skipped": 2,
+  "total_inference_time_s": 11.493,
+  "avg_inference_ms": 239.44,
+  "fps": 4.18,
+  "total_gt_masks": 250,
+  "total_predicted_masks": 202,
+  "PQ": 0.4727,
+  "mIoU": 0.3182,
+  "per_class_metrics": {
+    "bowl": {
+      "pq": 0.8571,
+      "miou": 0.7206,
+      "count": 1
+    },
+    "orange": {
+      "pq": 0.9444,
+      "miou": 0.1046,
+      "count": 2
+    },
+    "person": {
+      "pq": 0.4071,
+      "miou": 0.249,
+      "count": 13
+    },
+    "car": {
+      "pq": 0.6107,
+      "miou": 0.2464,
+      "count": 4
+    },
+    "toilet": {
+      "pq": 0.25,
+      "miou": 0.1856,
+      "count": 4
+    },
+    "book": {
+      "pq": 0.0769,
+      "miou": 0.3636,
+      "count": 2
+    },
+    "potted plant": {
+      "pq": 0.0,
+      "miou": 0.0,
+      "count": 1
+    },
+    "bird": {
+      "pq": 0.5556,
+      "miou": 0.592,
+      "count": 3
+    },
+    "boat": {
+      "pq": 0.4107,
+      "miou": 0.346,
+      "count": 2
+    },
+    "sheep": {
+      "pq": 0.0,
+      "miou": 0.0,
+      "count": 1
+    },
+    "bus": {
+      "pq": 0.0,
+      "miou": 0.0,
+      "count": 1
+    },
+    "giraffe": {
+      "pq": 0.0,
+      "miou": 0.0,
+      "count": 1
+    },
+    "train": {
+      "pq": 1.0,
+      "miou": 0.81,
+      "count": 1
+    },
+    "stop sign": {
+      "pq": 1.0,
+      "miou": 0.7531,
+      "count": 3
+    },
+    "couch": {
+      "pq": 0.0,
+      "miou": 0.0,
+      "count": 1
+    },
+    "cat": {
+      "pq": 0.6667,
+      "miou": 0.4018,
+      "count": 3
+    },
+    "cow": {
+      "pq": 0.45,
+      "miou": 0.6029,
+      "count": 2
+    },
+    "tv": {
+      "pq": 0.0,
+      "miou": 0.0,
+      "count": 1
+    },
+    "elephant": {
+      "pq": 0.8333,
+      "miou": 0.3517,
+      "count": 2
+    }
+  }
+}

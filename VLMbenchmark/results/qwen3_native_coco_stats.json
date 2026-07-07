@@ -1,0 +1,13 @@
+{
+  "model": "qwen3_native",
+  "dataset": "coco",
+  "images": 2,
+  "skipped": 1,
+  "total_inference_time_s": 3.013,
+  "avg_inference_ms": 1506.25,
+  "fps": 0.66,
+  "total_gt": 22,
+  "total_detected": 6,
+  "mAP@50:95": 0.020792079207920786,
+  "mAP@50": 0.06930693069306929
+}

@@ -1,0 +1,14 @@
+{
+  "model": "Qwen3-VL-8B-Thinking",
+  "model_key": "qwen3_thinking",
+  "task": "grounding",
+  "dataset": "coco",
+  "images": 25,
+  "skipped": 0,
+  "total_inference_time_s": 108.496,
+  "avg_inference_ms": 4339.83,
+  "fps": 0.23,
+  "total_gt": 168,
+  "total_correct": 12,
+  "acc@50": 0.0714
+}

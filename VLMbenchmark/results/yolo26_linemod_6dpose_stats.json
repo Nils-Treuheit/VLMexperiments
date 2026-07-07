@@ -1,0 +1,14 @@
+{
+  "model": "YOLO26n (Detect)",
+  "model_key": "yolo26",
+  "task": "6d_pose",
+  "dataset": "linemod",
+  "images": 25,
+  "skipped": 0,
+  "total_inference_time_s": 4.683,
+  "avg_inference_ms": 187.31,
+  "fps": 5.34,
+  "detection_rate": 4.76,
+  "total_gt_objects": 25,
+  "total_detected": 119
+}

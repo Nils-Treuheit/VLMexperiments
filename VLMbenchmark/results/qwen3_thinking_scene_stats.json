@@ -1,0 +1,18 @@
+{
+  "model": "Qwen3-VL-8B-Thinking",
+  "model_key": "qwen3_thinking",
+  "task": "scene_analysis",
+  "dataset": "COCO",
+  "images": 50,
+  "skipped": 0,
+  "total_inference_time_s": 1013.349,
+  "avg_inference_ms": 20266.98,
+  "fps": 0.05,
+  "scene_type_accuracy": 0.913,
+  "scene_type_correct": 42,
+  "scene_type_total": 46,
+  "object_recall": 0.6821,
+  "objects_recalled": 103,
+  "objects_total": 151,
+  "description_quality": 384.9
+}

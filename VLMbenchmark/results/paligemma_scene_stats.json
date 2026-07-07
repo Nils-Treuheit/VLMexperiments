@@ -1,0 +1,18 @@
+{
+  "model": "PaliGemma2-3B-mix",
+  "model_key": "paligemma",
+  "task": "scene_analysis",
+  "dataset": "COCO",
+  "images": 50,
+  "skipped": 0,
+  "total_inference_time_s": 5.083,
+  "avg_inference_ms": 101.67,
+  "fps": 9.84,
+  "scene_type_accuracy": 1.0,
+  "scene_type_correct": 6,
+  "scene_type_total": 6,
+  "object_recall": 0.0265,
+  "objects_recalled": 4,
+  "objects_total": 151,
+  "description_quality": 48.7
+}

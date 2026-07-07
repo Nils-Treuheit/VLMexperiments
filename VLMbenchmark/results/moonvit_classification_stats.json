@@ -1,0 +1,12 @@
+{
+  "model": "Tiny ImageNet Classification (moonvit)",
+  "model_key": "moonvit",
+  "task": "classification",
+  "dataset": "tiny-imagenet-200",
+  "images": 200,
+  "top1_accuracy": 0.01,
+  "top5_accuracy": 0.01,
+  "total_inference_time_s": 2946.43,
+  "avg_inference_ms": 14732.2,
+  "fps": 0.07
+}

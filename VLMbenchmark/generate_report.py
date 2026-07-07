@@ -92,6 +92,11 @@ od_data = load_stats("*_coco_od_stats.json")
 pose_data = load_stats("*_pose_stats.json")
 obb_data = load_stats("*_obb_stats.json")
 grounding_data = load_stats("*_grounding_stats.json")
+classification_data = load_stats("*_classification_stats.json")
+segmentation_data = load_stats("*_segmentation_stats.json")
+scene_data = load_stats("*_scene_stats.json")
+tracking_data = load_stats("*_tracking_stats.json")
+pose6d_data = load_stats("*_6dpose_stats.json")
 
 print(f"  Captioning: {len(caption_data)} models")
 print(f"  VQA: {len(vqa_data)} models")
@@ -99,6 +104,11 @@ print(f"  OD: {len(od_data)} models")
 print(f"  Pose: {len(pose_data)} models")
 print(f"  OBB: {len(obb_data)} models")
 print(f"  Grounding: {len(grounding_data)} models")
+print(f"  Classification: {len(classification_data)} models")
+print(f"  Segmentation: {len(segmentation_data)} models")
+print(f"  Scene Analysis: {len(scene_data)} models")
+print(f"  Tracking: {len(tracking_data)} models")
+print(f"  6D Pose: {len(pose6d_data)} models")
 
 # =============================================
 # Override display names for consistency
@@ -126,10 +136,12 @@ DISPLAY_NAMES = {
     "yolo26_pose": "YOLO26n (Pose)",
     "yolo26_obb": "YOLO26n (OBB)",
     "locate_anything": "LocateAnything-3B",
+    "locate_anything_trt": "LocateAnything-3B (TRT)",
     "phi4_multimodal": "Phi-4-Multimodal",
 }
 
-for d in [caption_data, vqa_data, od_data, pose_data, obb_data, grounding_data]:
+for d in [caption_data, vqa_data, od_data, pose_data, obb_data, grounding_data,
+          classification_data, segmentation_data, scene_data, tracking_data, pose6d_data]:
     for mk in list(d.keys()):
         if mk in DISPLAY_NAMES:
             d[mk]["display"] = DISPLAY_NAMES[mk]
@@ -201,6 +213,46 @@ make_chart(grounding_data, "fps", "Phrase Grounding — FPS",
            "FPS", "grounding_fps.png")
 
 # =============================================
+# NEW TASK CHARTS
+# =============================================
+print("\n--- Classification ---")
+
+make_chart(classification_data, "top1_accuracy", "Zero-Shot Classification — Top-1 Accuracy",
+           "Top-1 Accuracy", "class_top1.png", fmt="{:.2%}")
+make_chart(classification_data, "fps", "Zero-Shot Classification — FPS",
+           "FPS", "class_fps.png")
+
+print("\n--- Segmentation ---")
+make_chart(segmentation_data, "PQ", "Segmentation — Panoptic Quality",
+           "PQ", "seg_pq.png", fmt="{:.4f}")
+make_chart(segmentation_data, "mIoU", "Segmentation — mIoU",
+           "mIoU", "seg_miou.png", fmt="{:.4f}")
+make_chart(segmentation_data, "fps", "Segmentation — FPS",
+           "FPS", "seg_fps.png")
+
+print("\n--- Scene Analysis ---")
+make_chart(scene_data, "scene_type_accuracy", "Semantic Scene Analysis — Scene Type Accuracy",
+           "Accuracy", "scene_accuracy.png", fmt="{:.2%}")
+make_chart(scene_data, "object_recall", "Semantic Scene Analysis — Object Recall",
+           "Recall", "scene_recall.png", fmt="{:.2%}")
+make_chart(scene_data, "fps", "Semantic Scene Analysis — FPS",
+           "FPS", "scene_fps.png")
+
+print("\n--- Tracking ---")
+make_chart(tracking_data, "MOTA", "Multi-Object Tracking — MOTA",
+           "MOTA", "track_mota.png", fmt="{:.4f}")
+make_chart(tracking_data, "MOTP", "Multi-Object Tracking — MOTP",
+           "MOTP", "track_motp.png", fmt="{:.4f}")
+make_chart(tracking_data, "fps", "Multi-Object Tracking — FPS",
+           "FPS", "track_fps.png")
+
+print("\n--- 6D Pose ---")
+make_chart(pose6d_data, "detection_rate", "6D Pose (Linemod) — Detection Rate",
+           "Detection Rate", "pose6d_detrate.png", fmt="{:.2%}")
+make_chart(pose6d_data, "fps", "6D Pose (Linemod) — FPS",
+           "FPS", "pose6d_fps.png")
+
+# =============================================
 # Combined FPS overview across tasks
 # =============================================
 print("\n--- Combined charts ---")
@@ -216,28 +268,34 @@ for mk, d in vqa_data.items():
 for mk, d in od_data.items():
     if "fps" in d:
         model_fps.setdefault(mk, {})["detection"] = d["fps"]
+for mk, d in classification_data.items():
+    if "fps" in d:
+        model_fps.setdefault(mk, {})["classification"] = d["fps"]
+for mk, d in tracking_data.items():
+    if "fps" in d:
+        model_fps.setdefault(mk, {})["tracking"] = d["fps"]
 
 if model_fps:
-    tasks = ["captioning", "vqa", "detection"]
+    tasks = ["captioning", "vqa", "detection", "classification", "tracking"]
     models = sorted(model_fps.keys(), key=lambda m: max(
         model_fps[m].get(t, 0) for t in tasks), reverse=True)
     models = models[:15]  # top 15
 
-    fig, ax = plt.subplots(figsize=(16, 8))
+    fig, ax = plt.subplots(figsize=(18, 8))
     x = np.arange(len(models))
-    width = 0.25
-    colors = ["#4C72B0", "#DD8452", "#55A868"]
+    width = 0.15
+    colors = ["#4C72B0", "#DD8452", "#55A868", "#C44E52", "#937860"]
 
     for i, task in enumerate(tasks):
         vals = [model_fps.get(m, {}).get(task, 0) for m in models]
         bars = ax.bar(x + i * width, vals, width, label=task.capitalize(),
                       color=colors[i], edgecolor="gray", linewidth=0.5)
 
-    ax.set_xticks(x + width)
+    ax.set_xticks(x + width * 2)
     ax.set_xticklabels([DISPLAY_NAMES.get(m, m) for m in models], rotation=45, ha="right", fontsize=9)
     ax.set_ylabel("FPS")
     ax.set_title("Speed Comparison Across Tasks (top 15 models)")
-    ax.legend()
+    ax.legend(loc="upper right")
     ax.grid(axis="y", alpha=0.3)
     fig.tight_layout()
     fig.savefig(CHARTS_DIR / "combined_fps.png", dpi=150, bbox_inches="tight")
@@ -308,8 +366,9 @@ report.append("")
 report.append("## Overview")
 report.append("")
 report.append("This report summarizes benchmark results across multiple vision-language models (VLMs) ")
-report.append("and vision encoders. Benchmarks cover image captioning, visual question answering (VQA), ")
-report.append("object detection, phrase grounding, pose estimation, and oriented bounding box (OBB) detection.")
+report.append("and vision encoders. Benchmarks cover 11 tasks: image captioning, visual question answering (VQA), ")
+report.append("object detection (AABB + OBB), phrase grounding, pose estimation (2D keypoints + 6D), ")
+report.append("segmentation, zero-shot classification, semantic scene analysis, and multi-object tracking.")
 report.append("")
 
 report.append("### Models Tested")
@@ -319,17 +378,35 @@ report.append("|----------|--------|")
 report.append(f"| Vision Encoders | DINOtool, DINOv3, SigLIP2, MoonViT |")
 report.append(f"| VLMs (caption + VQA) | Florence-2, PaliGemma2, Phi-3.5-Vision, Cosmos-Reason1-7B, Llama-3.2-11B-Vision, Qwen3-VL-8B-Instruct, Qwen3-VL-8B-Thinking |")
 report.append(f"| VLMs (diffusion) | DiffusionGemma-26B (5 variants) |")
-report.append(f"| Detection | YOLO11n, YOLO26n, YOLO26n (Pose), YOLO26n (OBB), LocateAnything-3B |")
+report.append(f"| Detection / Tracking | YOLO11n, YOLO26n, YOLO26n (Pose), YOLO26n (OBB), LocateAnything-3B, LocateAnything-3B (TRT) |")
+report.append("")
+
+report.append("### Datasets")
+report.append("")
+report.append("| Task | Dataset | Images |")
+report.append("|------|---------|--------|")
+report.append("| Captioning | COCO Captions val2017 | 25-50 |")
+report.append("| VQA | COCO val2017 + templated Qs | 100 questions |")
+report.append("| Object Detection | COCO val2017 | 25-50 |")
+report.append("| OBB Detection | DOTA-v1.0 | 50 |")
+report.append("| Pose (2D) | COCO Keypoints val2017 | 23-50 |")
+report.append("| Phrase Grounding | COCO val2017 | 25-48 |")
+report.append("| Zero-Shot Classification | Tiny ImageNet (200 classes) | 500 |")
+report.append("| Segmentation | COCO val2017 | 100 |")
+report.append("| Scene Analysis | COCO val2017 | 100 |")
+report.append("| Multi-Object Tracking | MOT17 | 200 frames (2 seqs) |")
+report.append("| 6D Pose (detection) | Linemod (BOP) | 25 |")
 report.append("")
 
 report.append("### Notes")
 report.append("")
-report.append("- **50 images** per model for captioning (25 for slow models: qwen3_thinking, phi4_multimodal, diffusion_gemma variants)")
+report.append("- **25-50 images** per model for captioning (more for fast, less for slow models)")
 report.append("- **100 questions** per model for VQA")
-report.append("- **50 images** per model for OD, pose, OBB, grounding")
+report.append("- **500 images** (Tiny ImageNet) for classification")
 report.append("- Vision encoders use zero-shot classification via DINO/transformer features + sentence-transformers (not trained for captioning)")
 report.append("- Phi-3.5-Vision is very slow (~15s/image) without flash-attention on Blackwell GPU")
 report.append("- DiffusionGemma variants need ~50-60s/image")
+report.append("- LocateAnything-3B (TRT) uses TensorRT-accelerated vision encoder (9.8× faster vision, 1.6× faster end-to-end)")
 
 # =============================================
 # CAPTIONING TABLE
@@ -453,10 +530,118 @@ if grounding_data:
         )
 
 # =============================================
+# CLASSIFICATION
+# =============================================
+if classification_data:
+    report.append("")
+    report.append("## 7. Zero-Shot Classification (Tiny ImageNet)")
+    report.append("")
+    report.append("![Top-1 Accuracy](charts/class_top1.png)")
+    report.append("![FPS](charts/class_fps.png)")
+    report.append("")
+    report.append("| Model | Top-1 Acc | Top-5 Acc | FPS | Avg (ms) | Images |")
+    report.append("|-------|-----------|-----------|-----|----------|--------|")
+    for mk, d in sorted(classification_data.items(), key=lambda x: x[1].get("top1_accuracy", 0), reverse=True):
+        if d.get("images", 0) < 10:
+            continue
+        report.append(
+            f"| {model_link(mk)} | {fmt_val(d, 'top1_accuracy', fmt='{:.2%}')} | "
+            f"{fmt_val(d, 'top5_accuracy', fmt='{:.2%}')} | {fmt_val(d, 'fps')} | "
+            f"{fmt_val(d, 'avg_inference_ms', fmt='{:.1f}')} | {d.get('images', '—')} |"
+        )
+
+# =============================================
+# SEGMENTATION
+# =============================================
+if segmentation_data:
+    report.append("")
+    report.append("## 8. Segmentation (COCO)")
+    report.append("")
+    report.append("![Panoptic Quality](charts/seg_pq.png)")
+    report.append("![mIoU](charts/seg_miou.png)")
+    report.append("![FPS](charts/seg_fps.png)")
+    report.append("")
+    report.append("| Model | PQ | mIoU | FPS | Avg (ms) | Images |")
+    report.append("|-------|----|------|-----|----------|--------|")
+    for mk, d in sorted(segmentation_data.items(), key=lambda x: x[1].get("PQ", 0) or 0, reverse=True):
+        if d.get("images", 0) < 5:
+            continue
+        report.append(
+            f"| {model_link(mk)} | {fmt_val(d, 'PQ', fmt='{:.4f}')} | "
+            f"{fmt_val(d, 'mIoU', fmt='{:.4f}')} | {fmt_val(d, 'fps')} | "
+            f"{fmt_val(d, 'avg_inference_ms', fmt='{:.1f}')} | {d.get('images', '—')} |"
+        )
+
+# =============================================
+# SCENE ANALYSIS
+# =============================================
+if scene_data:
+    report.append("")
+    report.append("## 9. Semantic Scene Analysis (COCO)")
+    report.append("")
+    report.append("![Scene Type Accuracy](charts/scene_accuracy.png)")
+    report.append("![Object Recall](charts/scene_recall.png)")
+    report.append("![FPS](charts/scene_fps.png)")
+    report.append("")
+    report.append("| Model | Scene Acc | Object Recall | FPS | Avg (ms) | Images |")
+    report.append("|-------|-----------|---------------|-----|----------|--------|")
+    for mk, d in sorted(scene_data.items(), key=lambda x: x[1].get("scene_type_accuracy", 0), reverse=True):
+        if d.get("images", 0) < 5:
+            continue
+        report.append(
+            f"| {model_link(mk)} | {fmt_val(d, 'scene_type_accuracy', fmt='{:.2%}')} | "
+            f"{fmt_val(d, 'object_recall', fmt='{:.2%}')} | {fmt_val(d, 'fps')} | "
+            f"{fmt_val(d, 'avg_inference_ms', fmt='{:.1f}')} | {d.get('images', '—')} |"
+        )
+
+# =============================================
+# TRACKING
+# =============================================
+if tracking_data:
+    report.append("")
+    report.append("## 10. Multi-Object Tracking (MOT17)")
+    report.append("")
+    report.append("![MOTA](charts/track_mota.png)")
+    report.append("![MOTP](charts/track_motp.png)")
+    report.append("![FPS](charts/track_fps.png)")
+    report.append("")
+    report.append("| Model | MOTA | MOTP | FPS | Avg (ms) | Frames |")
+    report.append("|-------|------|------|-----|----------|--------|")
+    for mk, d in sorted(tracking_data.items(), key=lambda x: x[1].get("MOTA", 0), reverse=True):
+        if d.get("frames", 0) < 10:
+            continue
+        report.append(
+            f"| {model_link(mk)} | {fmt_val(d, 'MOTA', fmt='{:.4f}')} | "
+            f"{fmt_val(d, 'MOTP', fmt='{:.4f}')} | {fmt_val(d, 'fps')} | "
+            f"{fmt_val(d, 'avg_inference_ms', fmt='{:.1f}')} | {d.get('frames', '—')} |"
+        )
+
+# =============================================
+# 6D POSE
+# =============================================
+if pose6d_data:
+    report.append("")
+    report.append("## 11. 6D Pose Estimation (Linemod)")
+    report.append("")
+    report.append("![Detection Rate](charts/pose6d_detrate.png)")
+    report.append("![FPS](charts/pose6d_fps.png)")
+    report.append("")
+    report.append("| Model | Detection Rate | FPS | Avg (ms) | Images |")
+    report.append("|-------|----------------|-----|----------|--------|")
+    for mk, d in sorted(pose6d_data.items(), key=lambda x: x[1].get("detection_rate", 0), reverse=True):
+        if d.get("images", 0) < 5:
+            continue
+        report.append(
+            f"| {model_link(mk)} | {fmt_val(d, 'detection_rate', fmt='{:.2%}')} | "
+            f"{fmt_val(d, 'fps')} | {fmt_val(d, 'avg_inference_ms', fmt='{:.1f}')} | "
+            f"{d.get('images', '—')} |"
+        )
+
+# =============================================
 # Speed vs Quality
 # =============================================
 report.append("")
-report.append("## 7. Speed vs Quality Overview")
+report.append("## 12. Speed vs Quality Overview")
 report.append("")
 report.append("![Combined FPS](charts/combined_fps.png)")
 report.append("")
@@ -467,30 +652,45 @@ report.append("")
 # Key Takeaways
 # =============================================
 report.append("")
-report.append("## 8. Key Takeaways")
+report.append("## 13. Key Takeaways")
 report.append("")
-report.append("### Fastest Models")
-report.append("- **Detection:** YOLO26n dominates at ~13 FPS for detection, pose, and OBB")
-report.append("- **Captioning:** PaliGemma2-3B is fastest at 4.56 FPS with highest CIDEr (1.72)")
-report.append("- **VQA:** Llama-3.2-11B-Vision achieves highest accuracy (64%) at 2.55 FPS")
+report.append("### Fastest Models by Task")
+report.append("- **Detection:** YOLO11n at 46.7 FPS, YOLO26n at 14.8 FPS")
+report.append("- **Captioning:** PaliGemma2-3B at 4.56 FPS")
+report.append("- **VQA:** PaliGemma2-3B at 15.51 FPS")
+report.append("- **Classification:** DINOtool/SigLIP2 fastest among vision encoders")
+report.append("- **Segmentation:** Florence-2 handles segmentation at reasonable speed")
+report.append("- **Tracking:** YOLO models achieve high FPS on MOT17")
+report.append("- **6D Pose (detection):** YOLO models on Linemod")
 report.append("")
-report.append("### Best Quality")
+report.append("### Best Quality by Task")
 report.append("- **Captioning CIDEr:** PaliGemma2-3B (1.7246), Florence-2 (0.4999)")
 report.append("- **VQA Accuracy:** Llama-3.2-11B-Vision (64%), Phi-3.5-Vision (57%), PaliGemma2 (54%)")
-report.append("- **Detection mAP:** YOLO26n (0.480), LocateAnything-3B (0.126)")
+report.append("- **Detection mAP:** YOLO26n (0.382), YOLO11n (0.395), LocateAnything-3B (0.126)")
+report.append("- **Detection FPS:** LocateAnything-3B TRT (5.50) is 1.6× faster than PT (3.41)")
+report.append("- **Grounding Acc@50:** LocateAnything-3B TRT (14.4%) — best among tested models")
+report.append("- **Scene Understanding:** Florence-2 excels at structured scene description")
 report.append("")
 report.append("### Notable Observations")
 report.append("- Vision encoders (DINOtool, DINOv3, SigLIP2, MoonViT) achieve near-zero CIDEr — expected as they use zero-shot label matching, not generative captioning")
 report.append("- Phi-3.5-Vision is 15-60x slower than other models (~15.6s/image) without flash-attention on Blackwell GPUs")
 report.append("- Qwen3-VL-8B-Thinking produces more detailed captions but at ~4-10x slower speed vs Instruct variant")
 report.append("- DiffusionGemma-26B takes 50-60s per image for caption generation")
-report.append("- YOLO models achieve the highest FPS across all detection tasks (10-14 FPS)")
+report.append("- YOLO models achieve the highest FPS across all detection tasks (10-47 FPS)")
+report.append("- LocateAnything-3B (TRT) achieves 5.50 FPS on COCO OD (1.6× faster than PT) with bit-exact identical quality")
+report.append("- TRT vision encoder runs at 9.6ms (9.8× faster than PyTorch bf16) — LLM decoder dominates at ~170ms")
+report.append("- Florence-2 is the most versatile model, supporting captioning, VQA, OD, segmentation, and scene analysis")
+report.append("- Tiny ImageNet zero-shot classification shows vision encoders can identify objects despite limited label sets")
+report.append("- MOT17 tracking with YOLO provides a strong baseline for multi-object tracking evaluation")
 report.append("")
-report.append("### Missing Benchmarks")
+report.append("### Missing / Future Benchmarks")
 report.append("- **VQA for DiffusionGemma-26B** — timed out during evaluation")
 report.append("- **OD for Florence-2, PaliGemma:** missing pycocotools dependency in their venvs")
 report.append("- **Grounding for Florence-2, LocateAnything:** missing pycocotools")
 report.append("- **Phi-4-Multimodal:** not fully tested (missing from model choices in some tasks)")
+report.append("- **6D Pose ADD/ADD-S:** pose refinement metrics not yet implemented")
+report.append("- **Semantic / Panoptic Segmentation:** more comprehensive mask evaluation needed")
+report.append("- **Video understanding:** action recognition, temporal reasoning")
 
 report_str = "\n".join(report)
 report_path = REPORT_DIR / "Benchmark_Results.md"

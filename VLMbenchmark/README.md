@@ -4,23 +4,25 @@ Multi-task benchmark for visual models on COCO and DOTA-v1.0.
 
 ## Skill Matrix — Which Model Does What?
 
-| Model | Object Det. | Pose Est. | OBB Det. | Phrase Grounding | Captioning | VQA |
-|-------|:-----------:|:---------:|:--------:|:----------------:|:----------:|:---:|
-| LocateAnything-3B | ✓ | — | — | ✓ | — | — |
-| Qwen3-VL-8B-Instruct | ✓ | — | — | ✓ | ✓ | ✓ |
-| Qwen3-VL-8B-Thinking | ✓ | — | — | ✓ | ✓ | ✓ |
-| YOLO26n (Detect) | ✓ | — | — | — | — | — |
-| YOLO26n (Pose) | — | ✓ | — | — | — | — |
-| YOLO26n (OBB) | — | — | ✓ | — | — | — |
-| Florence-2-large-ft | ✓ | — | — | ✓ | ✓ | ✓ |
-| PaliGemma2-3B-mix | ✓* | — | — | — | ✓ | ✓ |
-| Llama-3.2-11B-Vision | — | — | — | — | ✓ | ✓ |
-| Phi-3.5-Vision-4.2B | — | — | — | — | ✓ | ✓ |
-| Cosmos-Reason1-7B | — | — | — | — | ✓ | ✓ |
-| DiffusionGemma-26B (YOLO+DG) | — | — | — | — | ✓ | ✓ |
-| SigLIP2 (Zero-shot Description) | — | — | — | — | ✓† | — |
-| MoonViT (Zero-shot Description) | — | — | — | — | ✓† | — |
-| DINOv3 (Zero-shot Description) | — | — | — | — | ✓† | — |
+| Model | Object Det. | Pose Est. | OBB Det. | Phrase Grounding | Captioning | VQA | Classif. | Segmentation | Scene Analysis | Tracking | 6D Pose |
+|-------|:-----------:|:---------:|:--------:|:----------------:|:----------:|:---:|:--------:|:------------:|:--------------:|:--------:|:-------:|
+| LocateAnything-3B | ✓ | — | — | ✓ | — | — | — | ✓ | — | — | — |
+| **LocateAnything-3B (TRT)** | **✓** | **—** | **—** | **✓** | **—** | **—** | **—** | **✓** | **—** | **—** | **—** |
+| Qwen3-VL-8B-Instruct | ✓ | — | — | ✓ | ✓ | ✓ | — | — | ✓ | — | — |
+| Qwen3-VL-8B-Thinking | ✓ | — | — | ✓ | ✓ | ✓ | — | — | ✓ | — | — |
+| YOLO26n (Detect) | ✓ | — | — | — | — | — | — | — | — | ✓ | ✓ |
+| YOLO26n (Pose) | — | ✓ | — | — | — | — | — | — | — | — | — |
+| YOLO26n (OBB) | — | — | ✓ | — | — | — | — | — | — | — | — |
+| Florence-2-large-ft | ✓ | — | — | ✓ | ✓ | ✓ | — | ✓ | ✓ | — | — |
+| PaliGemma2-3B-mix | ✓* | — | — | — | ✓ | ✓ | — | — | ✓ | — | — |
+| Llama-3.2-11B-Vision | — | — | — | — | ✓ | ✓ | — | — | ✓ | — | — |
+| Phi-3.5-Vision-4.2B | — | — | — | — | ✓ | ✓ | — | — | ✓ | — | — |
+| Cosmos-Reason1-7B | — | — | — | — | ✓ | ✓ | — | — | ✓ | — | — |
+| DiffusionGemma-26B (YOLO+DG) | — | — | — | — | ✓ | ✓ | — | — | — | — | — |
+| SigLIP2 (Zero-shot) | — | — | — | — | ✓† | — | ✓ | — | — | — | — |
+| MoonViT (Zero-shot) | — | — | — | — | ✓† | — | ✓ | — | — | — | — |
+| DINOv3 (Zero-shot) | — | — | — | — | ✓† | — | ✓ | — | — | — | — |
+| DINOtool (Zero-shot) | — | — | — | — | ✓† | — | ✓ | — | — | — | — |
 
 > `✓*` = PaliGemma OD is prompt-based (tokenizes bbox tokens), results may vary.
 > `✓†` = Vision encoders output structured zero-shot text (objects, scene, attributes) rather than freeform captions.
@@ -29,13 +31,18 @@ Multi-task benchmark for visual models on COCO and DOTA-v1.0.
 
 | Script | Task | Dataset | Models |
 |--------|------|---------|--------|
-| `benchmark_od.py` | Object Detection | COCO val2017 | locate_anything, qwen3_native, qwen3_thinking, yolo26, florence2, paligemma |
-| `benchmark_od.py` | Object Detection | DOTA-v1.0 | locate_anything, qwen3_native, qwen3_thinking |
+| `benchmark_od.py` | Object Detection | COCO val2017 | locate_anything, locate_anything_trt, qwen3_native, qwen3_thinking, yolo26, florence2, paligemma |
+| `benchmark_od.py` | Object Detection | DOTA-v1.0 | locate_anything, locate_anything_trt, qwen3_native, qwen3_thinking |
 | `benchmark_pose.py` | Pose Estimation | COCO Keypoints | yolo26_pose |
 | `benchmark_obb.py` | Oriented BBox | DOTA-v1.0 | yolo26_obb |
-| `benchmark_grounding.py` | Phrase Grounding | COCO val2017 | locate_anything, qwen3_native, qwen3_thinking, florence2 |
-| `benchmark_caption.py` | Image Captioning | COCO Captions val2017 | florence2, paligemma, llama_vision, phi_vision, cosmos_nemotron, qwen3_native, qwen3_thinking, diffusion_gemma, siglip2, moonvit, dinov3 |
-| `benchmark_vqa.py` | Visual Question Answering | COCO val2017 | florence2, paligemma, llama_vision, phi_vision, cosmos_nemotron, qwen3_native, qwen3_thinking, diffusion_gemma |
+| `benchmark_grounding.py` | Phrase Grounding | COCO val2017 | locate_anything, locate_anything_trt, qwen3_native, qwen3_thinking |
+| `benchmark_caption.py` | Image Captioning | COCO Captions | florence2, paligemma, llama_vision, phi_vision, cosmos_nemotron, qwen3_native, qwen3_thinking, diffusion_gemma, siglip2, moonvit, dinov3, dinotool |
+| `benchmark_vqa.py` | VQA | COCO val2017 | florence2, paligemma, llama_vision, phi_vision, cosmos_nemotron, qwen3_native, qwen3_thinking, diffusion_gemma |
+| `benchmark_classification.py` | Zero-Shot Classification | Tiny ImageNet | dinotool, dinov3, siglip2, moonvit |
+| `benchmark_segmentation.py` | Segmentation | COCO | florence2, locate_anything, locate_anything_trt |
+| `benchmark_scene.py` | Scene Analysis | COCO | florence2, paligemma, llama_vision, phi_vision, cosmos_nemotron, qwen3_native, qwen3_thinking |
+| `benchmark_tracking.py` | MOT | MOT17 | yolo26, yolo11 |
+| `benchmark_6dpose.py` | 6D Pose Detection | Linemod | yolo26, yolo11 |
 | `benchmark_all.py` | All supported tasks | — | All models |
 
 ## Quick Start

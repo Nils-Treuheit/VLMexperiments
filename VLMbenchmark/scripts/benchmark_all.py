@@ -11,14 +11,14 @@ TASKS = {
     "od": {
         "script": "benchmark_od.py",
         "title": "Object Detection (COCO)",
-        "models": ["locate_anything", "qwen3_native", "qwen3_thinking", "yolo26",
+        "models": ["locate_anything", "locate_anything_trt", "qwen3_native", "qwen3_thinking", "yolo26",
                     "florence2", "paligemma"],
         "dataset": "coco",
     },
     "od_dota": {
         "script": "benchmark_od.py",
         "title": "Object Detection (DOTA)",
-        "models": ["locate_anything", "qwen3_native", "qwen3_thinking"],
+        "models": ["locate_anything", "locate_anything_trt", "qwen3_native", "qwen3_thinking"],
         "dataset": "dota",
     },
     "pose": {
@@ -36,7 +36,7 @@ TASKS = {
     "grounding": {
         "script": "benchmark_grounding.py",
         "title": "Phrase Grounding (COCO)",
-        "models": ["locate_anything", "qwen3_native", "qwen3_thinking", "florence2"],
+        "models": ["locate_anything", "locate_anything_trt", "qwen3_native", "qwen3_thinking", "florence2"],
         "dataset": None,
     },
     "captioning": {
@@ -60,6 +60,37 @@ TASKS = {
                     "diffusion_gemma_moonvit"],
         "dataset": None,
     },
+    "classification": {
+        "script": "benchmark_classification.py",
+        "title": "Zero-Shot Classification (Tiny ImageNet)",
+        "models": ["dinotool", "dinov3", "siglip2", "moonvit"],
+        "dataset": None,
+    },
+    "segmentation": {
+        "script": "benchmark_segmentation.py",
+        "title": "Segmentation (COCO)",
+        "models": ["florence2", "locate_anything", "locate_anything_trt"],
+        "dataset": None,
+    },
+    "scene_analysis": {
+        "script": "benchmark_scene.py",
+        "title": "Semantic Scene Analysis (COCO)",
+        "models": ["florence2", "paligemma", "llama_vision", "phi_vision",
+                    "cosmos_nemotron", "qwen3_native", "qwen3_thinking"],
+        "dataset": None,
+    },
+    "tracking": {
+        "script": "benchmark_tracking.py",
+        "title": "Multi-Object Tracking (MOT17)",
+        "models": ["yolo26", "yolo11"],
+        "dataset": None,
+    },
+    "6d_pose": {
+        "script": "benchmark_6dpose.py",
+        "title": "6D Pose Estimation Detection (Linemod)",
+        "models": ["yolo26", "yolo11"],
+        "dataset": None,
+    },
 }
 
 COLLECTION_DIR = Path("/mnt/HDD1/Project_Code/VLMexperiments/VLMcollection")
@@ -67,6 +98,7 @@ COLLECTION_DIR = Path("/mnt/HDD1/Project_Code/VLMexperiments/VLMcollection")
 MODEL_VENV = {k: str(COLLECTION_DIR / v / ".venv" / "bin" / "python")
     for k, v in {
         "locate_anything": "locate_anything",
+        "locate_anything_trt": "locate_anything",
         "qwen3_native": "qwen3-vl_instruct",
         "qwen3_thinking": "qwen3-vl_thinking",
         "yolo26": "yolo11-26",
@@ -130,6 +162,16 @@ def extract_stats(model, script):
         fp = RESULTS_DIR / f"{prefix}_pose_stats.json"
     elif "grounding" in script:
         fp = RESULTS_DIR / f"{prefix}_grounding_stats.json"
+    elif "classification" in script:
+        fp = RESULTS_DIR / f"{prefix}_classification_stats.json"
+    elif "segmentation" in script:
+        fp = RESULTS_DIR / f"{prefix}_segmentation_stats.json"
+    elif "scene" in script:
+        fp = RESULTS_DIR / f"{prefix}_scene_stats.json"
+    elif "tracking" in script:
+        fp = RESULTS_DIR / f"{prefix}_tracking_stats.json"
+    elif "6dpose" in script:
+        fp = RESULTS_DIR / f"{prefix}_linemod_6dpose_stats.json"
     else:
         for ds in ["coco", "dota"]:
             fp = RESULTS_DIR / f"{prefix}_{ds}_od_stats.json"

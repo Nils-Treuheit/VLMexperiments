@@ -1,3 +1,4 @@
+import ctypes
 import json
 import os
 import re
@@ -307,6 +308,34 @@ def load_la():
     return infer.LocateAnythingWorker(mp, device=dev), infer
 
 
+def _load_trt_libs():
+    """Pre-load TensorRT shared libraries so onnxruntime can find them."""
+    trt_venv = str(PROJECT_DIR / "locate_anything" / "model" / "tensorRT" / ".venv" / "lib" / "python3.10" / "site-packages")
+    candidates = [
+        trt_venv + "/tensorrt_libs",
+        os.path.expanduser("~/.local/lib/python3.10/site-packages/nvidia/cudnn/lib"),
+        "/usr/local/cuda-12.8/lib64",
+    ]
+    for lib_dir in candidates:
+        if os.path.isdir(lib_dir):
+            for f in sorted(os.listdir(lib_dir)):
+                if f.endswith(".so") or ".so." in f:
+                    try:
+                        ctypes.CDLL(os.path.join(lib_dir, f), mode=ctypes.RTLD_GLOBAL)
+                    except Exception:
+                        pass
+
+
+def load_la_trt():
+    _load_trt_libs()
+    warnings.filterwarnings("ignore", message=".*torch_dtype is deprecated.*")
+    warnings.filterwarnings("ignore", message=".*image_processor_class.*")
+    sys.path.insert(0, str(PROJECT_DIR / "locate_anything"))
+    from infer_trt import LocateAnythingWorkerTRT
+    mp = str(PROJECT_DIR / "locate_anything" / "model")
+    return LocateAnythingWorkerTRT(mp), {}
+
+
 def load_qwen3():
     _logging = __import__("logging")
     for msg in [".*_check_is_size.*", ".*Python version.*", ".*parameters are on the meta device.*",
@@ -447,6 +476,7 @@ def load_dinotool():
 
 MODEL_LOADERS = {
     "locate_anything": load_la,
+    "locate_anything_trt": load_la_trt,
     "qwen3_native": load_qwen3,
     "qwen3_thinking": load_qwen3_thinking,
     # YOLO26 detection
@@ -495,6 +525,8 @@ MODEL_LOADERS = {
 
 MODEL_ALIASES = {
     "la": "locate_anything",
+    "la_trt": "locate_anything_trt",
+    "trt": "locate_anything_trt",
     "qwen3": "qwen3_native",
     "qwen3_vl_instruct": "qwen3_native",
     "qwen3_vl_thinking": "qwen3_thinking",
@@ -535,6 +567,7 @@ MODEL_ALIASES = {
 
 MODEL_DISPLAY = {
     "locate_anything": "LocateAnything-3B",
+    "locate_anything_trt": "LocateAnything-3B (TRT)",
     "qwen3_native": "Qwen3-VL-8B-Instruct",
     "qwen3_thinking": "Qwen3-VL-8B-Thinking",
     "yolo26": "YOLO26n (Detect)",
@@ -574,7 +607,7 @@ MODEL_DISPLAY = {
 
 
 def build_prompt(category_name, model_type):
-    if model_type == "locate_anything":
+    if model_type in ("locate_anything", "locate_anything_trt"):
         return category_name
     if model_type == "qwen3_native":
         return (
@@ -644,6 +677,40 @@ TASK_ROWS = {
         ("avg_inference_ms", "Avg inference (ms)", "{:.1f}"),
         ("accuracy", "Accuracy", "{:.4f}"),
         ("images", "Questions answered", "{}"),
+    ],
+    "classification": [
+        ("fps", "FPS", "{:.2f}"),
+        ("avg_inference_ms", "Avg inference (ms)", "{:.1f}"),
+        ("top1_accuracy", "Top-1 Accuracy", "{:.4f}"),
+        ("top5_accuracy", "Top-5 Accuracy", "{:.4f}"),
+        ("images", "Images processed", "{}"),
+    ],
+    "segmentation": [
+        ("fps", "FPS", "{:.2f}"),
+        ("avg_inference_ms", "Avg inference (ms)", "{:.1f}"),
+        ("PQ", "Panoptic Quality", "{:.4f}"),
+        ("mIoU", "mIoU", "{:.4f}"),
+        ("images", "Images processed", "{}"),
+    ],
+    "scene_analysis": [
+        ("fps", "FPS", "{:.2f}"),
+        ("avg_inference_ms", "Avg inference (ms)", "{:.1f}"),
+        ("scene_type_accuracy", "Scene type accuracy", "{:.4f}"),
+        ("object_recall", "Object recall", "{:.4f}"),
+        ("images", "Images processed", "{}"),
+    ],
+    "tracking": [
+        ("fps", "FPS", "{:.2f}"),
+        ("avg_inference_ms", "Avg inference (ms)", "{:.1f}"),
+        ("MOTA", "MOTA", "{:.4f}"),
+        ("MOTP", "MOTP", "{:.4f}"),
+        ("frames", "Frames processed", "{}"),
+    ],
+    "6d_pose": [
+        ("fps", "FPS", "{:.2f}"),
+        ("avg_inference_ms", "Avg inference (ms)", "{:.1f}"),
+        ("detection_rate", "Detection rate", "{:.4f}"),
+        ("images", "Images processed", "{}"),
     ],
 }
 

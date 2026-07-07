@@ -36,6 +36,33 @@ try:
 
         ready()
 
+    elif model_key == "locate_anything_trt":
+        sys.path.insert(0, str(BASE / "locate_anything"))
+        _trt_venv = str(BASE / "locate_anything" / "model" / "tensorRT" / ".venv")
+        _libs = [
+            _trt_venv + "/lib/python3.10/site-packages/tensorrt_libs",
+            f"{os.path.expanduser('~')}/.local/lib/python3.10/site-packages/nvidia/cudnn/lib",
+            "/usr/local/cuda-12.8/lib64",
+        ]
+        import ctypes as _ct
+        for _d in _libs:
+            if os.path.isdir(_d):
+                for _f in os.listdir(_d):
+                    if _f.endswith(".so") or ".so." in _f:
+                        try:
+                            _ct.CDLL(os.path.join(_d, _f), mode=_ct.RTLD_GLOBAL)
+                        except Exception:
+                            pass
+        with redirect_stdout(_suppress), redirect_stderr(_suppress):
+            from infer_trt import LocateAnythingWorkerTRT
+            worker = LocateAnythingWorkerTRT(str(BASE / "locate_anything" / "model"))
+
+        def predict(img_path, prompt):
+            from PIL import Image
+            return worker.predict(Image.open(img_path).convert("RGB"), prompt)
+
+        ready()
+
     elif model_key == "qwen3_instruct":
         sys.path.insert(0, str(BASE / "qwen3-vl_instruct"))
         os.environ["TRANSFORMERS_VERBOSITY"] = "error"

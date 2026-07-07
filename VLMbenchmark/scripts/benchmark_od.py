@@ -26,7 +26,7 @@ def benchmark(model_name, dataset="coco", max_images=100, verbose=True):
     if mn not in MODEL_LOADERS:
         raise ValueError(f"Unknown model {mn!r}. Choices: {list(MODEL_LOADERS)}")
 
-    is_la = mn == "locate_anything"
+    is_la = mn in ("locate_anything", "locate_anything_trt")
     is_q3 = mn == "qwen3_native"
     is_th = mn == "qwen3_thinking"
     is_yolo = mn.startswith("yolo")

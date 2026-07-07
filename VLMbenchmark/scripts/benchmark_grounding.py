@@ -17,7 +17,7 @@ from common import (
     build_prompt, print_comparison, save_stats,
 )
 
-GROUNDING_MODELS = {"locate_anything", "qwen3_native", "qwen3_thinking", "florence2"}
+GROUNDING_MODELS = {"locate_anything", "locate_anything_trt", "qwen3_native", "qwen3_thinking", "florence2"}
 
 
 def benchmark_grounding(model_name, max_images=100, verbose=True):
@@ -27,7 +27,7 @@ def benchmark_grounding(model_name, max_images=100, verbose=True):
     if mn not in GROUNDING_MODELS:
         raise ValueError(f"Model {mn!r} does not support grounding. Choose from: {GROUNDING_MODELS}")
 
-    is_la = mn == "locate_anything"
+    is_la = mn in ("locate_anything", "locate_anything_trt")
     is_q3 = mn == "qwen3_native"
     is_th = mn == "qwen3_thinking"
     is_f2 = mn == "florence2"

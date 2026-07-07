@@ -18,6 +18,14 @@ MODELS = {
         "display": "LocateAnything-3B",
         "capabilities": ["grounding", "detection", "text_detection"],
     },
+    "locate_anything_trt": {
+        "path": PROJECT_DIR / "locate_anything",
+        "venv_python": str(PROJECT_DIR / "locate_anything" / ".venv" / "bin" / "python"),
+        "script": str(PROJECT_DIR / "locate_anything" / "infer_trt.py"),
+        "model_dir": str(PROJECT_DIR / "locate_anything" / "model"),
+        "display": "LocateAnything-3B (TRT)",
+        "capabilities": ["grounding", "detection", "text_detection"],
+    },
     "qwen3_instruct": {
         "path": PROJECT_DIR / "qwen3-vl_instruct",
         "venv_python": str(PROJECT_DIR / "qwen3-vl_instruct" / ".venv" / "bin" / "python"),
@@ -148,7 +156,7 @@ COCO_CATEGORIES = [
 ]
 
 VLM_MODEL_KEYS = {
-    "locate_anything", "qwen3_instruct", "qwen3_thinking",
+    "locate_anything", "locate_anything_trt", "qwen3_instruct", "qwen3_thinking",
     "florence2", "paligemma", "cosmos_nemotron", "phi_vision", "llama_vision",
     "diffusion_gemma_vl", "phi4_multimodal",
 }

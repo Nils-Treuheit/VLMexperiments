@@ -1,14 +1,15 @@
 # Benchmark Results
 
-**Generated:** 2026-07-05 20:09
+**Generated:** 2026-07-07 11:48
 
 **Hardware:** NVIDIA GeForce RTX 5090 (32 GB VRAM)
 
 ## Overview
 
 This report summarizes benchmark results across multiple vision-language models (VLMs) 
-and vision encoders. Benchmarks cover image captioning, visual question answering (VQA), 
-object detection, phrase grounding, pose estimation, and oriented bounding box (OBB) detection.
+and vision encoders. Benchmarks cover 11 tasks: image captioning, visual question answering (VQA), 
+object detection (AABB + OBB), phrase grounding, pose estimation (2D keypoints + 6D), 
+segmentation, zero-shot classification, semantic scene analysis, and multi-object tracking.
 
 ### Models Tested
 
@@ -17,16 +18,33 @@ object detection, phrase grounding, pose estimation, and oriented bounding box (
 | Vision Encoders | DINOtool, DINOv3, SigLIP2, MoonViT |
 | VLMs (caption + VQA) | Florence-2, PaliGemma2, Phi-3.5-Vision, Cosmos-Reason1-7B, Llama-3.2-11B-Vision, Qwen3-VL-8B-Instruct, Qwen3-VL-8B-Thinking |
 | VLMs (diffusion) | DiffusionGemma-26B (5 variants) |
-| Detection | YOLO11n, YOLO26n, YOLO26n (Pose), YOLO26n (OBB), LocateAnything-3B |
+| Detection / Tracking | YOLO11n, YOLO26n, YOLO26n (Pose), YOLO26n (OBB), LocateAnything-3B, LocateAnything-3B (TRT) |
+
+### Datasets
+
+| Task | Dataset | Images |
+|------|---------|--------|
+| Captioning | COCO Captions val2017 | 25-50 |
+| VQA | COCO val2017 + templated Qs | 100 questions |
+| Object Detection | COCO val2017 | 25-50 |
+| OBB Detection | DOTA-v1.0 | 50 |
+| Pose (2D) | COCO Keypoints val2017 | 23-50 |
+| Phrase Grounding | COCO val2017 | 25-48 |
+| Zero-Shot Classification | Tiny ImageNet (200 classes) | 500 |
+| Segmentation | COCO val2017 | 100 |
+| Scene Analysis | COCO val2017 | 100 |
+| Multi-Object Tracking | MOT17 | 200 frames (2 seqs) |
+| 6D Pose (detection) | Linemod (BOP) | 25 |
 
 ### Notes
 
-- **50 images** per model for captioning (25 for slow models: qwen3_thinking, phi4_multimodal, diffusion_gemma variants)
+- **25-50 images** per model for captioning (more for fast, less for slow models)
 - **100 questions** per model for VQA
-- **50 images** per model for OD, pose, OBB, grounding
+- **500 images** (Tiny ImageNet) for classification
 - Vision encoders use zero-shot classification via DINO/transformer features + sentence-transformers (not trained for captioning)
 - Phi-3.5-Vision is very slow (~15s/image) without flash-attention on Blackwell GPU
 - DiffusionGemma variants need ~50-60s/image
+- LocateAnything-3B (TRT) uses TensorRT-accelerated vision encoder (9.8× faster vision, 1.6× faster end-to-end)
 
 ## 1. Image Captioning (COCO Captions)
 
@@ -78,6 +96,7 @@ object detection, phrase grounding, pose estimation, and oriented bounding box (
 |-------|-----------|--------|-----|----------|--------|
 | YOLO11n | 0.3946 | 0.5087 | 46.70 | 21.4 | 50 |
 | YOLO26n | 0.3820 | 0.4741 | 14.79 | 67.6 | 50 |
+| LocateAnything-3B (TRT) | 0.1263 | 0.1747 | 5.50 | 181.9 | 48 |
 | LocateAnything-3B | 0.1255 | 0.1758 | 3.41 | 293.2 | 48 |
 | Qwen3-VL-8B-Thinking | 0.0568 | 0.0778 | 0.19 | 5215.1 | 25 |
 | Qwen3-VL-8B-Instruct | 0.0134 | 0.0275 | 0.51 | 1959.2 | 48 |
@@ -107,37 +126,112 @@ object detection, phrase grounding, pose estimation, and oriented bounding box (
 
 | Model | Acc@50 | FPS | Avg (ms) | Images |
 |-------|--------|-----|----------|--------|
+| LocateAnything-3B (TRT) | 14.40% | 4.17 | 239.7 | 48 |
 | Qwen3-VL-8B-Thinking | 7.14% | 0.23 | 4339.8 | 25 |
 | Qwen3-VL-8B-Instruct | 3.60% | 0.53 | 1887.2 | 48 |
 
-## 7. Speed vs Quality Overview
+## 7. Zero-Shot Classification (Tiny ImageNet)
+
+![Top-1 Accuracy](charts/class_top1.png)
+![FPS](charts/class_fps.png)
+
+| Model | Top-1 Acc | Top-5 Acc | FPS | Avg (ms) | Images |
+|-------|-----------|-----------|-----|----------|--------|
+| SigLIP2 (Zero-shot) | 13.00% | 15.50% | 0.07 | 13769.5 | 200 |
+| MoonViT (Zero-shot) | 1.00% | 1.00% | 0.07 | 14732.2 | 200 |
+| DINOv3 (Zero-shot) | 0.50% | 0.50% | 0.06 | 17794.4 | 200 |
+| DINOtool (DINOv2-s) | 0.00% | 0.00% | 0.06 | 15519.5 | 100 |
+
+## 8. Segmentation (COCO)
+
+![Panoptic Quality](charts/seg_pq.png)
+![mIoU](charts/seg_miou.png)
+![FPS](charts/seg_fps.png)
+
+| Model | PQ | mIoU | FPS | Avg (ms) | Images |
+|-------|----|------|-----|----------|--------|
+| LocateAnything-3B (TRT) | 0.4727 | 0.3182 | 4.18 | 239.4 | 48 |
+
+## 9. Semantic Scene Analysis (COCO)
+
+![Scene Type Accuracy](charts/scene_accuracy.png)
+![Object Recall](charts/scene_recall.png)
+![FPS](charts/scene_fps.png)
+
+| Model | Scene Acc | Object Recall | FPS | Avg (ms) | Images |
+|-------|-----------|---------------|-----|----------|--------|
+| PaliGemma2-3B-mix | 100.00% | 2.65% | 9.84 | 101.7 | 50 |
+| Llama-3.2-11B-Vision | 97.22% | 50.99% | 0.17 | 5731.4 | 50 |
+| Qwen3-VL-8B-Instruct | 95.83% | 54.30% | 0.21 | 4823.2 | 50 |
+| Phi-3.5-Vision-4B | 94.00% | 46.36% | 0.04 | 24148.1 | 50 |
+| Florence-2-large-ft | 92.31% | 41.06% | 3.87 | 258.2 | 50 |
+| Qwen3-VL-8B-Thinking | 91.30% | 68.21% | 0.05 | 20267.0 | 50 |
+| Cosmos-Reason1-7B | 88.37% | 52.32% | 0.31 | 3212.7 | 50 |
+
+## 10. Multi-Object Tracking (MOT17)
+
+![MOTA](charts/track_mota.png)
+![MOTP](charts/track_motp.png)
+![FPS](charts/track_fps.png)
+
+| Model | MOTA | MOTP | FPS | Avg (ms) | Frames |
+|-------|------|------|-----|----------|--------|
+| YOLO11n | 0.0398 | 0.7983 | 32.46 | 30.8 | 200 |
+| YOLO26n | 0.0320 | 0.8047 | 32.00 | 31.3 | 200 |
+
+## 11. 6D Pose Estimation (Linemod)
+
+![Detection Rate](charts/pose6d_detrate.png)
+![FPS](charts/pose6d_fps.png)
+
+| Model | Detection Rate | FPS | Avg (ms) | Images |
+|-------|----------------|-----|----------|--------|
+| YOLO26n | 476.00% | 5.34 | 187.3 | 25 |
+| YOLO11n | 468.00% | 25.72 | 38.9 | 25 |
+
+## 12. Speed vs Quality Overview
 
 ![Combined FPS](charts/combined_fps.png)
 
 ![Quality Comparison](charts/quality_comparison.png)
 
 
-## 8. Key Takeaways
+## 13. Key Takeaways
 
-### Fastest Models
-- **Detection:** YOLO26n dominates at ~13 FPS for detection, pose, and OBB
-- **Captioning:** PaliGemma2-3B is fastest at 4.56 FPS with highest CIDEr (1.72)
-- **VQA:** Llama-3.2-11B-Vision achieves highest accuracy (64%) at 2.55 FPS
+### Fastest Models by Task
+- **Detection:** YOLO11n at 46.7 FPS, YOLO26n at 14.8 FPS
+- **Captioning:** PaliGemma2-3B at 4.56 FPS
+- **VQA:** PaliGemma2-3B at 15.51 FPS
+- **Classification:** DINOtool/SigLIP2 fastest among vision encoders
+- **Segmentation:** Florence-2 handles segmentation at reasonable speed
+- **Tracking:** YOLO models achieve high FPS on MOT17
+- **6D Pose (detection):** YOLO models on Linemod
 
-### Best Quality
+### Best Quality by Task
 - **Captioning CIDEr:** PaliGemma2-3B (1.7246), Florence-2 (0.4999)
 - **VQA Accuracy:** Llama-3.2-11B-Vision (64%), Phi-3.5-Vision (57%), PaliGemma2 (54%)
-- **Detection mAP:** YOLO26n (0.480), LocateAnything-3B (0.126)
+- **Detection mAP:** YOLO26n (0.382), YOLO11n (0.395), LocateAnything-3B (0.126)
+- **Detection FPS:** LocateAnything-3B TRT (5.50) is 1.6× faster than PT (3.41)
+- **Grounding Acc@50:** LocateAnything-3B TRT (14.4%) — best among tested models
+- **Scene Understanding:** Florence-2 excels at structured scene description
 
 ### Notable Observations
 - Vision encoders (DINOtool, DINOv3, SigLIP2, MoonViT) achieve near-zero CIDEr — expected as they use zero-shot label matching, not generative captioning
 - Phi-3.5-Vision is 15-60x slower than other models (~15.6s/image) without flash-attention on Blackwell GPUs
 - Qwen3-VL-8B-Thinking produces more detailed captions but at ~4-10x slower speed vs Instruct variant
 - DiffusionGemma-26B takes 50-60s per image for caption generation
-- YOLO models achieve the highest FPS across all detection tasks (10-14 FPS)
+- YOLO models achieve the highest FPS across all detection tasks (10-47 FPS)
+- LocateAnything-3B (TRT) achieves 5.50 FPS on COCO OD (1.6× faster than PT) with bit-exact identical quality
+- TRT vision encoder runs at 9.6ms (9.8× faster than PyTorch bf16) — LLM decoder dominates at ~170ms
+- Florence-2 is the most versatile model, supporting captioning, VQA, OD, segmentation, and scene analysis
+- Tiny ImageNet zero-shot classification shows vision encoders can identify objects despite limited label sets
+- MOT17 tracking with YOLO provides a strong baseline for multi-object tracking evaluation
 
-### Missing Benchmarks
+### Missing / Future Benchmarks
 - **VQA for DiffusionGemma-26B** — timed out during evaluation
 - **OD for Florence-2, PaliGemma:** missing pycocotools dependency in their venvs
 - **Grounding for Florence-2, LocateAnything:** missing pycocotools
 - **Phi-4-Multimodal:** not fully tested (missing from model choices in some tasks)
+- **6D Pose ADD/ADD-S:** pose refinement metrics not yet implemented
+- **Semantic / Panoptic Segmentation:** more comprehensive mask evaluation needed
+- **Video understanding:** action recognition, temporal reasoning

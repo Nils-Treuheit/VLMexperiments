@@ -1,0 +1,15 @@
+{
+  "model": "YOLO11s (Detect)",
+  "model_key": "yolo11s",
+  "dataset": "coco",
+  "task": "object_detection",
+  "images": 50,
+  "skipped": 0,
+  "total_inference_time_s": 1.281,
+  "avg_inference_ms": 25.63,
+  "fps": 39.02,
+  "total_gt": 382,
+  "total_detected": 324,
+  "mAP@50:95": 0.48559567766045336,
+  "mAP@50": 0.5808661949196838
+}

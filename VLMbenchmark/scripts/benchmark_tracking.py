@@ -162,6 +162,9 @@ def main():
                         help="Number of MOT17 sequences to evaluate (default: 2)")
     parser.add_argument("--max-frames", type=int, default=100,
                         help="Max frames per sequence (default: 100)")
+    parser.add_argument("--tracker", type=str, default="botsort",
+                        choices=["botsort", "bytetrack"],
+                        help="Tracker type (default: botsort)")
     args = parser.parse_args()
     
     # Find MOT17 sequences
@@ -216,7 +219,10 @@ def main():
             frame_num = frame_idx + 1
             t0 = time.time()
             
-            results = model.track(str(img_path), persist=True, verbose=False, device="cuda" if __import__('torch').cuda.is_available() else "cpu")
+            tracker_cfg = f"{args.tracker}.yaml"
+            results = model.track(str(img_path), persist=True, verbose=False,
+                                  tracker=tracker_cfg,
+                                  device="cuda" if __import__('torch').cuda.is_available() else "cpu")
             
             elapsed = time.time() - t0
             seq_time += elapsed
@@ -260,8 +266,9 @@ def main():
     avg_fps = total_frames / total_time if total_time > 0 else 0
     
     stats = {
-        "model": f"MOT17 Tracking ({args.model})",
+        "model": f"MOT17 Tracking ({args.model} + {args.tracker})",
         "model_key": args.model,
+        "tracker": args.tracker,
         "task": "tracking",
         "dataset": "MOT17",
         "sequences": len(all_metrics),
@@ -277,7 +284,7 @@ def main():
         "fps": round(avg_fps, 2),
     }
     
-    save_stats(stats, f"{args.model}_tracking")
+    save_stats(stats, f"{args.model}_{args.tracker}_tracking")
     
     print(f"\nTracking Results: {args.model}")
     print(f"  MOTA: {avg_mota:.4f}")

@@ -1,0 +1,13 @@
+{
+  "model": "LocateAnything-3B",
+  "model_key": "locate_anything",
+  "task": "ocr",
+  "dataset": "synthetic_coco",
+  "images": 25,
+  "total_gt_text_regions": 125,
+  "total_detected": 94,
+  "detection_rate": 0.752,
+  "total_inference_time_s": 11.959,
+  "avg_inference_ms": 478.4,
+  "fps": 2.09
+}

@@ -1,0 +1,18 @@
+{
+  "model": "MOT17 Tracking (yolo11 + bytetrack)",
+  "model_key": "yolo11",
+  "tracker": "bytetrack",
+  "task": "tracking",
+  "dataset": "MOT17",
+  "sequences": 2,
+  "frames": 200,
+  "MOTA": 0.0399,
+  "MOTP": 0.7994,
+  "FN": 30182,
+  "FP": 559,
+  "IDSW": 9,
+  "total_gt": 31999,
+  "total_inference_time_s": 4.33,
+  "avg_inference_ms": 21.7,
+  "fps": 46.18
+}

@@ -1,0 +1,18 @@
+{
+  "model": "MOT17 Tracking (yolo26 + botsort)",
+  "model_key": "yolo26",
+  "tracker": "botsort",
+  "task": "tracking",
+  "dataset": "MOT17",
+  "sequences": 2,
+  "frames": 200,
+  "MOTA": 0.032,
+  "MOTP": 0.8047,
+  "FN": 30575,
+  "FP": 485,
+  "IDSW": 4,
+  "total_gt": 31999,
+  "total_inference_time_s": 7.69,
+  "avg_inference_ms": 38.5,
+  "fps": 25.99
+}

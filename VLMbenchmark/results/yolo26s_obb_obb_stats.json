@@ -1,0 +1,15 @@
+{
+  "model": "YOLO26s (OBB)",
+  "model_key": "yolo26s_obb",
+  "task": "obb_detection",
+  "dataset": "dota",
+  "images": 50,
+  "skipped": 0,
+  "total_inference_time_s": 3.957,
+  "avg_inference_ms": 79.14,
+  "fps": 12.64,
+  "total_gt": 4054,
+  "total_detected": 4116,
+  "mAP@50:95": null,
+  "mAP@50": null
+}

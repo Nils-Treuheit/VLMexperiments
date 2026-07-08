@@ -11,26 +11,22 @@ TASKS = {
     "od": {
         "script": "benchmark_od.py",
         "title": "Object Detection (COCO)",
-        "models": ["locate_anything", "locate_anything_trt", "qwen3_native", "qwen3_thinking", "yolo26",
+        "models": ["locate_anything", "locate_anything_trt", "qwen3_native", "qwen3_thinking",
+                    "yolo26", "yolo26s", "yolo26m", "yolo26l", "yolo26x",
+                    "yolo11", "yolo11s", "yolo11m", "yolo11l", "yolo11x",
                     "florence2", "paligemma"],
         "dataset": "coco",
-    },
-    "od_dota": {
-        "script": "benchmark_od.py",
-        "title": "Object Detection (DOTA)",
-        "models": ["locate_anything", "locate_anything_trt", "qwen3_native", "qwen3_thinking"],
-        "dataset": "dota",
     },
     "pose": {
         "script": "benchmark_pose.py",
         "title": "Pose Estimation (COCO Keypoints)",
-        "models": ["yolo26_pose"],
+        "models": ["yolo26_pose", "yolo26s_pose", "yolo11_pose", "yolo11s_pose"],
         "dataset": None,
     },
     "obb": {
         "script": "benchmark_obb.py",
         "title": "OBB Detection (DOTA-v1.0)",
-        "models": ["yolo26_obb"],
+        "models": ["yolo26_obb", "yolo26s_obb", "yolo11_obb", "yolo11s_obb"],
         "dataset": None,
     },
     "grounding": {
@@ -63,7 +59,9 @@ TASKS = {
     "classification": {
         "script": "benchmark_classification.py",
         "title": "Zero-Shot Classification (Tiny ImageNet)",
-        "models": ["dinotool", "dinov3", "siglip2", "moonvit"],
+        "models": ["dinotool", "dinov3", "siglip2", "moonvit",
+                    "locate_anything", "locate_anything_trt", "qwen3_native", "qwen3_thinking",
+                    "florence2", "paligemma"],
         "dataset": None,
     },
     "segmentation": {
@@ -82,13 +80,13 @@ TASKS = {
     "tracking": {
         "script": "benchmark_tracking.py",
         "title": "Multi-Object Tracking (MOT17)",
-        "models": ["yolo26", "yolo11"],
+        "models": ["yolo26", "yolo26s", "yolo26m", "yolo11", "yolo11s", "yolo11m"],
         "dataset": None,
     },
     "6d_pose": {
         "script": "benchmark_6dpose.py",
         "title": "6D Pose Estimation Detection (Linemod)",
-        "models": ["yolo26", "yolo11"],
+        "models": ["yolo26", "yolo26s", "yolo26m", "yolo11", "yolo11s", "yolo11m"],
         "dataset": None,
     },
 }
@@ -102,8 +100,23 @@ MODEL_VENV = {k: str(COLLECTION_DIR / v / ".venv" / "bin" / "python")
         "qwen3_native": "qwen3-vl_instruct",
         "qwen3_thinking": "qwen3-vl_thinking",
         "yolo26": "yolo11-26",
+        "yolo26s": "yolo11-26",
+        "yolo26m": "yolo11-26",
+        "yolo26l": "yolo11-26",
+        "yolo26x": "yolo11-26",
         "yolo26_pose": "yolo11-26",
+        "yolo26s_pose": "yolo11-26",
         "yolo26_obb": "yolo11-26",
+        "yolo26s_obb": "yolo11-26",
+        "yolo11": "yolo11-26",
+        "yolo11s": "yolo11-26",
+        "yolo11m": "yolo11-26",
+        "yolo11l": "yolo11-26",
+        "yolo11x": "yolo11-26",
+        "yolo11_pose": "yolo11-26",
+        "yolo11s_pose": "yolo11-26",
+        "yolo11_obb": "yolo11-26",
+        "yolo11s_obb": "yolo11-26",
         "florence2": "florence-2",
         "paligemma": "paligemma",
         "llama_vision": "llama-vision",
@@ -173,11 +186,10 @@ def extract_stats(model, script):
     elif "6dpose" in script:
         fp = RESULTS_DIR / f"{prefix}_linemod_6dpose_stats.json"
     else:
-        for ds in ["coco", "dota"]:
-            fp = RESULTS_DIR / f"{prefix}_{ds}_od_stats.json"
-            if fp.exists():
-                with open(fp) as f:
-                    return json.load(f)
+        fp = RESULTS_DIR / f"{prefix}_coco_od_stats.json"
+        if fp.exists():
+            with open(fp) as f:
+                return json.load(f)
         return None
 
     if fp.exists():

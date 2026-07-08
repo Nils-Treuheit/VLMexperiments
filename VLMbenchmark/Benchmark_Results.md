@@ -1,15 +1,16 @@
 # Benchmark Results
 
-**Generated:** 2026-07-07 11:48
+**Generated:** 2026-07-08 02:24
 
 **Hardware:** NVIDIA GeForce RTX 5090 (32 GB VRAM)
 
 ## Overview
 
 This report summarizes benchmark results across multiple vision-language models (VLMs) 
-and vision encoders. Benchmarks cover 11 tasks: image captioning, visual question answering (VQA), 
+and vision encoders. Benchmarks cover 13 tasks: image captioning, visual question answering (VQA), 
 object detection (AABB + OBB), phrase grounding, pose estimation (2D keypoints + 6D), 
-segmentation, zero-shot classification, semantic scene analysis, and multi-object tracking.
+segmentation, zero-shot classification, semantic scene analysis, multi-object tracking, 
+OCR / text detection, and pointing / 2D keypoint localization.
 
 ### Models Tested
 
@@ -18,7 +19,8 @@ segmentation, zero-shot classification, semantic scene analysis, and multi-objec
 | Vision Encoders | DINOtool, DINOv3, SigLIP2, MoonViT |
 | VLMs (caption + VQA) | Florence-2, PaliGemma2, Phi-3.5-Vision, Cosmos-Reason1-7B, Llama-3.2-11B-Vision, Qwen3-VL-8B-Instruct, Qwen3-VL-8B-Thinking |
 | VLMs (diffusion) | DiffusionGemma-26B (5 variants) |
-| Detection / Tracking | YOLO11n, YOLO26n, YOLO26n (Pose), YOLO26n (OBB), LocateAnything-3B, LocateAnything-3B (TRT) |
+| Detection / OBB / Pose | YOLO11n/s/m, YOLO26n/s/m (detect, pose, OBB), LocateAnything-3B, LocateAnything-3B (TRT) |
+| OCR / Pointing | LocateAnything-3B, LocateAnything-3B (TRT) |
 
 ### Datasets
 
@@ -35,6 +37,8 @@ segmentation, zero-shot classification, semantic scene analysis, and multi-objec
 | Scene Analysis | COCO val2017 | 100 |
 | Multi-Object Tracking | MOT17 | 200 frames (2 seqs) |
 | 6D Pose (detection) | Linemod (BOP) | 25 |
+| OCR / Text Detection | Synthetic text on COCO | 25 |
+| Pointing / 2D Keypoint | COCO Keypoints val2017 | 10-25 |
 
 ### Notes
 
@@ -45,6 +49,8 @@ segmentation, zero-shot classification, semantic scene analysis, and multi-objec
 - Phi-3.5-Vision is very slow (~15s/image) without flash-attention on Blackwell GPU
 - DiffusionGemma variants need ~50-60s/image
 - LocateAnything-3B (TRT) uses TensorRT-accelerated vision encoder (9.8× faster vision, 1.6× faster end-to-end)
+- OCR benchmark uses synthetic text overlays on COCO images (5 random words per image)
+- Pointing benchmark evaluates COCO keypoints (nose, eyes, shoulders, etc.) with normalized distance thresholds
 
 ## 1. Image Captioning (COCO Captions)
 
@@ -94,6 +100,12 @@ segmentation, zero-shot classification, semantic scene analysis, and multi-objec
 
 | Model | mAP@50:95 | mAP@50 | FPS | Avg (ms) | Images |
 |-------|-----------|--------|-----|----------|--------|
+| YOLO26m | 0.5141 | 0.6305 | 35.32 | 28.3 | 50 |
+| YOLO11m | 0.4973 | 0.5994 | 39.12 | 25.6 | 50 |
+| YOLO11s | 0.4856 | 0.5809 | 39.02 | 25.6 | 50 |
+| YOLO11x | 0.4812 | 0.5912 | 33.88 | 29.5 | 50 |
+| YOLO26s | 0.4579 | 0.5573 | 35.65 | 28.1 | 50 |
+| YOLO11l | 0.4460 | 0.5528 | 35.54 | 28.1 | 50 |
 | YOLO11n | 0.3946 | 0.5087 | 46.70 | 21.4 | 50 |
 | YOLO26n | 0.3820 | 0.4741 | 14.79 | 67.6 | 50 |
 | LocateAnything-3B (TRT) | 0.1263 | 0.1747 | 5.50 | 181.9 | 48 |
@@ -108,7 +120,10 @@ segmentation, zero-shot classification, semantic scene analysis, and multi-objec
 
 | Model | mAP@50:95 | mAP@50 | FPS | Avg (ms) | Images |
 |-------|-----------|--------|-----|----------|--------|
+| YOLO11s (Pose) | — | — | 24.36 | 41.1 | 23 |
+| YOLO26s (Pose) | — | — | 19.85 | 50.4 | 23 |
 | YOLO26n (Pose) | — | — | 23.43 | 42.7 | 23 |
+| YOLO11n (Pose) | — | — | 23.04 | 43.4 | 23 |
 
 ## 5. Oriented Bounding Box (DOTA-v1.0)
 
@@ -117,7 +132,10 @@ segmentation, zero-shot classification, semantic scene analysis, and multi-objec
 
 | Model | mAP@50:95 | mAP@50 | FPS | Avg (ms) | Images |
 |-------|-----------|--------|-----|----------|--------|
+| YOLO11n (OBB) | — | — | 11.66 | 85.8 | 50 |
+| YOLO11s (OBB) | — | — | 12.60 | 79.4 | 50 |
 | YOLO26n (OBB) | — | — | 13.60 | 73.5 | 50 |
+| YOLO26s (OBB) | — | — | 12.64 | 79.1 | 50 |
 
 ## 6. Phrase Grounding (COCO)
 
@@ -189,43 +207,68 @@ segmentation, zero-shot classification, semantic scene analysis, and multi-objec
 | YOLO26n | 476.00% | 5.34 | 187.3 | 25 |
 | YOLO11n | 468.00% | 25.72 | 38.9 | 25 |
 
-## 12. Speed vs Quality Overview
+## 12. OCR / Text Detection (Synthetic COCO)
+
+![Detection Rate](charts/ocr_detrate.png)
+![FPS](charts/ocr_fps.png)
+
+| Model | Detection Rate | FPS | Avg (ms) | Images |
+|-------|----------------|-----|----------|--------|
+| LocateAnything-3B (TRT) | 85.60% | 3.08 | 324.8 | 25 |
+| LocateAnything-3B | 75.20% | 2.09 | 478.4 | 25 |
+
+## 13. Pointing / 2D Keypoint (COCO Keypoints)
+
+![Acc@0.05](charts/pointing_acc05.png)
+![Acc@0.10](charts/pointing_acc10.png)
+![FPS](charts/pointing_fps.png)
+
+| Model | Acc@0.05 | Acc@0.10 | FPS | Avg (ms) | Keypoints |
+|-------|----------|----------|-----|----------|-----------|
+| LocateAnything-3B | 22.81% | 27.76% | 0.25 | 151.1 | 263 |
+| LocateAnything-3B (TRT) | 19.77% | 24.71% | 0.36 | 106.9 | 263 |
+
+## 14. Speed vs Quality Overview
 
 ![Combined FPS](charts/combined_fps.png)
 
 ![Quality Comparison](charts/quality_comparison.png)
 
 
-## 13. Key Takeaways
+## 15. Key Takeaways
 
 ### Fastest Models by Task
-- **Detection:** YOLO11n at 46.7 FPS, YOLO26n at 14.8 FPS
+- **Detection:** YOLO11n at 46.7 FPS, YOLO26n at 14.8 FPS (medium: 35 FPS)
 - **Captioning:** PaliGemma2-3B at 4.56 FPS
 - **VQA:** PaliGemma2-3B at 15.51 FPS
-- **Classification:** DINOtool/SigLIP2 fastest among vision encoders
+- **Classification:** Vision encoders via embedding matching
 - **Segmentation:** Florence-2 handles segmentation at reasonable speed
-- **Tracking:** YOLO models achieve high FPS on MOT17
+- **Tracking:** YOLO + ByteTrack achieves ~50 FPS on MOT17
 - **6D Pose (detection):** YOLO models on Linemod
+- **OCR (text detection):** LocateAnything-3B TRT at 3.08 FPS, 85.6% detection rate
 
 ### Best Quality by Task
 - **Captioning CIDEr:** PaliGemma2-3B (1.7246), Florence-2 (0.4999)
 - **VQA Accuracy:** Llama-3.2-11B-Vision (64%), Phi-3.5-Vision (57%), PaliGemma2 (54%)
-- **Detection mAP:** YOLO26n (0.382), YOLO11n (0.395), LocateAnything-3B (0.126)
+- **Detection mAP:** YOLO26m (0.514), YOLO11m (0.497), YOLO26s (0.458)
 - **Detection FPS:** LocateAnything-3B TRT (5.50) is 1.6× faster than PT (3.41)
 - **Grounding Acc@50:** LocateAnything-3B TRT (14.4%) — best among tested models
+- **OCR:** LocateAnything-3B TRT 85.6% detection — better than PT 75.2%
 - **Scene Understanding:** Florence-2 excels at structured scene description
 
 ### Notable Observations
+- YOLO26m achieves highest detection mAP@50:95 (0.514) at 35 FPS — best accuracy-speed trade-off
+- ByteTrack is ~1.5-2× faster than BoTSORT with nearly identical MOTA accuracy
+- LocateAnything-3B OCR: TRT achieves 85.6% detection rate vs 75.2% PT (~10% improvement)
+- LocateAnything-3B Pointing: ~20-28% accuracy at 0.05-0.10 normalized distance thresholds
 - Vision encoders (DINOtool, DINOv3, SigLIP2, MoonViT) achieve near-zero CIDEr — expected as they use zero-shot label matching, not generative captioning
 - Phi-3.5-Vision is 15-60x slower than other models (~15.6s/image) without flash-attention on Blackwell GPUs
 - Qwen3-VL-8B-Thinking produces more detailed captions but at ~4-10x slower speed vs Instruct variant
 - DiffusionGemma-26B takes 50-60s per image for caption generation
-- YOLO models achieve the highest FPS across all detection tasks (10-47 FPS)
+- YOLO models achieve the highest FPS across all detection tasks (10-50 FPS)
 - LocateAnything-3B (TRT) achieves 5.50 FPS on COCO OD (1.6× faster than PT) with bit-exact identical quality
 - TRT vision encoder runs at 9.6ms (9.8× faster than PyTorch bf16) — LLM decoder dominates at ~170ms
 - Florence-2 is the most versatile model, supporting captioning, VQA, OD, segmentation, and scene analysis
-- Tiny ImageNet zero-shot classification shows vision encoders can identify objects despite limited label sets
-- MOT17 tracking with YOLO provides a strong baseline for multi-object tracking evaluation
 
 ### Missing / Future Benchmarks
 - **VQA for DiffusionGemma-26B** — timed out during evaluation

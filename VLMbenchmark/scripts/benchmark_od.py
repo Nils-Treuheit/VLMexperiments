@@ -12,12 +12,12 @@ from pycocotools.cocoeval import COCOeval
 from tqdm import tqdm
 
 from common import (
-    RESULTS_DIR, COCO_DIR, DOTA_DIR,
+    RESULTS_DIR, COCO_DIR,
     MODEL_LOADERS, MODEL_ALIASES, MODEL_DISPLAY,
     parse_box_tags, parse_json_detections, extract_narrative_boxes,
     scale_la, scale_qwen, scale_thinking, scale_florence2,
     COCO_CAT_NAME_TO_ID,
-    load_dota_coco_gt, build_prompt, print_comparison, save_stats,
+    build_prompt, print_comparison, save_stats,
 )
 
 
@@ -33,8 +33,8 @@ def benchmark(model_name, dataset="coco", max_images=100, verbose=True):
     is_f2 = mn == "florence2"
     is_pg = mn == "paligemma"
 
-    if dataset not in ("coco", "dota"):
-        raise ValueError(f"Unknown dataset {dataset!r}")
+    if dataset != "coco":
+        raise ValueError(f"Unknown dataset {dataset!r}. Only 'coco' is supported for AABB OD.")
 
     display = MODEL_DISPLAY.get(mn, mn)
     if verbose:
@@ -56,32 +56,18 @@ def benchmark(model_name, dataset="coco", max_images=100, verbose=True):
     else:
         processor, model = obj
 
-    dota_gt_dict = None
-    if dataset == "coco":
-        ap = COCO_DIR / "annotations" / "instances_val2017.json"
-        if not ap.exists():
-            print(f"Error: COCO annotations not found at {ap}")
-            return None
-        coco_gt = COCO(ap)
-        cat_id_to_name = {c["id"]: c["name"] for c in coco_gt.loadCats(coco_gt.getCatIds())}
-        if is_yolo:
-            coco_name_to_id = {c["name"]: c["id"] for c in coco_gt.loadCats(coco_gt.getCatIds())}
-        img_ids = coco_gt.getImgIds()
-        if max_images:
-            img_ids = img_ids[:max_images]
-        img_dir = COCO_DIR / "val2017"
-    else:
-        dota_gt_dict = load_dota_coco_gt(DOTA_DIR, max_images=max_images)
-        if dota_gt_dict is None or not dota_gt_dict["images"]:
-            print(f"Error: DOTA data not found at {DOTA_DIR}")
-            return None
-        gt_path = RESULTS_DIR / "dota_gt_temp.json"
-        with open(gt_path, "w") as f:
-            json.dump(dota_gt_dict, f)
-        coco_gt = COCO(str(gt_path))
-        cat_id_to_name = {c["id"]: c["name"] for c in coco_gt.loadCats(coco_gt.getCatIds())}
-        img_ids = [im["id"] for im in dota_gt_dict["images"]]
-        img_dir = DOTA_DIR / "images"
+    ap = COCO_DIR / "annotations" / "instances_val2017.json"
+    if not ap.exists():
+        print(f"Error: COCO annotations not found at {ap}")
+        return None
+    coco_gt = COCO(ap)
+    cat_id_to_name = {c["id"]: c["name"] for c in coco_gt.loadCats(coco_gt.getCatIds())}
+    if is_yolo:
+        coco_name_to_id = {c["name"]: c["id"] for c in coco_gt.loadCats(coco_gt.getCatIds())}
+    img_ids = coco_gt.getImgIds()
+    if max_images:
+        img_ids = img_ids[:max_images]
+    img_dir = COCO_DIR / "val2017"
 
     results = []
     times = []
@@ -322,7 +308,7 @@ def main():
     parser = argparse.ArgumentParser(description="Object Detection Benchmark (COCO/DOTA)")
     all_choices = list(MODEL_LOADERS) + list(MODEL_ALIASES)
     parser.add_argument("--model", choices=all_choices, default="locate_anything")
-    parser.add_argument("--dataset", choices=["coco", "dota"], default="coco")
+    parser.add_argument("--dataset", choices=["coco"], default="coco")
     parser.add_argument("--max-images", type=int, default=100)
     parser.add_argument("--save", action="store_true")
     args = parser.parse_args()

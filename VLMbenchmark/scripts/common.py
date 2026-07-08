@@ -240,64 +240,6 @@ def load_coco_captions(max_images=None):
     return img_ids, (img_infos, img_id_to_captions)
 
 
-def load_dota_coco_gt(dota_dir, max_images=None):
-    images_dir = dota_dir / "images"
-    labels_dir = dota_dir / "labels"
-    if not images_dir.exists() or not labels_dir.exists():
-        return None
-
-    image_files = sorted(images_dir.glob("*.png"))
-    if not image_files:
-        return None
-    if max_images:
-        image_files = image_files[:max_images]
-
-    out = {
-        "images": [],
-        "annotations": [],
-        "categories": [{"id": i + 1, "name": n} for i, n in enumerate(DOTA_CATEGORIES)],
-    }
-    aid = 1
-    for iid, imp in enumerate(image_files, start=1):
-        lp = labels_dir / f"{imp.stem}.txt"
-        if not lp.exists():
-            continue
-        try:
-            with Image.open(imp) as im:
-                w, h = im.size
-        except Exception:
-            continue
-        out["images"].append({"id": iid, "file_name": imp.name, "width": w, "height": h})
-        with open(lp) as f:
-            for line in f:
-                line = line.strip()
-                if not line or line.startswith(("#", "imagesource", "gsd")):
-                    continue
-                parts = line.split()
-                if len(parts) < 9:
-                    continue
-                try:
-                    coords = [float(p) for p in parts[:8]]
-                    cname = parts[8]
-                    diff = int(parts[9]) if len(parts) > 9 else 0
-                except (ValueError, IndexError):
-                    continue
-                if diff != 0 or cname not in DOTA_CAT_NAME_TO_ID:
-                    continue
-                cat_id = DOTA_CAT_NAME_TO_ID[cname]
-                xs, ys = coords[0::2], coords[1::2]
-                x1, y1, x2, y2 = min(xs), min(ys), max(xs), max(ys)
-                out["annotations"].append({
-                    "id": aid, "image_id": iid,
-                    "category_id": cat_id,
-                    "bbox": [x1, y1, x2 - x1, y2 - y1],
-                    "area": (x2 - x1) * (y2 - y1),
-                    "iscrowd": 0,
-                })
-                aid += 1
-    return out
-
-
 def load_la():
     warnings.filterwarnings("ignore", message=".*torch_dtype is deprecated.*")
     warnings.filterwarnings("ignore", message=".*image_processor_class.*")

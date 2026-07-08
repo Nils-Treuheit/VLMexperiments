@@ -97,6 +97,8 @@ segmentation_data = load_stats("*_segmentation_stats.json")
 scene_data = load_stats("*_scene_stats.json")
 tracking_data = load_stats("*_tracking_stats.json")
 pose6d_data = load_stats("*_6dpose_stats.json")
+ocr_data = load_stats("*_ocr_stats.json")
+pointing_data = load_stats("*_pointing_stats.json")
 
 print(f"  Captioning: {len(caption_data)} models")
 print(f"  VQA: {len(vqa_data)} models")
@@ -109,6 +111,8 @@ print(f"  Segmentation: {len(segmentation_data)} models")
 print(f"  Scene Analysis: {len(scene_data)} models")
 print(f"  Tracking: {len(tracking_data)} models")
 print(f"  6D Pose: {len(pose6d_data)} models")
+print(f"  OCR: {len(ocr_data)} models")
+print(f"  Pointing: {len(pointing_data)} models")
 
 # =============================================
 # Override display names for consistency
@@ -132,11 +136,31 @@ DISPLAY_NAMES = {
     "qwen3_native": "Qwen3-VL-8B-Instruct",
     "qwen3_thinking": "Qwen3-VL-8B-Thinking",
     "yolo26": "YOLO26n",
+    "yolo26s": "YOLO26s",
+    "yolo26m": "YOLO26m",
+    "yolo26l": "YOLO26l",
+    "yolo26x": "YOLO26x",
     "yolo11": "YOLO11n",
+    "yolo11s": "YOLO11s",
+    "yolo11m": "YOLO11m",
+    "yolo11l": "YOLO11l",
+    "yolo11x": "YOLO11x",
     "yolo26_pose": "YOLO26n (Pose)",
+    "yolo26s_pose": "YOLO26s (Pose)",
+    "yolo11_pose": "YOLO11n (Pose)",
+    "yolo11s_pose": "YOLO11s (Pose)",
     "yolo26_obb": "YOLO26n (OBB)",
+    "yolo26s_obb": "YOLO26s (OBB)",
+    "yolo11_obb": "YOLO11n (OBB)",
+    "yolo11s_obb": "YOLO11s (OBB)",
     "locate_anything": "LocateAnything-3B",
     "locate_anything_trt": "LocateAnything-3B (TRT)",
+    "locate_anything_ocr": "LocateAnything-3B (OCR)",
+    "locate_anything_trt_ocr": "LocateAnything-3B TRT (OCR)",
+    "yolo26_botsort": "YOLO26n + BoTSORT",
+    "yolo26_bytetrack": "YOLO26n + ByteTrack",
+    "yolo11_botsort": "YOLO11n + BoTSORT",
+    "yolo11_bytetrack": "YOLO11n + ByteTrack",
     "phi4_multimodal": "Phi-4-Multimodal",
 }
 
@@ -252,6 +276,20 @@ make_chart(pose6d_data, "detection_rate", "6D Pose (Linemod) — Detection Rate"
 make_chart(pose6d_data, "fps", "6D Pose (Linemod) — FPS",
            "FPS", "pose6d_fps.png")
 
+print("\n--- OCR ---")
+make_chart(ocr_data, "detection_rate", "OCR / Text Detection — Detection Rate",
+           "Detection Rate", "ocr_detrate.png", fmt="{:.2%}")
+make_chart(ocr_data, "fps", "OCR / Text Detection — FPS",
+           "FPS", "ocr_fps.png")
+
+print("\n--- Pointing ---")
+make_chart(pointing_data, "acc@0.05", "Pointing / 2D Keypoint — Acc@0.05",
+           "Acc@0.05", "pointing_acc05.png", fmt="{:.2%}")
+make_chart(pointing_data, "acc@0.10", "Pointing / 2D Keypoint — Acc@0.10",
+           "Acc@0.10", "pointing_acc10.png", fmt="{:.2%}")
+make_chart(pointing_data, "fps", "Pointing / 2D Keypoint — FPS",
+           "FPS", "pointing_fps.png")
+
 # =============================================
 # Combined FPS overview across tasks
 # =============================================
@@ -366,9 +404,10 @@ report.append("")
 report.append("## Overview")
 report.append("")
 report.append("This report summarizes benchmark results across multiple vision-language models (VLMs) ")
-report.append("and vision encoders. Benchmarks cover 11 tasks: image captioning, visual question answering (VQA), ")
+report.append("and vision encoders. Benchmarks cover 13 tasks: image captioning, visual question answering (VQA), ")
 report.append("object detection (AABB + OBB), phrase grounding, pose estimation (2D keypoints + 6D), ")
-report.append("segmentation, zero-shot classification, semantic scene analysis, and multi-object tracking.")
+report.append("segmentation, zero-shot classification, semantic scene analysis, multi-object tracking, ")
+report.append("OCR / text detection, and pointing / 2D keypoint localization.")
 report.append("")
 
 report.append("### Models Tested")
@@ -378,7 +417,8 @@ report.append("|----------|--------|")
 report.append(f"| Vision Encoders | DINOtool, DINOv3, SigLIP2, MoonViT |")
 report.append(f"| VLMs (caption + VQA) | Florence-2, PaliGemma2, Phi-3.5-Vision, Cosmos-Reason1-7B, Llama-3.2-11B-Vision, Qwen3-VL-8B-Instruct, Qwen3-VL-8B-Thinking |")
 report.append(f"| VLMs (diffusion) | DiffusionGemma-26B (5 variants) |")
-report.append(f"| Detection / Tracking | YOLO11n, YOLO26n, YOLO26n (Pose), YOLO26n (OBB), LocateAnything-3B, LocateAnything-3B (TRT) |")
+report.append(f"| Detection / OBB / Pose | YOLO11n/s/m, YOLO26n/s/m (detect, pose, OBB), LocateAnything-3B, LocateAnything-3B (TRT) |")
+report.append(f"| OCR / Pointing | LocateAnything-3B, LocateAnything-3B (TRT) |")
 report.append("")
 
 report.append("### Datasets")
@@ -396,6 +436,8 @@ report.append("| Segmentation | COCO val2017 | 100 |")
 report.append("| Scene Analysis | COCO val2017 | 100 |")
 report.append("| Multi-Object Tracking | MOT17 | 200 frames (2 seqs) |")
 report.append("| 6D Pose (detection) | Linemod (BOP) | 25 |")
+report.append("| OCR / Text Detection | Synthetic text on COCO | 25 |")
+report.append("| Pointing / 2D Keypoint | COCO Keypoints val2017 | 10-25 |")
 report.append("")
 
 report.append("### Notes")
@@ -407,6 +449,8 @@ report.append("- Vision encoders use zero-shot classification via DINO/transform
 report.append("- Phi-3.5-Vision is very slow (~15s/image) without flash-attention on Blackwell GPU")
 report.append("- DiffusionGemma variants need ~50-60s/image")
 report.append("- LocateAnything-3B (TRT) uses TensorRT-accelerated vision encoder (9.8× faster vision, 1.6× faster end-to-end)")
+report.append("- OCR benchmark uses synthetic text overlays on COCO images (5 random words per image)")
+report.append("- Pointing benchmark evaluates COCO keypoints (nose, eyes, shoulders, etc.) with normalized distance thresholds")
 
 # =============================================
 # CAPTIONING TABLE
@@ -487,7 +531,7 @@ if pose_data:
     report.append("")
     report.append("| Model | mAP@50:95 | mAP@50 | FPS | Avg (ms) | Images |")
     report.append("|-------|-----------|--------|-----|----------|--------|")
-    for mk, d in sorted(pose_data.items(), key=lambda x: x[1].get("mAP@50:95", 0), reverse=True):
+    for mk, d in sorted(pose_data.items(), key=lambda x: x[1].get("AP@50:95_keypoints", 0) or 0, reverse=True):
         if d.get("images", 0) < 5:
             continue
         report.append(
@@ -504,7 +548,7 @@ if obb_data:
     report.append("")
     report.append("| Model | mAP@50:95 | mAP@50 | FPS | Avg (ms) | Images |")
     report.append("|-------|-----------|--------|-----|----------|--------|")
-    for mk, d in sorted(obb_data.items(), key=lambda x: x[1].get("mAP@50:95", 0), reverse=True):
+    for mk, d in sorted(obb_data.items(), key=lambda x: x[1].get("mAP@50:95") or 0, reverse=True):
         if d.get("images", 0) < 5:
             continue
         report.append(
@@ -638,10 +682,53 @@ if pose6d_data:
         )
 
 # =============================================
+# OCR
+# =============================================
+if ocr_data:
+    report.append("")
+    report.append("## 12. OCR / Text Detection (Synthetic COCO)")
+    report.append("")
+    report.append("![Detection Rate](charts/ocr_detrate.png)")
+    report.append("![FPS](charts/ocr_fps.png)")
+    report.append("")
+    report.append("| Model | Detection Rate | FPS | Avg (ms) | Images |")
+    report.append("|-------|----------------|-----|----------|--------|")
+    for mk, d in sorted(ocr_data.items(), key=lambda x: x[1].get("detection_rate", 0), reverse=True):
+        if d.get("images", 0) < 5:
+            continue
+        report.append(
+            f"| {model_link(mk)} | {fmt_val(d, 'detection_rate', fmt='{:.2%}')} | "
+            f"{fmt_val(d, 'fps')} | {fmt_val(d, 'avg_inference_ms', fmt='{:.1f}')} | "
+            f"{d.get('images', '—')} |"
+        )
+
+# =============================================
+# POINTING (2D Keypoint)
+# =============================================
+if pointing_data:
+    report.append("")
+    report.append("## 13. Pointing / 2D Keypoint (COCO Keypoints)")
+    report.append("")
+    report.append("![Acc@0.05](charts/pointing_acc05.png)")
+    report.append("![Acc@0.10](charts/pointing_acc10.png)")
+    report.append("![FPS](charts/pointing_fps.png)")
+    report.append("")
+    report.append("| Model | Acc@0.05 | Acc@0.10 | FPS | Avg (ms) | Keypoints |")
+    report.append("|-------|----------|----------|-----|----------|-----------|")
+    for mk, d in sorted(pointing_data.items(), key=lambda x: x[1].get("acc@0.05", 0), reverse=True):
+        if d.get("total_keypoints", 0) < 10:
+            continue
+        report.append(
+            f"| {model_link(mk)} | {fmt_val(d, 'acc@0.05', fmt='{:.2%}')} | "
+            f"{fmt_val(d, 'acc@0.10', fmt='{:.2%}')} | {fmt_val(d, 'fps')} | "
+            f"{fmt_val(d, 'avg_inference_ms', fmt='{:.1f}')} | {d.get('total_keypoints', '—')} |"
+        )
+
+# =============================================
 # Speed vs Quality
 # =============================================
 report.append("")
-report.append("## 12. Speed vs Quality Overview")
+report.append("## 14. Speed vs Quality Overview")
 report.append("")
 report.append("![Combined FPS](charts/combined_fps.png)")
 report.append("")
@@ -652,36 +739,40 @@ report.append("")
 # Key Takeaways
 # =============================================
 report.append("")
-report.append("## 13. Key Takeaways")
+report.append("## 15. Key Takeaways")
 report.append("")
 report.append("### Fastest Models by Task")
-report.append("- **Detection:** YOLO11n at 46.7 FPS, YOLO26n at 14.8 FPS")
+report.append("- **Detection:** YOLO11n at 46.7 FPS, YOLO26n at 14.8 FPS (medium: 35 FPS)")
 report.append("- **Captioning:** PaliGemma2-3B at 4.56 FPS")
 report.append("- **VQA:** PaliGemma2-3B at 15.51 FPS")
-report.append("- **Classification:** DINOtool/SigLIP2 fastest among vision encoders")
+report.append("- **Classification:** Vision encoders via embedding matching")
 report.append("- **Segmentation:** Florence-2 handles segmentation at reasonable speed")
-report.append("- **Tracking:** YOLO models achieve high FPS on MOT17")
+report.append("- **Tracking:** YOLO + ByteTrack achieves ~50 FPS on MOT17")
 report.append("- **6D Pose (detection):** YOLO models on Linemod")
+report.append("- **OCR (text detection):** LocateAnything-3B TRT at 3.08 FPS, 85.6% detection rate")
 report.append("")
 report.append("### Best Quality by Task")
 report.append("- **Captioning CIDEr:** PaliGemma2-3B (1.7246), Florence-2 (0.4999)")
 report.append("- **VQA Accuracy:** Llama-3.2-11B-Vision (64%), Phi-3.5-Vision (57%), PaliGemma2 (54%)")
-report.append("- **Detection mAP:** YOLO26n (0.382), YOLO11n (0.395), LocateAnything-3B (0.126)")
+report.append("- **Detection mAP:** YOLO26m (0.514), YOLO11m (0.497), YOLO26s (0.458)")
 report.append("- **Detection FPS:** LocateAnything-3B TRT (5.50) is 1.6× faster than PT (3.41)")
 report.append("- **Grounding Acc@50:** LocateAnything-3B TRT (14.4%) — best among tested models")
+report.append("- **OCR:** LocateAnything-3B TRT 85.6% detection — better than PT 75.2%")
 report.append("- **Scene Understanding:** Florence-2 excels at structured scene description")
 report.append("")
 report.append("### Notable Observations")
+report.append("- YOLO26m achieves highest detection mAP@50:95 (0.514) at 35 FPS — best accuracy-speed trade-off")
+report.append("- ByteTrack is ~1.5-2× faster than BoTSORT with nearly identical MOTA accuracy")
+report.append("- LocateAnything-3B OCR: TRT achieves 85.6% detection rate vs 75.2% PT (~10% improvement)")
+report.append("- LocateAnything-3B Pointing: ~20-28% accuracy at 0.05-0.10 normalized distance thresholds")
 report.append("- Vision encoders (DINOtool, DINOv3, SigLIP2, MoonViT) achieve near-zero CIDEr — expected as they use zero-shot label matching, not generative captioning")
 report.append("- Phi-3.5-Vision is 15-60x slower than other models (~15.6s/image) without flash-attention on Blackwell GPUs")
 report.append("- Qwen3-VL-8B-Thinking produces more detailed captions but at ~4-10x slower speed vs Instruct variant")
 report.append("- DiffusionGemma-26B takes 50-60s per image for caption generation")
-report.append("- YOLO models achieve the highest FPS across all detection tasks (10-47 FPS)")
+report.append("- YOLO models achieve the highest FPS across all detection tasks (10-50 FPS)")
 report.append("- LocateAnything-3B (TRT) achieves 5.50 FPS on COCO OD (1.6× faster than PT) with bit-exact identical quality")
 report.append("- TRT vision encoder runs at 9.6ms (9.8× faster than PyTorch bf16) — LLM decoder dominates at ~170ms")
 report.append("- Florence-2 is the most versatile model, supporting captioning, VQA, OD, segmentation, and scene analysis")
-report.append("- Tiny ImageNet zero-shot classification shows vision encoders can identify objects despite limited label sets")
-report.append("- MOT17 tracking with YOLO provides a strong baseline for multi-object tracking evaluation")
 report.append("")
 report.append("### Missing / Future Benchmarks")
 report.append("- **VQA for DiffusionGemma-26B** — timed out during evaluation")

@@ -1,0 +1,14 @@
+{
+  "model": "YOLO11n (Pose)",
+  "model_key": "yolo11_pose",
+  "task": "pose_estimation",
+  "images": 23,
+  "skipped": 27,
+  "total_inference_time_s": 0.998,
+  "avg_inference_ms": 43.41,
+  "fps": 23.04,
+  "total_gt_persons": 127,
+  "total_detected_persons": 47,
+  "AP@50:95_keypoints": 0.5446524043594622,
+  "AP@50_keypoints": 0.8613861386138614
+}

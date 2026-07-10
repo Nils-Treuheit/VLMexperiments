@@ -1,0 +1,14 @@
+{
+  "model": "LLaVA-NeXT-Video-7B",
+  "model_key": "llava_next_video_7b",
+  "task": "captioning",
+  "dataset": "coco",
+  "images": 50,
+  "skipped": 0,
+  "total_inference_time_s": 1136.994,
+  "avg_inference_ms": 22739.88,
+  "fps": 0.04,
+  "bleu_4": 0.0065,
+  "rouge_l": 0.0839,
+  "cider": 0.1296
+}

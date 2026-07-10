@@ -1,0 +1,18 @@
+{
+  "model": "LLaVA-OneVision-Qwen2-7B",
+  "model_key": "llava_onevision",
+  "task": "scene_analysis",
+  "dataset": "COCO",
+  "images": 50,
+  "skipped": 0,
+  "total_inference_time_s": 894.569,
+  "avg_inference_ms": 17891.38,
+  "fps": 0.06,
+  "scene_type_accuracy": 0.9388,
+  "scene_type_correct": 46,
+  "scene_type_total": 49,
+  "object_recall": 0.5894,
+  "objects_recalled": 89,
+  "objects_total": 151,
+  "description_quality": 152.5
+}

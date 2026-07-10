@@ -1,0 +1,14 @@
+{
+  "model": "LLaVA-v1.6-Mistral-7B",
+  "model_key": "llava_v16_mistral",
+  "task": "captioning",
+  "dataset": "coco",
+  "images": 50,
+  "skipped": 0,
+  "total_inference_time_s": 1223.323,
+  "avg_inference_ms": 24466.45,
+  "fps": 0.04,
+  "bleu_4": 0.0062,
+  "rouge_l": 0.0915,
+  "cider": 0.1359
+}

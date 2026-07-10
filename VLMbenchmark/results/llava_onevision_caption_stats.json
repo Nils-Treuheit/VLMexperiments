@@ -1,0 +1,14 @@
+{
+  "model": "LLaVA-OneVision-Qwen2-7B",
+  "model_key": "llava_onevision",
+  "task": "captioning",
+  "dataset": "coco",
+  "images": 50,
+  "skipped": 0,
+  "total_inference_time_s": 1143.317,
+  "avg_inference_ms": 22866.35,
+  "fps": 0.04,
+  "bleu_4": 0.0096,
+  "rouge_l": 0.0734,
+  "cider": 0.114
+}

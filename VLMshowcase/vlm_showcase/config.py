@@ -119,6 +119,41 @@ MODELS = {
         "display": "DINOtool (Multi-ViT Encoder)",
         "capabilities": ["description", "encode", "features"],
     },
+    "llava_v16_mistral": {
+        "path": PROJECT_DIR / "Llava",
+        "venv_python": str(PROJECT_DIR / "Llava" / ".venv" / "bin" / "python"),
+        "display": "LLaVA-1.6-Mistral-7B",
+        "llava_variant": "llava-v1.6-mistral",
+        "capabilities": ["description", "vqa", "caption"],
+    },
+    "llava_onevision": {
+        "path": PROJECT_DIR / "Llava",
+        "venv_python": str(PROJECT_DIR / "Llava" / ".venv" / "bin" / "python"),
+        "display": "LLaVA-Onevision-Qwen2-7B",
+        "llava_variant": "llava-onevision",
+        "capabilities": ["description", "vqa", "caption"],
+    },
+    "llava_next_video_7b": {
+        "path": PROJECT_DIR / "Llava",
+        "venv_python": str(PROJECT_DIR / "Llava" / ".venv" / "bin" / "python"),
+        "display": "LLaVA-NeXT-Video-7B",
+        "llava_variant": "llava-next-video-7b",
+        "capabilities": ["description", "vqa", "caption"],
+    },
+    "llava_next_video_34b": {
+        "path": PROJECT_DIR / "Llava",
+        "venv_python": str(PROJECT_DIR / "Llava" / ".venv" / "bin" / "python"),
+        "display": "LLaVA-NeXT-Video-34B-DPO",
+        "llava_variant": "llava-next-video-34b",
+        "capabilities": ["description", "vqa", "caption"],
+    },
+    "phi3_vision": {
+        "path": PROJECT_DIR / "Llava",
+        "venv_python": str(PROJECT_DIR / "Llava" / ".venv" / "bin" / "python"),
+        "display": "LLaVA-Phi-3-Mini",
+        "llava_variant": "phi-3-vision",
+        "capabilities": ["description", "vqa", "caption"],
+    },
 }
 
 YOLO_MODEL_PATHS = {
@@ -159,6 +194,8 @@ VLM_MODEL_KEYS = {
     "locate_anything", "locate_anything_trt", "qwen3_instruct", "qwen3_thinking",
     "florence2", "paligemma", "cosmos_nemotron", "phi_vision", "llama_vision",
     "diffusion_gemma_vl", "phi4_multimodal",
+    "llava_v16_mistral", "llava_onevision", "llava_next_video_7b",
+    "llava_next_video_34b", "phi3_vision",
 }
 
 VISION_ENCODER_KEYS = {"dinov3", "siglip2", "moonvit", "dinotool"}

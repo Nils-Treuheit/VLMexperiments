@@ -55,26 +55,43 @@ ATTRIBUTE_LABELS = [
 ALL_LABELS = COCO_LABELS + SCENE_LABELS + ATTRIBUTE_LABELS
 
 
-def describe(model, processor, image, top_k=8):
-    candidate_texts = [f"This is a photo of {l}." for l in ALL_LABELS]
-    inputs = processor(
-        text=candidate_texts, images=image,
-        padding="max_length", max_length=64, return_tensors="pt",
-    )
-    inputs = {k: v.to(model.device) if hasattr(v, "to") else v for k, v in inputs.items()}
-    with torch.no_grad():
-        outputs = model(**inputs)
-    logits = outputs.logits_per_image
+def describe(model, processor, image, top_k=8, label_overrides=None, prompt_template=None):
+    labels = label_overrides or ALL_LABELS
+    tmpl = prompt_template or "This is a photo of {label}."
+    candidate_texts = [tmpl.replace("{label}", l) for l in labels]
+
+    # SigLIP2 processes text and image together. For efficiency, pre-get pixel_values
+    img_inputs = processor(images=image, return_tensors="pt")
+    pixel_values = img_inputs["pixel_values"].to(device=model.device, dtype=model.dtype)
+
+    # Encode text labels in batches, reusing pixel_values
+    batch_size = 32
+    logits_list = []
+    for i in range(0, len(candidate_texts), batch_size):
+        batch_texts = candidate_texts[i:i + batch_size]
+        inputs = processor(
+            text=batch_texts, images=image,
+            padding="max_length", max_length=64, return_tensors="pt",
+        )
+        inputs["pixel_values"] = pixel_values
+        inputs = {k: v.to(model.device) if hasattr(v, "to") else v for k, v in inputs.items()}
+        with torch.no_grad():
+            outputs = model(**inputs)
+        logits_list.append(outputs.logits_per_image)
+
+    logits = torch.cat(logits_list, dim=1)
     probs = torch.sigmoid(logits)
     top_probs, top_indices = probs[0].topk(top_k)
     results = []
     for prob, idx in zip(top_probs.tolist(), top_indices.tolist()):
-        label = ALL_LABELS[idx]
-        category = (
-            "object" if label in COCO_LABELS
-            else "scene" if label in SCENE_LABELS
-            else "attribute"
-        )
+        label = labels[idx]
+        category = "custom"
+        if label_overrides is None:
+            category = (
+                "object" if label in COCO_LABELS
+                else "scene" if label in SCENE_LABELS
+                else "attribute"
+            )
         results.append({"label": label, "probability": round(prob, 4), "category": category})
     return results
 
@@ -108,6 +125,8 @@ def main():
         help="SigLIP2 model variant (default: google/siglip2-base-patch16-224)",
     )
     parser.add_argument("--top-k", type=int, default=8, help="Top-k labels for describe")
+    parser.add_argument("--labels-file", type=str, default=None,
+                        help="JSON file with custom labels (format: {\"labels\": [...], \"prompt_template\": \"...\"})")
     parser.add_argument("--device", type=str, default=None, help="Device override (e.g. 'cpu', 'cuda')")
 
     args = parser.parse_args()
@@ -132,27 +151,29 @@ def main():
 
     result = {"model": args.model, "image": str(img_path)}
 
+    label_overrides = None
+    prompt_template = None
+    if args.labels_file:
+        with open(args.labels_file) as f:
+            ldata = json.load(f)
+        label_overrides = ldata["labels"]
+        prompt_template = ldata.get("prompt_template")
+
     if args.task in ("describe", "encode+describe"):
-        desc = describe(model, processor, image, top_k=args.top_k)
-        lines = []
-        obj_lines = []
-        scene_lines = []
-        attr_lines = []
-        for d in desc:
-            if d["category"] == "object":
-                obj_lines.append(f"{d['label']} ({d['probability']:.1%})")
-            elif d["category"] == "scene":
-                scene_lines.append(f"{d['label']} ({d['probability']:.1%})")
-            else:
-                attr_lines.append(f"{d['label']} ({d['probability']:.1%})")
+        desc = describe(model, processor, image, top_k=args.top_k,
+                        label_overrides=label_overrides, prompt_template=prompt_template)
         text_parts = []
-        if obj_lines:
-            text_parts.append("Objects detected: " + ", ".join(obj_lines[:6]) + ".")
-        if scene_lines:
-            text_parts.append("Scene: " + scene_lines[0] + ".")
-        if attr_lines:
-            text_parts.append("Attributes: " + ", ".join(attr_lines[:4]) + ".")
-        result["description_text"] = " ".join(text_parts)
+        if label_overrides is None:
+            obj_lines = [f"{d['label']} ({d['probability']:.1%})" for d in desc if d["category"] == "object"]
+            scene_lines = [f"{d['label']} ({d['probability']:.1%})" for d in desc if d["category"] == "scene"]
+            attr_lines = [f"{d['label']} ({d['probability']:.1%})" for d in desc if d["category"] == "attribute"]
+            if obj_lines:
+                text_parts.append("Objects detected: " + ", ".join(obj_lines[:6]) + ".")
+            if scene_lines:
+                text_parts.append("Scene: " + scene_lines[0] + ".")
+            if attr_lines:
+                text_parts.append("Attributes: " + ", ".join(attr_lines[:4]) + ".")
+        result["description_text"] = " ".join(text_parts) if text_parts else ", ".join(d["label"] for d in desc[:5])
         result["predictions"] = desc
 
     if args.task in ("encode", "encode+describe"):

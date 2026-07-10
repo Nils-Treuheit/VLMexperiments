@@ -1,6 +1,11 @@
-# Microsoft Phi-3.5 Vision — Edge VLM
+# Phi Vision Models
 
-4.2B VLM with 128K context. Excellent for document understanding, charts, general VQA.
+This folder supports Microsoft's Phi vision-language models.
+
+| Model | Size | Context |
+|---|---|---|
+| `phi-3.5-vision` (default) | Phi-3.5-Vision-Instruct — 4.2B | 128K |
+| `phi-3-vision-128k` | Phi-3-Vision-128K-Instruct — 4.2B | 128K |
 
 ## Setup
 
@@ -13,7 +18,14 @@ uv pip install -U torch transformers pillow requests accelerate
 ## Usage
 
 ```bash
-python run.py
+# Default (Phi-3.5-Vision)
+python run.py --image path/to/image.jpg
+
+# Phi-3-Vision-128K
+python run.py --model phi-3-vision-128k --image path/to/image.jpg
+
+# Custom prompt
+python run.py --image path/to/image.jpg --prompt "What text do you see?"
 ```
 
 ## Quantization for Edge
@@ -70,4 +82,5 @@ response = processor.tokenizer.decode(gids[0][inputs["input_ids"].shape[1]:], sk
 ## References
 
 - https://huggingface.co/microsoft/Phi-3.5-vision-instruct
+- https://huggingface.co/microsoft/Phi-3-vision-128k-instruct
 - https://onnxruntime.ai/docs/genai/tutorials/phi3-v.html

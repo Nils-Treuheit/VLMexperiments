@@ -17,10 +17,14 @@ from common import (
     print_comparison, save_stats,
 )
 
+LLAVA_VENV_PY = PROJECT_DIR / "Llava" / ".venv" / "bin" / "python"
+
 VQA_MODELS = {"florence2", "paligemma", "llama_vision", "phi_vision", "cosmos_nemotron",
               "qwen3_native", "qwen3_thinking",
               "diffusion_gemma", "diffusion_gemma_yolo", "diffusion_gemma_yolo_pose",
-              "diffusion_gemma_yolo_obb", "diffusion_gemma_siglip2", "diffusion_gemma_moonvit"}
+              "diffusion_gemma_yolo_obb", "diffusion_gemma_siglip2", "diffusion_gemma_moonvit",
+              "llava_v16_mistral", "llava_onevision", "llava_next_video_7b",
+              "llava_next_video_34b", "phi3_vision"}
 
 VQA_QUESTIONS = [
     ("Is there a person in this image?", ["yes", "no"]),
@@ -74,6 +78,7 @@ def benchmark_vqa(model_name, max_questions=200, verbose=True):
     is_q3 = mn == "qwen3_native"
     is_th = mn == "qwen3_thinking"
     is_dg = mn.startswith("diffusion_gemma")
+    is_llava = mn.startswith("llava") or mn == "phi3_vision"
 
     display = MODEL_DISPLAY.get(mn, mn)
 
@@ -87,7 +92,7 @@ def benchmark_vqa(model_name, max_questions=200, verbose=True):
         detector = obj
     elif is_q3:
         processor, model = obj
-    elif is_dg:
+    elif is_dg or is_llava:
         pass  # subprocess-based; model/processor unused
     else:
         model, processor = obj
@@ -102,8 +107,9 @@ def benchmark_vqa(model_name, max_questions=200, verbose=True):
 
     img_dir = COCO_DIR / "val2017"
     img_infos = {im["id"]: im for im in coco_data["images"]}
+    rng = random.Random(42)
     img_ids = sorted(img_infos.keys())
-    random.shuffle(img_ids)
+    rng.shuffle(img_ids)
 
     questions_per_image = 2
     needed_images = (max_questions + questions_per_image - 1) // questions_per_image
@@ -134,7 +140,7 @@ def benchmark_vqa(model_name, max_questions=200, verbose=True):
             continue
 
         ow, oh = image.size
-        sampled_qs = random.sample(VQA_QUESTIONS, min(questions_per_image, len(VQA_QUESTIONS)))
+        sampled_qs = rng.sample(VQA_QUESTIONS, min(questions_per_image, len(VQA_QUESTIONS)))
 
         for question, choices in sampled_qs:
             t0 = time.perf_counter()
@@ -229,6 +235,32 @@ def benchmark_vqa(model_name, max_questions=200, verbose=True):
                         dg_args, capture_output=True, text=True, timeout=300,
                     )
                     answer = result.stdout.strip()
+                elif is_llava:
+                    run_py = PROJECT_DIR / "Llava" / "run.py"
+                    # Map benchmark model key to Llava/run.py model key
+                    llava_key_map = {
+                        "llava_v16_mistral": "llava-v1.6-mistral",
+                        "llava_onevision": "llava-onevision",
+                        "llava_next_video_7b": "llava-next-video-7b",
+                        "llava_next_video_34b": "llava-next-video-34b",
+                        "phi3_vision": "phi-3-vision",
+                    }
+                    lk = llava_key_map.get(mn, mn)
+                    llava_args = [str(LLAVA_VENV_PY), str(run_py), "--model", lk,
+                                  "--image", str(img_path),
+                                  "--task", "vqa",
+                                  "--prompt", f"Answer in one word: {question}",
+                                  "--max-new-tokens", "20"]
+                    if mn == "llava_next_video_34b":
+                        llava_args += ["--quantize"]
+                    result = subprocess.run(
+                        llava_args, capture_output=True, text=True, timeout=1800,
+                    )
+                    try:
+                        data = json.loads(result.stdout)
+                        answer = data.get("response", "").strip()
+                    except (json.JSONDecodeError, KeyError):
+                        answer = result.stdout.strip()
 
                 elapsed = time.perf_counter() - t0
                 times.append(elapsed)
@@ -306,6 +338,7 @@ def main():
     parser.add_argument("--model", choices=all_choices, default="florence2")
     parser.add_argument("--max-questions", type=int, default=200,
                         help="Total number of VQA questions to evaluate")
+    parser.add_argument("--samples-file", type=str, default=None, help="Path to samples file (unused, for compatibility)")
     args = parser.parse_args()
 
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)

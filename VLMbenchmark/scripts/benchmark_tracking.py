@@ -165,6 +165,7 @@ def main():
     parser.add_argument("--tracker", type=str, default="botsort",
                         choices=["botsort", "bytetrack"],
                         help="Tracker type (default: botsort)")
+    parser.add_argument("--samples-file", type=str, default=None, help="Path to samples file (unused, for compatibility)")
     args = parser.parse_args()
     
     # Find MOT17 sequences

@@ -264,6 +264,7 @@ def main():
                         help="Model to benchmark")
     parser.add_argument("--max-images", type=int, default=None,
                         help="Limit number of test images (default: all BOP targets)")
+    parser.add_argument("--samples-file", type=str, default=None, help="Path to samples file (unused, for compatibility)")
     args = parser.parse_args()
 
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)

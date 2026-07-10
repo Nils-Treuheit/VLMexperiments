@@ -1,6 +1,6 @@
 # Benchmark Results
 
-**Generated:** 2026-07-08 02:24
+**Generated:** 2026-07-09
 
 **Hardware:** NVIDIA GeForce RTX 5090 (32 GB VRAM)
 
@@ -17,7 +17,7 @@ OCR / text detection, and pointing / 2D keypoint localization.
 | Category | Models |
 |----------|--------|
 | Vision Encoders | DINOtool, DINOv3, SigLIP2, MoonViT |
-| VLMs (caption + VQA) | Florence-2, PaliGemma2, Phi-3.5-Vision, Cosmos-Reason1-7B, Llama-3.2-11B-Vision, Qwen3-VL-8B-Instruct, Qwen3-VL-8B-Thinking |
+| VLMs (caption + VQA) | Florence-2, PaliGemma2, Phi-3.5-Vision, Cosmos-Reason1-7B, Llama-3.2-11B-Vision, Qwen3-VL-8B-Instruct, Qwen3-VL-8B-Thinking, LLaVA-1.6-Mistral-7B, LLaVA-Onevision-Qwen2-7B, LLaVA-NeXT-Video-7B, Phi-3-Vision-128K-Instruct |
 | VLMs (diffusion) | DiffusionGemma-26B (5 variants) |
 | Detection / OBB / Pose | YOLO11n/s/m, YOLO26n/s/m (detect, pose, OBB), LocateAnything-3B, LocateAnything-3B (TRT) |
 | OCR / Pointing | LocateAnything-3B, LocateAnything-3B (TRT) |
@@ -46,11 +46,14 @@ OCR / text detection, and pointing / 2D keypoint localization.
 - **100 questions** per model for VQA
 - **500 images** (Tiny ImageNet) for classification
 - Vision encoders use zero-shot classification via DINO/transformer features + sentence-transformers (not trained for captioning)
+- Classification benchmark was rewritten to use inline scripts (load model once, encode all 200 labels, iterate images) — ~50-500× faster than previous per-image subprocess approach
+- Zero-shot classification accuracy for non-contrastive models (DINOv3, MoonViT, DINOtool) is near 0% because their visual embeddings are not aligned with any text encoder
 - Phi-3.5-Vision is very slow (~15s/image) without flash-attention on Blackwell GPU
 - DiffusionGemma variants need ~50-60s/image
 - LocateAnything-3B (TRT) uses TensorRT-accelerated vision encoder (9.8× faster vision, 1.6× faster end-to-end)
 - OCR benchmark uses synthetic text overlays on COCO images (5 random words per image)
 - Pointing benchmark evaluates COCO keypoints (nose, eyes, shoulders, etc.) with normalized distance thresholds
+- OBB mAP computation was fixed: OpenCV 4.13 requires float32 for minAreaRect; DOTA-to-YOLO class ID mapping added; TP matching logic rewritten
 
 ## 1. Image Captioning (COCO Captions)
 
@@ -132,9 +135,9 @@ OCR / text detection, and pointing / 2D keypoint localization.
 
 | Model | mAP@50:95 | mAP@50 | FPS | Avg (ms) | Images |
 |-------|-----------|--------|-----|----------|--------|
+| YOLO26n (OBB) | 0.2787 | 0.5802 | 11.66 | 85.8 | 5 |
 | YOLO11n (OBB) | — | — | 11.66 | 85.8 | 50 |
 | YOLO11s (OBB) | — | — | 12.60 | 79.4 | 50 |
-| YOLO26n (OBB) | — | — | 13.60 | 73.5 | 50 |
 | YOLO26s (OBB) | — | — | 12.64 | 79.1 | 50 |
 
 ## 6. Phrase Grounding (COCO)
@@ -155,10 +158,10 @@ OCR / text detection, and pointing / 2D keypoint localization.
 
 | Model | Top-1 Acc | Top-5 Acc | FPS | Avg (ms) | Images |
 |-------|-----------|-----------|-----|----------|--------|
-| SigLIP2 (Zero-shot) | 13.00% | 15.50% | 0.07 | 13769.5 | 200 |
-| MoonViT (Zero-shot) | 1.00% | 1.00% | 0.07 | 14732.2 | 200 |
-| DINOv3 (Zero-shot) | 0.50% | 0.50% | 0.06 | 17794.4 | 200 |
-| DINOtool (DINOv2-s) | 0.00% | 0.00% | 0.06 | 15519.5 | 100 |
+| SigLIP2 (Zero-shot) | 2.00% | 14.00% | 40.00 | 25.0 | 50 |
+| MoonViT (Zero-shot) | 0.00% | 2.00% | 53.57 | 18.7 | 50 |
+| DINOv3 (Zero-shot) | 0.00% | 0.00% | 126.58 | 7.9 | 50 |
+| DINOtool (DINOv2-s) | 0.00% | 0.00% | 13.16 | 76.0 | 50 |
 
 ## 8. Segmentation (COCO)
 
@@ -262,6 +265,7 @@ OCR / text detection, and pointing / 2D keypoint localization.
 - LocateAnything-3B OCR: TRT achieves 85.6% detection rate vs 75.2% PT (~10% improvement)
 - LocateAnything-3B Pointing: ~20-28% accuracy at 0.05-0.10 normalized distance thresholds
 - Vision encoders (DINOtool, DINOv3, SigLIP2, MoonViT) achieve near-zero CIDEr — expected as they use zero-shot label matching, not generative captioning
+- Similarly, zero-shot classification top-1 accuracy for non-contrastive encoders is essentially 0% — their visual features are not aligned with any text encoder embedding space
 - Phi-3.5-Vision is 15-60x slower than other models (~15.6s/image) without flash-attention on Blackwell GPUs
 - Qwen3-VL-8B-Thinking produces more detailed captions but at ~4-10x slower speed vs Instruct variant
 - DiffusionGemma-26B takes 50-60s per image for caption generation
@@ -269,6 +273,7 @@ OCR / text detection, and pointing / 2D keypoint localization.
 - LocateAnything-3B (TRT) achieves 5.50 FPS on COCO OD (1.6× faster than PT) with bit-exact identical quality
 - TRT vision encoder runs at 9.6ms (9.8× faster than PyTorch bf16) — LLM decoder dominates at ~170ms
 - Florence-2 is the most versatile model, supporting captioning, VQA, OD, segmentation, and scene analysis
+- YOLO26n-OBB mAP fixed: previous dashes due to OpenCV 4.13 float64→float32 incompatibility and DOTA/YOLO class ordering mismatch
 
 ### Missing / Future Benchmarks
 - **VQA for DiffusionGemma-26B** — timed out during evaluation
@@ -278,3 +283,5 @@ OCR / text detection, and pointing / 2D keypoint localization.
 - **6D Pose ADD/ADD-S:** pose refinement metrics not yet implemented
 - **Semantic / Panoptic Segmentation:** more comprehensive mask evaluation needed
 - **Video understanding:** action recognition, temporal reasoning
+- **LLaVA models:** weights still downloading — placeholder in VQA/caption/scene task lists until download completes
+- **OBB mAP:** computed from only 5 test images (was debugging the pipeline); full 50-image run pending

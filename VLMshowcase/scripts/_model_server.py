@@ -10,6 +10,9 @@ from io import StringIO
 from pathlib import Path
 
 BASE = Path("/mnt/HDD1/Project_Code/VLMexperiments/VLMcollection")
+# Must import MODELS at runtime to avoid circular / venv mismatch
+sys.path.insert(0, str(Path(__file__).parent.parent / "vlm_showcase"))
+from config import MODELS
 model_key = sys.argv[1]
 mode = sys.argv[2] if len(sys.argv) > 2 else "describe"
 _suppress = StringIO()
@@ -271,6 +274,136 @@ try:
         def predict(img_path, prompt):
             return run_encoder_yolo(img_path, yolo_tasks=["aabb"])
 
+        ready()
+
+    elif model_key == "llava_v16_mistral":
+        import torch
+        os.environ["TRANSFORMERS_VERBOSITY"] = "error"
+        with redirect_stdout(_suppress), redirect_stderr(_suppress):
+            from transformers import LlavaForConditionalGeneration, AutoProcessor
+            model = LlavaForConditionalGeneration.from_pretrained(
+                "llava-hf/llava-v1.6-mistral-7b-hf",
+                torch_dtype=torch.bfloat16, device_map="auto", trust_remote_code=True,
+            ).eval()
+            processor = AutoProcessor.from_pretrained(
+                "llava-hf/llava-v1.6-mistral-7b-hf", trust_remote_code=True)
+
+        def predict(img_path, prompt):
+            from PIL import Image
+            img = Image.open(img_path).convert("RGB")
+            p = prompt.strip() or "Describe this image in detail."
+            messages = [{"role": "user", "content": [{"type": "image", "image": img}, {"type": "text", "text": p}]}]
+            text = processor.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+            inputs = processor(images=img, text=text, padding=True, return_tensors="pt")
+            device = next(model.parameters()).device
+            inputs = {k: v.to(device) if hasattr(v, "to") else v for k, v in inputs.items()}
+            with torch.no_grad():
+                output = model.generate(**inputs, max_new_tokens=256)
+            return processor.decode(output[0][inputs["input_ids"].shape[-1]:], skip_special_tokens=True)
+        ready()
+
+    elif model_key == "llava_onevision":
+        import torch
+        os.environ["TRANSFORMERS_VERBOSITY"] = "error"
+        with redirect_stdout(_suppress), redirect_stderr(_suppress):
+            from transformers import LlavaOnevisionForConditionalGeneration, AutoProcessor
+            model = LlavaOnevisionForConditionalGeneration.from_pretrained(
+                "llava-hf/llava-onevision-qwen2-7b-ov-hf",
+                torch_dtype=torch.bfloat16, device_map="auto", trust_remote_code=True,
+            ).eval()
+            processor = AutoProcessor.from_pretrained(
+                "llava-hf/llava-onevision-qwen2-7b-ov-hf", trust_remote_code=True)
+
+        def predict(img_path, prompt):
+            from PIL import Image
+            img = Image.open(img_path).convert("RGB")
+            p = prompt.strip() or "Describe this image in detail."
+            messages = [{"role": "user", "content": [{"type": "image", "image": img}, {"type": "text", "text": p}]}]
+            text = processor.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+            inputs = processor(images=img, text=text, padding=True, return_tensors="pt")
+            device = next(model.parameters()).device
+            inputs = {k: v.to(device) if hasattr(v, "to") else v for k, v in inputs.items()}
+            with torch.no_grad():
+                output = model.generate(**inputs, max_new_tokens=256)
+            return processor.decode(output[0][inputs["input_ids"].shape[-1]:], skip_special_tokens=True)
+        ready()
+
+    elif model_key == "llava_next_video_7b":
+        import torch
+        os.environ["TRANSFORMERS_VERBOSITY"] = "error"
+        with redirect_stdout(_suppress), redirect_stderr(_suppress):
+            from transformers import LlavaNextVideoForConditionalGeneration, AutoProcessor
+            model = LlavaNextVideoForConditionalGeneration.from_pretrained(
+                "llava-hf/LLaVA-NeXT-Video-7B-hf",
+                torch_dtype=torch.bfloat16, device_map="auto", trust_remote_code=True,
+            ).eval()
+            processor = AutoProcessor.from_pretrained(
+                "llava-hf/LLaVA-NeXT-Video-7B-hf", trust_remote_code=True)
+
+        def predict(img_path, prompt):
+            from PIL import Image
+            img = Image.open(img_path).convert("RGB")
+            p = prompt.strip() or "Describe this image in detail."
+            messages = [{"role": "user", "content": [{"type": "image", "image": img}, {"type": "text", "text": p}]}]
+            text = processor.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+            inputs = processor(images=img, text=text, padding=True, return_tensors="pt")
+            device = next(model.parameters()).device
+            inputs = {k: v.to(device) if hasattr(v, "to") else v for k, v in inputs.items()}
+            with torch.no_grad():
+                output = model.generate(**inputs, max_new_tokens=256)
+            return processor.decode(output[0][inputs["input_ids"].shape[-1]:], skip_special_tokens=True)
+        ready()
+
+    elif model_key == "llava_next_video_34b":
+        import torch
+        os.environ["TRANSFORMERS_VERBOSITY"] = "error"
+        with redirect_stdout(_suppress), redirect_stderr(_suppress):
+            from transformers import LlavaNextVideoForConditionalGeneration, AutoProcessor
+            model = LlavaNextVideoForConditionalGeneration.from_pretrained(
+                "llava-hf/LLaVA-NeXT-Video-34B-DPO-hf",
+                torch_dtype=torch.float16, device_map="auto",
+                load_in_4bit=True, trust_remote_code=True,
+            ).eval()
+            processor = AutoProcessor.from_pretrained(
+                "llava-hf/LLaVA-NeXT-Video-34B-DPO-hf", trust_remote_code=True)
+
+        def predict(img_path, prompt):
+            from PIL import Image
+            img = Image.open(img_path).convert("RGB")
+            p = prompt.strip() or "Describe this image in detail."
+            messages = [{"role": "user", "content": [{"type": "image", "image": img}, {"type": "text", "text": p}]}]
+            text = processor.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+            inputs = processor(images=img, text=text, padding=True, return_tensors="pt")
+            device = next(model.parameters()).device
+            inputs = {k: v.to(device) if hasattr(v, "to") else v for k, v in inputs.items()}
+            with torch.no_grad():
+                output = model.generate(**inputs, max_new_tokens=256)
+            return processor.decode(output[0][inputs["input_ids"].shape[-1]:], skip_special_tokens=True)
+        ready()
+
+    elif model_key == "phi3_vision":
+        import torch
+        os.environ["TRANSFORMERS_VERBOSITY"] = "error"
+        with redirect_stdout(_suppress), redirect_stderr(_suppress):
+            from transformers import LlavaForConditionalGeneration, AutoProcessor
+            model = LlavaForConditionalGeneration.from_pretrained(
+                "xtuner/llava-phi-3-mini-hf",
+                torch_dtype=torch.float16, device_map="auto", trust_remote_code=True,
+            ).eval()
+            processor = AutoProcessor.from_pretrained(
+                "xtuner/llava-phi-3-mini-hf", trust_remote_code=True)
+
+        def predict(img_path, prompt):
+            from PIL import Image
+            img = Image.open(img_path).convert("RGB")
+            p = prompt.strip() or "Describe this image in detail."
+            prompt_text = f"<|user|>\n<image>\n{p}<|end|>\n<assistant|>\n"
+            inputs = processor(prompt_text, img, return_tensors="pt")
+            device = next(model.parameters()).device
+            inputs = {k: v.to(device) if hasattr(v, "to") else v for k, v in inputs.items()}
+            with torch.no_grad():
+                output = model.generate(**inputs, max_new_tokens=256)
+            return processor.decode(output[0][inputs["input_ids"].shape[-1]:], skip_special_tokens=True)
         ready()
 
     else:

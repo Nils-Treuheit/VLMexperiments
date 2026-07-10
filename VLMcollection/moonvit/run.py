@@ -56,7 +56,11 @@ ATTRIBUTE_LABELS = [
 ]
 
 ALL_LABELS = COCO_LABELS + SCENE_LABELS + ATTRIBUTE_LABELS
-LABEL_PROMPTS = [f"This is a photo of {l}." for l in ALL_LABELS]
+
+
+def _build_label_prompts(labels, tmpl=None):
+    tmpl = tmpl or "This is a photo of {label}."
+    return [tmpl.replace("{label}", l) for l in labels]
 
 
 def get_global_embedding(model, pixel_values, image_grid_hws):
@@ -71,17 +75,20 @@ def get_global_embedding(model, pixel_values, image_grid_hws):
     return result
 
 
-def describe(vision_model, text_model, text_tokenizer, image, top_k=8, device="cuda"):
+def describe(vision_model, text_model, text_tokenizer, image, top_k=8, device="cuda",
+             label_overrides=None, prompt_template=None):
     processor = AutoImageProcessor.from_pretrained(
         "moonshotai/MoonViT-SO-400M", trust_remote_code=True,
     )
+    labels = label_overrides or ALL_LABELS
+    label_prompts = _build_label_prompts(labels, prompt_template)
     inputs = processor(image, return_tensors="pt").to(device=device, dtype=vision_model.dtype)
     with torch.no_grad():
         img_emb = get_global_embedding(vision_model, inputs.pixel_values, inputs.image_grid_hws)
         img_emb = F.normalize(img_emb, dim=-1)
 
     text_inputs = text_tokenizer(
-        LABEL_PROMPTS, padding="max_length", max_length=64,
+        label_prompts, padding="max_length", max_length=64,
         return_tensors="pt", truncation=True,
     ).to(device)
     with torch.no_grad():
@@ -96,12 +103,14 @@ def describe(vision_model, text_model, text_tokenizer, image, top_k=8, device="c
     top_sims, top_indices = sims.topk(top_k)
     results = []
     for sim, idx in zip(top_sims.tolist(), top_indices.tolist()):
-        label = ALL_LABELS[idx]
-        category = (
-            "object" if label in COCO_LABELS
-            else "scene" if label in SCENE_LABELS
-            else "attribute"
-        )
+        label = labels[idx]
+        category = "custom"
+        if label_overrides is None:
+            category = (
+                "object" if label in COCO_LABELS
+                else "scene" if label in SCENE_LABELS
+                else "attribute"
+            )
         results.append({"label": label, "similarity": round(sim, 4), "category": category})
     return results
 
@@ -169,6 +178,8 @@ def main():
         help="Task type (default: describe)",
     )
     parser.add_argument("--top-k", type=int, default=8, help="Top-k labels for describe")
+    parser.add_argument("--labels-file", type=str, default=None,
+                        help="JSON file with custom labels (format: {\"labels\": [...], \"prompt_template\": \"...\"})")
     parser.add_argument("--device", type=str, default=None, help="Device override")
     parser.add_argument(
         "--text-model", type=str, default="google/siglip2-so400m-patch14-384",
@@ -196,6 +207,14 @@ def main():
         low_cpu_mem_usage=False,
     ).eval().to(device)
 
+    label_overrides = None
+    prompt_template = None
+    if args.labels_file:
+        with open(args.labels_file) as f:
+            ldata = json.load(f)
+        label_overrides = ldata["labels"]
+        prompt_template = ldata.get("prompt_template")
+
     result = {"model": "moonshotai/MoonViT-SO-400M", "image": str(img_path)}
 
     if args.task in ("describe", "encode+describe"):
@@ -210,26 +229,22 @@ def main():
         ).eval().to(device)
         text_tokenizer = AutoTokenizer.from_pretrained(args.text_model)
 
-        desc = describe(vision_model, text_model, text_tokenizer, image, top_k=args.top_k, device=device)
-        lines = []
-        obj_lines = []
-        scene_lines = []
-        attr_lines = []
-        for d in desc:
-            if d["category"] == "object":
-                obj_lines.append(f"{d['label']} ({d['similarity']:.1%})")
-            elif d["category"] == "scene":
-                scene_lines.append(f"{d['label']} ({d['similarity']:.1%})")
-            else:
-                attr_lines.append(f"{d['label']} ({d['similarity']:.1%})")
-        text_parts = []
-        if obj_lines:
-            text_parts.append("Objects detected: " + ", ".join(obj_lines[:6]) + ".")
-        if scene_lines:
-            text_parts.append("Scene: " + scene_lines[0] + ".")
-        if attr_lines:
-            text_parts.append("Attributes: " + ", ".join(attr_lines[:4]) + ".")
-        result["description_text"] = " ".join(text_parts)
+        desc = describe(vision_model, text_model, text_tokenizer, image, top_k=args.top_k, device=device,
+                        label_overrides=label_overrides, prompt_template=prompt_template)
+        if label_overrides is None:
+            obj_lines = [f"{d['label']} ({d['similarity']:.1%})" for d in desc if d["category"] == "object"]
+            scene_lines = [f"{d['label']} ({d['similarity']:.1%})" for d in desc if d["category"] == "scene"]
+            attr_lines = [f"{d['label']} ({d['similarity']:.1%})" for d in desc if d["category"] == "attribute"]
+            text_parts = []
+            if obj_lines:
+                text_parts.append("Objects detected: " + ", ".join(obj_lines[:6]) + ".")
+            if scene_lines:
+                text_parts.append("Scene: " + scene_lines[0] + ".")
+            if attr_lines:
+                text_parts.append("Attributes: " + ", ".join(attr_lines[:4]) + ".")
+            result["description_text"] = " ".join(text_parts)
+        else:
+            result["description_text"] = ", ".join(d["label"] for d in desc[:5])
         result["predictions"] = desc
 
     if args.task in ("encode", "encode+describe"):

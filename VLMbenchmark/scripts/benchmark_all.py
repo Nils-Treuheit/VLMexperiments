@@ -6,6 +6,7 @@ from pathlib import Path
 
 SCRIPTS_DIR = Path(__file__).resolve().parent
 RESULTS_DIR = SCRIPTS_DIR.parent / "results"
+SAMPLES_DIR = SCRIPTS_DIR.parent / "samples"
 
 TASKS = {
     "od": {
@@ -43,7 +44,9 @@ TASKS = {
                     "diffusion_gemma_yolo", "diffusion_gemma_yolo_pose",
                     "diffusion_gemma_yolo_obb", "diffusion_gemma_siglip2",
                     "diffusion_gemma_moonvit",
-                    "siglip2", "moonvit", "dinov3", "dinotool"],
+                    "siglip2", "moonvit", "dinov3", "dinotool",
+                    "llava_v16_mistral", "llava_onevision", "llava_next_video_7b", "llava_next_video_34b",
+                    "phi3_vision"],
         "dataset": None,
     },
     "vqa": {
@@ -53,7 +56,9 @@ TASKS = {
                     "qwen3_native", "qwen3_thinking",
                     "diffusion_gemma", "diffusion_gemma_yolo", "diffusion_gemma_yolo_pose",
                     "diffusion_gemma_yolo_obb", "diffusion_gemma_siglip2",
-                    "diffusion_gemma_moonvit"],
+                    "diffusion_gemma_moonvit",
+                    "llava_v16_mistral", "llava_onevision", "llava_next_video_7b", "llava_next_video_34b",
+                    "phi3_vision"],
         "dataset": None,
     },
     "classification": {
@@ -74,7 +79,9 @@ TASKS = {
         "script": "benchmark_scene.py",
         "title": "Semantic Scene Analysis (COCO)",
         "models": ["florence2", "paligemma", "llama_vision", "phi_vision",
-                    "cosmos_nemotron", "qwen3_native", "qwen3_thinking"],
+                    "cosmos_nemotron", "qwen3_native", "qwen3_thinking",
+                    "llava_v16_mistral", "llava_onevision", "llava_next_video_7b", "llava_next_video_34b",
+                    "phi3_vision"],
         "dataset": None,
     },
     "tracking": {
@@ -87,6 +94,18 @@ TASKS = {
         "script": "benchmark_6dpose.py",
         "title": "6D Pose Estimation Detection (Linemod)",
         "models": ["yolo26", "yolo26s", "yolo26m", "yolo11", "yolo11s", "yolo11m"],
+        "dataset": None,
+    },
+    "ocr": {
+        "script": "benchmark_ocr.py",
+        "title": "OCR / Text Detection (Synthetic COCO)",
+        "models": ["locate_anything", "locate_anything_trt", "florence2"],
+        "dataset": None,
+    },
+    "pointing": {
+        "script": "benchmark_pointing.py",
+        "title": "Pointing / 2D Keypoint Localization (COCO)",
+        "models": ["locate_anything", "locate_anything_trt"],
         "dataset": None,
     },
 }
@@ -132,10 +151,48 @@ MODEL_VENV = {k: str(COLLECTION_DIR / v / ".venv" / "bin" / "python")
         "siglip2": "siglip2",
         "moonvit": "moonvit",
         "dinotool": "DINOtool",
+        "llava_v16_mistral": "Llava",
+        "llava_onevision": "Llava",
+        "llava_next_video_7b": "Llava",
+        "llava_next_video_34b": "Llava",
+        "phi3_vision": "Llava",
     }.items()}
 
 
-def run_model(model, script, max_images, dataset=None):
+def generate_samples(task_key, task, max_images):
+    """Pre-generate persistent sample files for reproducibility."""
+    SAMPLES_DIR.mkdir(parents=True, exist_ok=True)
+    script = task["script"]
+    task_name = script.replace("benchmark_", "").replace(".py", "")
+
+    if task_name in ("caption", "vqa", "scene"):
+        sample_file = SAMPLES_DIR / f"coco_{task_name}_samples.json"
+    elif task_name == "classification":
+        sample_file = SAMPLES_DIR / "tiny_imagenet_val.json"
+    elif task_name == "obb":
+        sample_file = SAMPLES_DIR / "dota_obb_samples.json"
+    elif task_name == "tracking":
+        sample_file = SAMPLES_DIR / "mot17_samples.json"
+    elif task_name == "6dpose":
+        sample_file = SAMPLES_DIR / "linemod_samples.json"
+    elif task_name == "ocr":
+        sample_file = SAMPLES_DIR / "coco_ocr_samples.json"
+    elif task_name == "pointing":
+        sample_file = SAMPLES_DIR / "coco_pointing_samples.json"
+    elif task_name in ("od", "pose", "grounding", "segmentation"):
+        sample_file = SAMPLES_DIR / f"coco_{task_name}_samples.json"
+    else:
+        sample_file = SAMPLES_DIR / f"{task_name}_samples.json"
+
+    if sample_file.exists():
+        print(f"  Samples already exist: {sample_file.name}")
+        return str(sample_file)
+
+    print(f"  Generating samples: {sample_file.name}")
+    return str(sample_file)
+
+
+def run_model(model, script, max_images, dataset=None, sample_file=None):
     venv_python = MODEL_VENV.get(model)
     if not venv_python:
         print(f"  [SKIP] No venv configured for {model}")
@@ -143,11 +200,13 @@ def run_model(model, script, max_images, dataset=None):
 
     script_path = SCRIPTS_DIR / script
     if "vqa" in script:
-        cmd = [venv_python, str(script_path), "--model", model, "--max-questions", str(max_images * 4)]
+        cmd = [venv_python, str(script_path), "--model", model, "--max-questions", str(max_images * 2)]
     else:
         cmd = [venv_python, str(script_path), "--model", model, "--max-images", str(max_images)]
     if dataset:
         cmd += ["--dataset", dataset]
+    if sample_file and "classification" not in script:
+        cmd += ["--samples-file", sample_file]
 
     print(f"\n  ── Running: {model} via {venv_python.split('/')[-3]} ──")
     sys.stdout.flush()
@@ -185,6 +244,10 @@ def extract_stats(model, script):
         fp = RESULTS_DIR / f"{prefix}_tracking_stats.json"
     elif "6dpose" in script:
         fp = RESULTS_DIR / f"{prefix}_linemod_6dpose_stats.json"
+    elif "ocr" in script:
+        fp = RESULTS_DIR / f"{prefix}_ocr_stats.json"
+    elif "pointing" in script:
+        fp = RESULTS_DIR / f"{prefix}_pointing_stats.json"
     else:
         fp = RESULTS_DIR / f"{prefix}_coco_od_stats.json"
         if fp.exists():
@@ -200,12 +263,14 @@ def extract_stats(model, script):
 
 def main():
     parser = argparse.ArgumentParser(description="Run all benchmarks")
-    parser.add_argument("--max-images", type=int, default=25,
-                        help="Images per model per task")
+    parser.add_argument("--max-images", type=int, default=50,
+                        help="Images per model per task (default: 50)")
     parser.add_argument("--tasks", nargs="+",
                         choices=list(TASKS) + ["all"],
                         default=["all"],
                         help="Tasks to run (default: all)")
+    parser.add_argument("--no-samples", action="store_true",
+                        help="Skip persistent sample generation")
     args = parser.parse_args()
 
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
@@ -220,9 +285,11 @@ def main():
         print(f"# TASK: {task['title']}")
         print(f"{'#' * 70}")
 
+        sample_file = generate_samples(task_key, task, args.max_images) if not args.no_samples else None
+
         task_stats = {}
         for model in task["models"]:
-            stats = run_model(model, task["script"], args.max_images, task.get("dataset"))
+            stats = run_model(model, task["script"], args.max_images, task.get("dataset"), sample_file)
             if stats:
                 task_stats[model] = stats
 

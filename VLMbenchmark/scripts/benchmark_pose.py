@@ -180,6 +180,7 @@ def main():
     parser.add_argument("--model", default="yolo26_pose",
                         help="Model to benchmark (use yolo_pose or yolo26_pose)")
     parser.add_argument("--max-images", type=int, default=100)
+    parser.add_argument("--samples-file", type=str, default=None, help="Path to samples file (unused, for compatibility)")
     args = parser.parse_args()
 
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)

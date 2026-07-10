@@ -261,6 +261,7 @@ def main():
                    if MODEL_ALIASES.get(m, m) in GROUNDING_MODELS or m in GROUNDING_MODELS]
     parser.add_argument("--model", choices=all_choices, default="locate_anything")
     parser.add_argument("--max-images", type=int, default=100)
+    parser.add_argument("--samples-file", type=str, default=None, help="Path to samples file (unused, for compatibility)")
     args = parser.parse_args()
 
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)

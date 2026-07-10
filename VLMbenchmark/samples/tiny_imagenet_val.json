@@ -1,0 +1,1006 @@
+{
+  "paths": [
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_0.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_1.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_2.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_3.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_4.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_5.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_6.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_7.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_8.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_9.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_10.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_11.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_12.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_13.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_14.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_15.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_16.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_17.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_18.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_19.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_20.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_21.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_22.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_23.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_24.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_25.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_26.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_27.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_28.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_29.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_30.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_31.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_32.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_33.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_34.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_35.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_36.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_37.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_38.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_39.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_40.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_41.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_42.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_43.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_44.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_45.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_46.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_47.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_48.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_49.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_50.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_51.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_52.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_53.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_54.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_55.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_56.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_57.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_58.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_59.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_60.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_61.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_62.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_63.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_64.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_65.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_66.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_67.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_68.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_69.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_70.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_71.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_72.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_73.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_74.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_75.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_76.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_77.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_78.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_79.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_80.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_81.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_82.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_83.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_84.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_85.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_86.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_87.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_88.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_89.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_90.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_91.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_92.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_93.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_94.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_95.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_96.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_97.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_98.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_99.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_100.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_101.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_102.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_103.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_104.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_105.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_106.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_107.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_108.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_109.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_110.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_111.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_112.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_113.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_114.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_115.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_116.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_117.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_118.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_119.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_120.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_121.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_122.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_123.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_124.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_125.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_126.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_127.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_128.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_129.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_130.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_131.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_132.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_133.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_134.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_135.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_136.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_137.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_138.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_139.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_140.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_141.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_142.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_143.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_144.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_145.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_146.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_147.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_148.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_149.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_150.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_151.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_152.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_153.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_154.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_155.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_156.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_157.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_158.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_159.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_160.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_161.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_162.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_163.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_164.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_165.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_166.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_167.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_168.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_169.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_170.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_171.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_172.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_173.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_174.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_175.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_176.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_177.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_178.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_179.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_180.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_181.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_182.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_183.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_184.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_185.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_186.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_187.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_188.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_189.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_190.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_191.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_192.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_193.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_194.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_195.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_196.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_197.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_198.JPEG",
+    "/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/val/images/val_199.JPEG"
+  ],
+  "labels": [
+    {
+      "class_id": "n03444034",
+      "class_name": "go-kart"
+    },
+    {
+      "class_id": "n04067472",
+      "class_name": "reel"
+    },
+    {
+      "class_id": "n04070727",
+      "class_name": "refrigerator"
+    },
+    {
+      "class_id": "n02808440",
+      "class_name": "bathtub"
+    },
+    {
+      "class_id": "n02808440",
+      "class_name": "bathtub"
+    },
+    {
+      "class_id": "n04399382",
+      "class_name": "teddy"
+    },
+    {
+      "class_id": "n04179913",
+      "class_name": "sewing machine"
+    },
+    {
+      "class_id": "n02823428",
+      "class_name": "beer bottle"
+    },
+    {
+      "class_id": "n04146614",
+      "class_name": "school bus"
+    },
+    {
+      "class_id": "n02226429",
+      "class_name": "grasshopper"
+    },
+    {
+      "class_id": "n04371430",
+      "class_name": "swimming trunks"
+    },
+    {
+      "class_id": "n07753592",
+      "class_name": "banana"
+    },
+    {
+      "class_id": "n02226429",
+      "class_name": "grasshopper"
+    },
+    {
+      "class_id": "n03770439",
+      "class_name": "miniskirt"
+    },
+    {
+      "class_id": "n02056570",
+      "class_name": "king penguin"
+    },
+    {
+      "class_id": "n02906734",
+      "class_name": "broom"
+    },
+    {
+      "class_id": "n02125311",
+      "class_name": "cougar"
+    },
+    {
+      "class_id": "n04486054",
+      "class_name": "triumphal arch"
+    },
+    {
+      "class_id": "n04285008",
+      "class_name": "sports car"
+    },
+    {
+      "class_id": "n03763968",
+      "class_name": "military uniform"
+    },
+    {
+      "class_id": "n03814639",
+      "class_name": "neck brace"
+    },
+    {
+      "class_id": "n03837869",
+      "class_name": "obelisk"
+    },
+    {
+      "class_id": "n01983481",
+      "class_name": "American lobster"
+    },
+    {
+      "class_id": "n01629819",
+      "class_name": "European fire salamander"
+    },
+    {
+      "class_id": "n04532670",
+      "class_name": "viaduct"
+    },
+    {
+      "class_id": "n04074963",
+      "class_name": "remote control"
+    },
+    {
+      "class_id": "n04540053",
+      "class_name": "volleyball"
+    },
+    {
+      "class_id": "n04371430",
+      "class_name": "swimming trunks"
+    },
+    {
+      "class_id": "n02906734",
+      "class_name": "broom"
+    },
+    {
+      "class_id": "n02094433",
+      "class_name": "Yorkshire terrier"
+    },
+    {
+      "class_id": "n03796401",
+      "class_name": "moving van"
+    },
+    {
+      "class_id": "n07614500",
+      "class_name": "ice cream"
+    },
+    {
+      "class_id": "n03837869",
+      "class_name": "obelisk"
+    },
+    {
+      "class_id": "n03937543",
+      "class_name": "pill bottle"
+    },
+    {
+      "class_id": "n06596364",
+      "class_name": "comic book"
+    },
+    {
+      "class_id": "n02977058",
+      "class_name": "cash machine"
+    },
+    {
+      "class_id": "n01768244",
+      "class_name": "trilobite"
+    },
+    {
+      "class_id": "n03930313",
+      "class_name": "picket fence"
+    },
+    {
+      "class_id": "n04099969",
+      "class_name": "rocking chair"
+    },
+    {
+      "class_id": "n03891332",
+      "class_name": "parking meter"
+    },
+    {
+      "class_id": "n02125311",
+      "class_name": "cougar"
+    },
+    {
+      "class_id": "n02125311",
+      "class_name": "cougar"
+    },
+    {
+      "class_id": "n02279972",
+      "class_name": "monarch"
+    },
+    {
+      "class_id": "n02231487",
+      "class_name": "walking stick"
+    },
+    {
+      "class_id": "n03584254",
+      "class_name": "iPod"
+    },
+    {
+      "class_id": "n02231487",
+      "class_name": "walking stick"
+    },
+    {
+      "class_id": "n04376876",
+      "class_name": "syringe"
+    },
+    {
+      "class_id": "n07720875",
+      "class_name": "bell pepper"
+    },
+    {
+      "class_id": "n02504458",
+      "class_name": "African elephant"
+    },
+    {
+      "class_id": "n02909870",
+      "class_name": "bucket"
+    },
+    {
+      "class_id": "n01774750",
+      "class_name": "tarantula"
+    },
+    {
+      "class_id": "n02129165",
+      "class_name": "lion"
+    },
+    {
+      "class_id": "n02226429",
+      "class_name": "grasshopper"
+    },
+    {
+      "class_id": "n01917289",
+      "class_name": "brain coral"
+    },
+    {
+      "class_id": "n02841315",
+      "class_name": "binoculars"
+    },
+    {
+      "class_id": "n12267677",
+      "class_name": "acorn"
+    },
+    {
+      "class_id": "n01784675",
+      "class_name": "centipede"
+    },
+    {
+      "class_id": "n03250847",
+      "class_name": "drumstick"
+    },
+    {
+      "class_id": "n02793495",
+      "class_name": "barn"
+    },
+    {
+      "class_id": "n04398044",
+      "class_name": "teapot"
+    },
+    {
+      "class_id": "n02808440",
+      "class_name": "bathtub"
+    },
+    {
+      "class_id": "n07579787",
+      "class_name": "plate"
+    },
+    {
+      "class_id": "n02094433",
+      "class_name": "Yorkshire terrier"
+    },
+    {
+      "class_id": "n03355925",
+      "class_name": "flagpole"
+    },
+    {
+      "class_id": "n03388043",
+      "class_name": "fountain"
+    },
+    {
+      "class_id": "n04562935",
+      "class_name": "water tower"
+    },
+    {
+      "class_id": "n03733131",
+      "class_name": "maypole"
+    },
+    {
+      "class_id": "n03355925",
+      "class_name": "flagpole"
+    },
+    {
+      "class_id": "n01443537",
+      "class_name": "goldfish"
+    },
+    {
+      "class_id": "n03126707",
+      "class_name": "crane"
+    },
+    {
+      "class_id": "n01770393",
+      "class_name": "scorpion"
+    },
+    {
+      "class_id": "n03970156",
+      "class_name": "plunger"
+    },
+    {
+      "class_id": "n12267677",
+      "class_name": "acorn"
+    },
+    {
+      "class_id": "n03637318",
+      "class_name": "lampshade"
+    },
+    {
+      "class_id": "n02165456",
+      "class_name": "ladybug"
+    },
+    {
+      "class_id": "n01742172",
+      "class_name": "boa constrictor"
+    },
+    {
+      "class_id": "n02123045",
+      "class_name": "tabby"
+    },
+    {
+      "class_id": "n01698640",
+      "class_name": "American alligator"
+    },
+    {
+      "class_id": "n07749582",
+      "class_name": "lemon"
+    },
+    {
+      "class_id": "n01945685",
+      "class_name": "slug"
+    },
+    {
+      "class_id": "n02437312",
+      "class_name": "Arabian camel"
+    },
+    {
+      "class_id": "n02074367",
+      "class_name": "dugong"
+    },
+    {
+      "class_id": "n03026506",
+      "class_name": "Christmas stocking"
+    },
+    {
+      "class_id": "n03544143",
+      "class_name": "hourglass"
+    },
+    {
+      "class_id": "n06596364",
+      "class_name": "comic book"
+    },
+    {
+      "class_id": "n04399382",
+      "class_name": "teddy"
+    },
+    {
+      "class_id": "n02279972",
+      "class_name": "monarch"
+    },
+    {
+      "class_id": "n02002724",
+      "class_name": "black stork"
+    },
+    {
+      "class_id": "n02056570",
+      "class_name": "king penguin"
+    },
+    {
+      "class_id": "n02132136",
+      "class_name": "brown bear"
+    },
+    {
+      "class_id": "n02948072",
+      "class_name": "candle"
+    },
+    {
+      "class_id": "n02074367",
+      "class_name": "dugong"
+    },
+    {
+      "class_id": "n07720875",
+      "class_name": "bell pepper"
+    },
+    {
+      "class_id": "n02769748",
+      "class_name": "backpack"
+    },
+    {
+      "class_id": "n03930313",
+      "class_name": "picket fence"
+    },
+    {
+      "class_id": "n02481823",
+      "class_name": "chimpanzee"
+    },
+    {
+      "class_id": "n02123045",
+      "class_name": "tabby"
+    },
+    {
+      "class_id": "n02094433",
+      "class_name": "Yorkshire terrier"
+    },
+    {
+      "class_id": "n04487081",
+      "class_name": "trolleybus"
+    },
+    {
+      "class_id": "n04146614",
+      "class_name": "school bus"
+    },
+    {
+      "class_id": "n03026506",
+      "class_name": "Christmas stocking"
+    },
+    {
+      "class_id": "n02236044",
+      "class_name": "mantis"
+    },
+    {
+      "class_id": "n02206856",
+      "class_name": "bee"
+    },
+    {
+      "class_id": "n03937543",
+      "class_name": "pill bottle"
+    },
+    {
+      "class_id": "n03584254",
+      "class_name": "iPod"
+    },
+    {
+      "class_id": "n02165456",
+      "class_name": "ladybug"
+    },
+    {
+      "class_id": "n09193705",
+      "class_name": "alp"
+    },
+    {
+      "class_id": "n03733131",
+      "class_name": "maypole"
+    },
+    {
+      "class_id": "n02124075",
+      "class_name": "Egyptian cat"
+    },
+    {
+      "class_id": "n04265275",
+      "class_name": "space heater"
+    },
+    {
+      "class_id": "n04596742",
+      "class_name": "wok"
+    },
+    {
+      "class_id": "n02795169",
+      "class_name": "barrel"
+    },
+    {
+      "class_id": "n03544143",
+      "class_name": "hourglass"
+    },
+    {
+      "class_id": "n04560804",
+      "class_name": "water jug"
+    },
+    {
+      "class_id": "n04023962",
+      "class_name": "punching bag"
+    },
+    {
+      "class_id": "n02437312",
+      "class_name": "Arabian camel"
+    },
+    {
+      "class_id": "n02504458",
+      "class_name": "African elephant"
+    },
+    {
+      "class_id": "n03355925",
+      "class_name": "flagpole"
+    },
+    {
+      "class_id": "n02190166",
+      "class_name": "fly"
+    },
+    {
+      "class_id": "n03970156",
+      "class_name": "plunger"
+    },
+    {
+      "class_id": "n03201208",
+      "class_name": "dining table"
+    },
+    {
+      "class_id": "n02909870",
+      "class_name": "bucket"
+    },
+    {
+      "class_id": "n03838899",
+      "class_name": "oboe"
+    },
+    {
+      "class_id": "n02410509",
+      "class_name": "bison"
+    },
+    {
+      "class_id": "n02823428",
+      "class_name": "beer bottle"
+    },
+    {
+      "class_id": "n04560804",
+      "class_name": "water jug"
+    },
+    {
+      "class_id": "n09256479",
+      "class_name": "coral reef"
+    },
+    {
+      "class_id": "n04465501",
+      "class_name": "tractor"
+    },
+    {
+      "class_id": "n04067472",
+      "class_name": "reel"
+    },
+    {
+      "class_id": "n02892201",
+      "class_name": "brass"
+    },
+    {
+      "class_id": "n01641577",
+      "class_name": "bullfrog"
+    },
+    {
+      "class_id": "n07871810",
+      "class_name": "meat loaf"
+    },
+    {
+      "class_id": "n03770439",
+      "class_name": "miniskirt"
+    },
+    {
+      "class_id": "n04486054",
+      "class_name": "triumphal arch"
+    },
+    {
+      "class_id": "n07734744",
+      "class_name": "mushroom"
+    },
+    {
+      "class_id": "n04328186",
+      "class_name": "stopwatch"
+    },
+    {
+      "class_id": "n04067472",
+      "class_name": "reel"
+    },
+    {
+      "class_id": "n03970156",
+      "class_name": "plunger"
+    },
+    {
+      "class_id": "n02364673",
+      "class_name": "guinea pig"
+    },
+    {
+      "class_id": "n01784675",
+      "class_name": "centipede"
+    },
+    {
+      "class_id": "n04532670",
+      "class_name": "viaduct"
+    },
+    {
+      "class_id": "n01944390",
+      "class_name": "snail"
+    },
+    {
+      "class_id": "n02950826",
+      "class_name": "cannon"
+    },
+    {
+      "class_id": "n04562935",
+      "class_name": "water tower"
+    },
+    {
+      "class_id": "n02085620",
+      "class_name": "Chihuahua"
+    },
+    {
+      "class_id": "n04008634",
+      "class_name": "projectile"
+    },
+    {
+      "class_id": "n07615774",
+      "class_name": "ice lolly"
+    },
+    {
+      "class_id": "n03837869",
+      "class_name": "obelisk"
+    },
+    {
+      "class_id": "n04371430",
+      "class_name": "swimming trunks"
+    },
+    {
+      "class_id": "n02123045",
+      "class_name": "tabby"
+    },
+    {
+      "class_id": "n03042490",
+      "class_name": "cliff dwelling"
+    },
+    {
+      "class_id": "n07768694",
+      "class_name": "pomegranate"
+    },
+    {
+      "class_id": "n02113799",
+      "class_name": "standard poodle"
+    },
+    {
+      "class_id": "n03796401",
+      "class_name": "moving van"
+    },
+    {
+      "class_id": "n02481823",
+      "class_name": "chimpanzee"
+    },
+    {
+      "class_id": "n03599486",
+      "class_name": "jinrikisha"
+    },
+    {
+      "class_id": "n02415577",
+      "class_name": "bighorn"
+    },
+    {
+      "class_id": "n04311004",
+      "class_name": "steel arch bridge"
+    },
+    {
+      "class_id": "n03355925",
+      "class_name": "flagpole"
+    },
+    {
+      "class_id": "n02666196",
+      "class_name": "abacus"
+    },
+    {
+      "class_id": "n02056570",
+      "class_name": "king penguin"
+    },
+    {
+      "class_id": "n07720875",
+      "class_name": "bell pepper"
+    },
+    {
+      "class_id": "n01917289",
+      "class_name": "brain coral"
+    },
+    {
+      "class_id": "n02364673",
+      "class_name": "guinea pig"
+    },
+    {
+      "class_id": "n04417672",
+      "class_name": "thatch"
+    },
+    {
+      "class_id": "n02769748",
+      "class_name": "backpack"
+    },
+    {
+      "class_id": "n07695742",
+      "class_name": "pretzel"
+    },
+    {
+      "class_id": "n02795169",
+      "class_name": "barrel"
+    },
+    {
+      "class_id": "n02841315",
+      "class_name": "binoculars"
+    },
+    {
+      "class_id": "n03970156",
+      "class_name": "plunger"
+    },
+    {
+      "class_id": "n03930313",
+      "class_name": "picket fence"
+    },
+    {
+      "class_id": "n07734744",
+      "class_name": "mushroom"
+    },
+    {
+      "class_id": "n04465501",
+      "class_name": "tractor"
+    },
+    {
+      "class_id": "n04376876",
+      "class_name": "syringe"
+    },
+    {
+      "class_id": "n03637318",
+      "class_name": "lampshade"
+    },
+    {
+      "class_id": "n03393912",
+      "class_name": "freight car"
+    },
+    {
+      "class_id": "n02403003",
+      "class_name": "ox"
+    },
+    {
+      "class_id": "n03838899",
+      "class_name": "oboe"
+    },
+    {
+      "class_id": "n04099969",
+      "class_name": "rocking chair"
+    },
+    {
+      "class_id": "n02123045",
+      "class_name": "tabby"
+    },
+    {
+      "class_id": "n02125311",
+      "class_name": "cougar"
+    },
+    {
+      "class_id": "n03662601",
+      "class_name": "lifeboat"
+    },
+    {
+      "class_id": "n02321529",
+      "class_name": "sea cucumber"
+    },
+    {
+      "class_id": "n04560804",
+      "class_name": "water jug"
+    },
+    {
+      "class_id": "n04254777",
+      "class_name": "sock"
+    },
+    {
+      "class_id": "n03637318",
+      "class_name": "lampshade"
+    },
+    {
+      "class_id": "n03992509",
+      "class_name": "potter's wheel"
+    },
+    {
+      "class_id": "n02504458",
+      "class_name": "African elephant"
+    },
+    {
+      "class_id": "n02233338",
+      "class_name": "cockroach"
+    },
+    {
+      "class_id": "n01950731",
+      "class_name": "sea slug"
+    },
+    {
+      "class_id": "n03770439",
+      "class_name": "miniskirt"
+    },
+    {
+      "class_id": "n01910747",
+      "class_name": "jellyfish"
+    },
+    {
+      "class_id": "n01774384",
+      "class_name": "black widow"
+    },
+    {
+      "class_id": "n04259630",
+      "class_name": "sombrero"
+    },
+    {
+      "class_id": "n02948072",
+      "class_name": "candle"
+    },
+    {
+      "class_id": "n03970156",
+      "class_name": "plunger"
+    },
+    {
+      "class_id": "n02837789",
+      "class_name": "bikini"
+    },
+    {
+      "class_id": "n01945685",
+      "class_name": "slug"
+    },
+    {
+      "class_id": "n02074367",
+      "class_name": "dugong"
+    },
+    {
+      "class_id": "n02509815",
+      "class_name": "lesser panda"
+    }
+  ]
+}

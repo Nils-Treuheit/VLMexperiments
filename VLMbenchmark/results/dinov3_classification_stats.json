@@ -3,10 +3,10 @@
   "model_key": "dinov3",
   "task": "classification",
   "dataset": "tiny-imagenet-200",
-  "images": 200,
-  "top1_accuracy": 0.005,
-  "top5_accuracy": 0.005,
-  "total_inference_time_s": 3558.88,
-  "avg_inference_ms": 17794.4,
-  "fps": 0.06
+  "images": 50,
+  "top1_accuracy": 0.0,
+  "top5_accuracy": 0.0,
+  "total_inference_time_s": 0.4,
+  "avg_inference_ms": 7.9,
+  "fps": 126.58
 }

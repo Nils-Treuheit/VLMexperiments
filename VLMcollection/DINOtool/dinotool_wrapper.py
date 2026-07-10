@@ -50,17 +50,25 @@ ATTRIBUTE_LABELS = [
 ]
 
 ALL_LABELS = COCO_LABELS + SCENE_LABELS + ATTRIBUTE_LABELS
-LABEL_PROMPTS = [f"This is a photo of {l}." for l in ALL_LABELS]
+DEFAULT_LABEL_PROMPTS = [f"This is a photo of {l}." for l in ALL_LABELS]
+
+
+def _build_label_prompts(labels, tmpl=None):
+    tmpl = tmpl or "This is a photo of {label}."
+    return [tmpl.replace("{label}", l) for l in labels]
 
 
 class DINoToolWorker:
-    def __init__(self, model_name="dinov2_vits14_reg", device=None, text_model_name="all-MiniLM-L6-v2"):
+    def __init__(self, model_name="dinov2_vits14_reg", device=None, text_model_name="all-MiniLM-L6-v2",
+                 label_overrides=None, prompt_template=None):
         self.model_name = model_name
         self.device = device or ("cuda" if torch.cuda.is_available() else "cpu")
         self.text_model_name = text_model_name
         self._vision_model = None
         self._text_model = None
         self._label_embs = None
+        self._label_overrides = label_overrides
+        self._prompt_template = prompt_template
 
     def load_vision_model(self):
         if self._vision_model is not None:
@@ -82,10 +90,16 @@ class DINoToolWorker:
     def get_label_embeddings(self):
         if self._label_embs is not None:
             return self._label_embs
+        labels = self._label_overrides or ALL_LABELS
+        label_prompts = _build_label_prompts(labels, self._prompt_template)
         text_model = self.load_text_model()
-        embs = text_model.encode(LABEL_PROMPTS, convert_to_tensor=True, normalize_embeddings=True)
+        embs = text_model.encode(label_prompts, convert_to_tensor=True, normalize_embeddings=True)
         self._label_embs = embs
+        self._labels = labels
         return embs
+
+    def _current_labels(self):
+        return self._label_overrides or ALL_LABELS
 
     def describe(self, image_path, top_k=8):
         vision_model = self.load_vision_model()
@@ -98,31 +112,37 @@ class DINoToolWorker:
             cls_token = F.normalize(cls_token, dim=-1)
 
         text_embs = self.get_label_embeddings()
+        labels = self._current_labels()
         cls_token = cls_token.to(text_embs.device)
         sims = (cls_token @ text_embs.T).squeeze(0)
 
         top_sims, top_indices = sims.topk(top_k)
         results = []
         for sim, idx in zip(top_sims.tolist(), top_indices.tolist()):
-            label = ALL_LABELS[idx]
-            category = (
-                "object" if label in COCO_LABELS
-                else "scene" if label in SCENE_LABELS
-                else "attribute"
-            )
+            label = labels[idx]
+            category = "custom"
+            if self._label_overrides is None:
+                category = (
+                    "object" if label in COCO_LABELS
+                    else "scene" if label in SCENE_LABELS
+                    else "attribute"
+                )
             results.append({"label": label, "similarity": round(sim, 4), "category": category})
 
-        obj_lines = [f"{d['label']} ({d['similarity']:.1%})" for d in results if d["category"] == "object"]
-        scene_lines = [f"{d['label']} ({d['similarity']:.1%})" for d in results if d["category"] == "scene"]
-        attr_lines = [f"{d['label']} ({d['similarity']:.1%})" for d in results if d["category"] == "attribute"]
-        text_parts = []
-        if obj_lines:
-            text_parts.append("Objects detected: " + ", ".join(obj_lines[:6]) + ".")
-        if scene_lines:
-            text_parts.append("Scene: " + scene_lines[0] + ".")
-        if attr_lines:
-            text_parts.append("Attributes: " + ", ".join(attr_lines[:4]) + ".")
-        description_text = " ".join(text_parts)
+        if self._label_overrides is None:
+            obj_lines = [f"{d['label']} ({d['similarity']:.1%})" for d in results if d["category"] == "object"]
+            scene_lines = [f"{d['label']} ({d['similarity']:.1%})" for d in results if d["category"] == "scene"]
+            attr_lines = [f"{d['label']} ({d['similarity']:.1%})" for d in results if d["category"] == "attribute"]
+            text_parts = []
+            if obj_lines:
+                text_parts.append("Objects detected: " + ", ".join(obj_lines[:6]) + ".")
+            if scene_lines:
+                text_parts.append("Scene: " + scene_lines[0] + ".")
+            if attr_lines:
+                text_parts.append("Attributes: " + ", ".join(attr_lines[:4]) + ".")
+            description_text = " ".join(text_parts)
+        else:
+            description_text = ", ".join(d["label"] for d in results[:5])
 
         return description_text, results
 

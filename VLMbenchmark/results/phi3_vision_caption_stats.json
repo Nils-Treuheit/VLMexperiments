@@ -1,0 +1,14 @@
+{
+  "model": "LLaVA-Phi-3-Mini-4B",
+  "model_key": "phi3_vision",
+  "task": "captioning",
+  "dataset": "coco",
+  "images": 50,
+  "skipped": 0,
+  "total_inference_time_s": 951.927,
+  "avg_inference_ms": 19038.54,
+  "fps": 0.05,
+  "bleu_4": 0.0074,
+  "rouge_l": 0.0889,
+  "cider": 0.1291
+}

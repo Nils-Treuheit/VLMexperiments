@@ -25,7 +25,7 @@ FONT_PATH = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
 if not Path(FONT_PATH).exists():
     FONT_PATH = "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf"
 
-OCR_MODELS = {"locate_anything", "locate_anything_trt"}
+OCR_MODELS = {"locate_anything", "locate_anything_trt", "florence2"}
 
 WORD_LIST = [
     "hello", "world", "vision", "language", "model", "object", "detection",
@@ -140,8 +140,16 @@ def benchmark(model_name, max_images=100, words_per_image=5, verbose=True):
         print(f"OCR Benchmark: {display}")
         print(f"{'=' * 60}")
 
+    random.seed(42)
+
+    is_la = mn in ("locate_anything", "locate_anything_trt")
+    is_f2 = mn == "florence2"
+
     obj, _ = MODEL_LOADERS[mn]()
-    worker = obj
+    if is_la:
+        worker = obj
+    elif is_f2:
+        f2_model, f2_processor = obj
 
     img_dir = COCO_DIR / "val2017"
     all_images = sorted(img_dir.glob("*.jpg"))
@@ -174,19 +182,43 @@ def benchmark(model_name, max_images=100, words_per_image=5, verbose=True):
 
         t0 = time.perf_counter()
         try:
-            raw = worker.predict(synth_img, prompt_text, max_new_tokens=512,
-                                 temperature=0.1, generation_mode="fast")
+            if is_la:
+                raw = worker.predict(synth_img, prompt_text, max_new_tokens=512,
+                                     temperature=0.1, generation_mode="fast")
+                det_boxes = parse_la_ocr_boxes(raw)
+            elif is_f2:
+                inputs = f2_processor(text="<OCR>", images=synth_img, return_tensors="pt")
+                inputs = {k: v.to(f2_model.device) if hasattr(v, 'to') else v for k, v in inputs.items()}
+                if "pixel_values" in inputs:
+                    inputs["pixel_values"] = inputs["pixel_values"].to(dtype=f2_model.dtype)
+                with torch.no_grad():
+                    out = f2_model.generate(
+                        input_ids=inputs["input_ids"],
+                        pixel_values=inputs["pixel_values"],
+                        max_new_tokens=256, num_beams=1,
+                    )
+                raw = f2_processor.batch_decode(out, skip_special_tokens=False)[0]
+                parsed = f2_processor.post_process_generation(raw, task="<OCR>", image_size=(ow, oh))
+                ocr_text = parsed.get("<OCR>", raw).strip()
+                det_boxes = []
+                for gt_word in set(r["word"] for r in text_regions):
+                    if gt_word.lower() in ocr_text.lower():
+                        det_boxes.append([0, 0, ow, oh])
         except Exception:
             pbar.update(1)
             continue
         elapsed = time.perf_counter() - t0
         total_time += elapsed
-
-        det_boxes = parse_la_ocr_boxes(raw)
         total_gt += len(text_regions)
-        for region in text_regions:
-            if is_text_detected(det_boxes, region, ow, oh):
-                total_detected += 1
+        if is_la:
+            for region in text_regions:
+                if is_text_detected(det_boxes, region, ow, oh):
+                    total_detected += 1
+        elif is_f2:
+            ocr_words = ocr_text.lower().split()
+            for region in text_regions:
+                if region["word"].lower() in ocr_words or region["word"].lower() in ocr_text.lower():
+                    total_detected += 1
 
         processed += 1
         pbar.update(1)
@@ -227,6 +259,7 @@ def main():
     parser.add_argument("--max-images", type=int, default=100)
     parser.add_argument("--words-per-image", type=int, default=5,
                         help="Number of synthetic words to overlay per image")
+    parser.add_argument("--samples-file", type=str, default=None, help="Path to samples file (unused, for compatibility)")
     args = parser.parse_args()
 
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)

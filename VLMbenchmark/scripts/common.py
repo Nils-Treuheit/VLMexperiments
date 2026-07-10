@@ -13,6 +13,7 @@ import torch
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 RESULTS_DIR = BASE_DIR / "results"
+SAMPLES_DIR = BASE_DIR / "samples"
 DATA_DIR = Path("/mnt/HDD1/Project_Data/public_datasets")
 COCO_DIR = DATA_DIR / "coco"
 DOTA_DIR = DATA_DIR / "dotav1"
@@ -220,6 +221,24 @@ def cider(candidate, references):
     return sum(scores) / len(scores) * 10 if scores else 0
 
 
+def load_sample_list(filename):
+    """Load a persistent sample list from SAMPLES_DIR. Returns None if not found."""
+    fp = SAMPLES_DIR / filename
+    if fp.exists():
+        with open(fp) as f:
+            return json.load(f)
+    return None
+
+
+def save_sample_list(data, filename):
+    """Save a persistent sample list to SAMPLES_DIR."""
+    SAMPLES_DIR.mkdir(parents=True, exist_ok=True)
+    fp = SAMPLES_DIR / filename
+    with open(fp, "w") as f:
+        json.dump(data, f, indent=2)
+    print(f"  Samples saved to: {fp}")
+
+
 def load_coco_captions(max_images=None):
     ap = COCO_DIR / "annotations" / "captions_val2017.json"
     if not ap.exists():
@@ -416,6 +435,26 @@ def load_dinotool():
     return ("dinotool",), {}
 
 
+def load_llava_v16_mistral():
+    return ("llava_v16_mistral",), {}
+
+
+def load_llava_onevision():
+    return ("llava_onevision",), {}
+
+
+def load_llava_next_video_7b():
+    return ("llava_next_video_7b",), {}
+
+
+def load_llava_next_video_34b():
+    return ("llava_next_video_34b",), {}
+
+
+def load_phi3_vision():
+    return ("phi3_vision",), {}
+
+
 MODEL_LOADERS = {
     "locate_anything": load_la,
     "locate_anything_trt": load_la_trt,
@@ -445,6 +484,12 @@ MODEL_LOADERS = {
     # YOLO11 OBB
     "yolo11_obb": lambda: load_yolo26("yolo11n-obb"),
     "yolo11s_obb": lambda: load_yolo26("yolo11s-obb"),
+    # LLaVA models
+    "llava_v16_mistral": load_llava_v16_mistral,
+    "llava_onevision": load_llava_onevision,
+    "llava_next_video_7b": load_llava_next_video_7b,
+    "llava_next_video_34b": load_llava_next_video_34b,
+    "phi3_vision": load_phi3_vision,
     # Edge VLM models (captioning / VQA)
     "florence2": load_florence2,
     "paligemma": load_paligemma,
@@ -501,6 +546,12 @@ MODEL_ALIASES = {
     "dinov3": "dinov3",
     "dinotool": "dinotool",
     "dt": "dinotool",
+    "llava": "llava_v16_mistral",
+    "llava_mistral": "llava_v16_mistral",
+    "llava_onevision": "llava_onevision",
+    "llava_next7b": "llava_next_video_7b",
+    "llava_next34b": "llava_next_video_34b",
+    "phi3v": "phi3_vision",
     "s2": "siglip2",
     "siglip": "siglip2",
     "mv": "moonvit",
@@ -535,6 +586,12 @@ MODEL_DISPLAY = {
     "llama_vision": "Llama-3.2-11B-Vision",
     "phi_vision": "Phi-3.5-Vision-4.2B",
     "cosmos_nemotron": "Cosmos-Reason1-7B",
+    # LLaVA models
+    "llava_v16_mistral": "LLaVA-v1.6-Mistral-7B",
+    "llava_onevision": "LLaVA-OneVision-Qwen2-7B",
+    "llava_next_video_7b": "LLaVA-NeXT-Video-7B",
+    "llava_next_video_34b": "LLaVA-NeXT-Video-34B",
+    "phi3_vision": "LLaVA-Phi-3-Mini-4B",
     "diffusion_gemma": "DiffusionGemma-26B (YOLO)",
     "diffusion_gemma_yolo": "DiffusionGemma-26B (YOLO)",
     "diffusion_gemma_yolo_pose": "DiffusionGemma-26B (YOLO+pose)",

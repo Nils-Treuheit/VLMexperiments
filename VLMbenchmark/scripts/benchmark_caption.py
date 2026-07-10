@@ -21,7 +21,9 @@ CAPTION_MODELS = {"florence2", "paligemma", "llama_vision", "phi_vision", "cosmo
                   "qwen3_native", "qwen3_thinking",
                   "diffusion_gemma", "diffusion_gemma_yolo", "diffusion_gemma_yolo_pose",
                   "diffusion_gemma_yolo_obb", "diffusion_gemma_siglip2", "diffusion_gemma_moonvit",
-                  "siglip2", "moonvit", "dinov3", "dinotool"}
+                  "siglip2", "moonvit", "dinov3", "dinotool",
+                  "llava_v16_mistral", "llava_onevision", "llava_next_video_7b",
+                  "llava_next_video_34b", "phi3_vision"}
 
 
 def benchmark_caption(model_name, max_images=100, verbose=True):
@@ -43,6 +45,7 @@ def benchmark_caption(model_name, max_images=100, verbose=True):
     is_mv = mn == "moonvit"
     is_dv = mn == "dinov3"
     is_dt = mn == "dinotool"
+    is_llava = mn.startswith("llava") or mn == "phi3_vision"
 
     display = MODEL_DISPLAY.get(mn, mn)
 
@@ -56,7 +59,7 @@ def benchmark_caption(model_name, max_images=100, verbose=True):
         detector = obj
     elif is_q3:
         processor, model = obj
-    elif is_dg or is_s2 or is_mv or is_dv or is_dt:
+    elif is_dg or is_s2 or is_mv or is_dv or is_dt or is_llava:
         pass  # subprocess-based; model/processor unused
     else:
         model, processor = obj
@@ -235,6 +238,28 @@ def benchmark_caption(model_name, max_images=100, verbose=True):
                     caption = data.get("description_text", result.stdout)
                 except json.JSONDecodeError:
                     caption = result.stdout
+            elif is_llava:
+                run_py = PROJECT_DIR / "Llava" / "run.py"
+                llava_vpy = str(PROJECT_DIR / "Llava" / ".venv" / "bin" / "python")
+                llava_key_map = {
+                    "llava_v16_mistral": "llava-v1.6-mistral",
+                    "llava_onevision": "llava-onevision",
+                    "llava_next_video_7b": "llava-next-video-7b",
+                    "llava_next_video_34b": "llava-next-video-34b",
+                    "phi3_vision": "phi-3-vision",
+                }
+                lk = llava_key_map.get(mn, mn)
+                llava_args = [llava_vpy, str(run_py), "--model", lk,
+                              "--image", str(img_path), "--task", "caption",
+                              "--max-new-tokens", "256"]
+                if mn == "llava_next_video_34b":
+                    llava_args += ["--quantize"]
+                result = subprocess.run(llava_args, capture_output=True, text=True, timeout=1800)
+                try:
+                    data = json.loads(result.stdout)
+                    caption = data.get("response", "")
+                except (json.JSONDecodeError, KeyError):
+                    caption = result.stdout[:500]
 
             elapsed = time.perf_counter() - t0
             times.append(elapsed)
@@ -317,6 +342,7 @@ def main():
                    if MODEL_ALIASES.get(m, m) in CAPTION_MODELS or m in CAPTION_MODELS]
     parser.add_argument("--model", choices=all_choices, default="florence2")
     parser.add_argument("--max-images", type=int, default=100)
+    parser.add_argument("--samples-file", type=str, default=None, help="Path to samples file (unused, for compatibility)")
     args = parser.parse_args()
 
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)

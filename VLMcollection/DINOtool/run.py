@@ -51,6 +51,8 @@ def main():
                         choices=MODEL_SHORTCUTS,
                         help="Model shortcut (default: dinov2_vits14_reg)")
     parser.add_argument("--top-k", type=int, default=8, help="Top-k labels for describe")
+    parser.add_argument("--labels-file", type=str, default=None,
+                        help="JSON file with custom labels (format: {\"labels\": [...], \"prompt_template\": \"...\"})")
     parser.add_argument("--device", type=str, default=None, help="Device override (cpu, cuda)")
 
     args = parser.parse_args()
@@ -60,7 +62,16 @@ def main():
         print(json.dumps({"error": f"Image not found: {img_path}"}))
         sys.exit(1)
 
-    worker = DINoToolWorker(model_name=args.model, device=args.device)
+    label_overrides = None
+    prompt_template = None
+    if args.labels_file:
+        with open(args.labels_file) as f:
+            ldata = json.load(f)
+        label_overrides = ldata["labels"]
+        prompt_template = ldata.get("prompt_template")
+
+    worker = DINoToolWorker(model_name=args.model, device=args.device,
+                            label_overrides=label_overrides, prompt_template=prompt_template)
     result = {"model": args.model, "image": str(img_path)}
 
     t0 = time.time()

@@ -1,0 +1,15 @@
+{
+  "model": "DiffusionGemma-26B (YOLO)",
+  "model_key": "diffusion_gemma",
+  "task": "object_counting",
+  "dataset": "coco",
+  "questions": 12,
+  "skipped": 0,
+  "total_inference_time_s": 747.658,
+  "avg_inference_ms": 62304.81,
+  "fps": 0.02,
+  "MAE": 2.0,
+  "RMSE": 3.7859,
+  "exact_accuracy": 0.3333,
+  "correct_exact": 4
+}

@@ -125,6 +125,7 @@ def load_model(model_path, device=None):
         original_warmup = mu.caching_allocator_warmup
         mu.caching_allocator_warmup = lambda *args, **kwargs: None
         load_kwargs["device_map"] = "cuda"
+        load_kwargs["attn_implementation"] = "sdpa"
         if not is_fp8:
             load_kwargs["torch_dtype"] = torch.bfloat16
         model = model_class.from_pretrained(model_path, **load_kwargs)

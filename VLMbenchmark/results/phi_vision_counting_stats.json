@@ -1,0 +1,15 @@
+{
+  "model": "Phi-3.5-Vision-4.2B",
+  "model_key": "phi_vision",
+  "task": "object_counting",
+  "dataset": "coco",
+  "questions": 122,
+  "skipped": 0,
+  "total_inference_time_s": 87.814,
+  "avg_inference_ms": 719.79,
+  "fps": 1.39,
+  "MAE": 1.1158,
+  "RMSE": 3.1422,
+  "exact_accuracy": 0.4918,
+  "correct_exact": 60
+}

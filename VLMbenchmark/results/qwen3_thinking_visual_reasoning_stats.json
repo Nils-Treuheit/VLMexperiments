@@ -1,0 +1,12 @@
+{
+  "model": "Qwen3-VL-8B-Thinking",
+  "model_key": "qwen3_thinking",
+  "task": "visual_reasoning",
+  "dataset": "coco",
+  "questions": 50,
+  "skipped": 0,
+  "total_inference_time_s": 317.157,
+  "avg_inference_ms": 6343.13,
+  "fps": 0.16,
+  "accuracy": 0.5
+}

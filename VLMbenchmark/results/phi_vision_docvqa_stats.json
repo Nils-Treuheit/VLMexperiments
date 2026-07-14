@@ -1,0 +1,12 @@
+{
+  "model": "Phi-3.5-Vision-4.2B",
+  "model_key": "phi_vision",
+  "task": "docvqa",
+  "dataset": "coco",
+  "questions": 100,
+  "skipped": 0,
+  "total_inference_time_s": 225.649,
+  "avg_inference_ms": 2256.49,
+  "fps": 0.44,
+  "accuracy": 0.1
+}

@@ -341,10 +341,10 @@ def load_florence2():
     sys.path.insert(0, str(PROJECT_DIR / "florence-2"))
     from transformers import AutoModelForCausalLM, AutoProcessor
     dev = "cuda" if torch.cuda.is_available() else "cpu"
-    dtype = torch.float16 if torch.cuda.is_available() else torch.float32
     model = AutoModelForCausalLM.from_pretrained(
-        "microsoft/Florence-2-large-ft", torch_dtype=dtype, trust_remote_code=True
-    ).to(dev)
+        "microsoft/Florence-2-large-ft", torch_dtype=torch.float16,
+        device_map=dev, trust_remote_code=True, attn_implementation="sdpa",
+    )
     processor = AutoProcessor.from_pretrained("microsoft/Florence-2-large-ft", trust_remote_code=True)
     return (model, processor), {}
 
@@ -353,6 +353,7 @@ def load_paligemma():
     from transformers import AutoProcessor, PaliGemmaForConditionalGeneration
     model = PaliGemmaForConditionalGeneration.from_pretrained(
         "google/paligemma2-3b-mix-224", torch_dtype=torch.bfloat16, device_map="auto",
+        attn_implementation="sdpa",
     ).eval()
     processor = AutoProcessor.from_pretrained("google/paligemma2-3b-mix-224")
     return (model, processor), {}
@@ -362,6 +363,7 @@ def load_llama_vision():
     from transformers import AutoModelForMultimodalLM, AutoProcessor
     model = AutoModelForMultimodalLM.from_pretrained(
         "unsloth/Llama-3.2-11B-Vision-Instruct-bnb-4bit", device_map="auto", torch_dtype=torch.bfloat16,
+        attn_implementation="sdpa",
     )
     processor = AutoProcessor.from_pretrained("unsloth/Llama-3.2-11B-Vision-Instruct-bnb-4bit")
     return (model, processor), {}
@@ -373,7 +375,7 @@ def load_phi_vision():
     config._attn_implementation = "eager"
     model = AutoModelForCausalLM.from_pretrained(
         "microsoft/Phi-3.5-vision-instruct", config=config, trust_remote_code=True,
-        dtype="auto", device_map="auto",
+        torch_dtype=torch.float16, device_map="auto",
     )
     processor = AutoProcessor.from_pretrained("microsoft/Phi-3.5-vision-instruct", trust_remote_code=True)
     return (model, processor), {}

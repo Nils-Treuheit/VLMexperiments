@@ -1,0 +1,15 @@
+{
+  "model": "LLaVA-Phi-3-Mini-4B",
+  "model_key": "phi3_vision",
+  "task": "object_counting",
+  "dataset": "coco",
+  "questions": 122,
+  "skipped": 0,
+  "total_inference_time_s": 1191.68,
+  "avg_inference_ms": 9767.87,
+  "fps": 0.1,
+  "MAE": 0.9167,
+  "RMSE": 2.1794,
+  "exact_accuracy": 0.5082,
+  "correct_exact": 62
+}

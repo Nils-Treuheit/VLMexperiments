@@ -1,0 +1,12 @@
+{
+  "model": "Cosmos-Reason1-7B",
+  "model_key": "cosmos_nemotron",
+  "task": "visual_reasoning",
+  "dataset": "coco",
+  "questions": 50,
+  "skipped": 0,
+  "total_inference_time_s": 7.482,
+  "avg_inference_ms": 149.64,
+  "fps": 6.68,
+  "accuracy": 0.34
+}

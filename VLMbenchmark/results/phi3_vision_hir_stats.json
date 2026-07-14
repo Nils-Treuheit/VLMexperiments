@@ -1,0 +1,12 @@
+{
+  "model": "LLaVA-Phi-3-Mini-4B",
+  "model_key": "phi3_vision",
+  "task": "human_intention_recognition",
+  "dataset": "coco",
+  "questions": 50,
+  "skipped": 0,
+  "total_inference_time_s": 461.369,
+  "avg_inference_ms": 9227.38,
+  "fps": 0.11,
+  "accuracy": 0.3
+}

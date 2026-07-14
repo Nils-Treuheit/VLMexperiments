@@ -47,7 +47,7 @@ def get_model_info(model_name):
     return info[model_name]
 
 
-def load_model(model_name, device, quantize_4bit=False):
+def load_model(model_name, device, quantize_4bit=False, attn_implementation=None):
     info = get_model_info(model_name)
     hf_id = info["hf_id"]
     arch = info["arch"]
@@ -67,6 +67,8 @@ def load_model(model_name, device, quantize_4bit=False):
 
     dtype = torch.float16 if device == "cuda" else torch.float32
     kw = {"torch_dtype": dtype, "device_map": device, "trust_remote_code": True}
+    if attn_implementation is not None:
+        kw["attn_implementation"] = attn_implementation
 
     if arch == "LlavaForConditionalGeneration":
         kw["low_cpu_mem_usage"] = True
@@ -141,6 +143,9 @@ def main():
     parser.add_argument("--device", type=str, default=None, help="Device (cuda, cpu)")
     parser.add_argument("--max-new-tokens", type=int, default=512, help="Max generation tokens")
     parser.add_argument("--quantize", action="store_true", help="Use 4-bit quantization (for 34B model)")
+    parser.add_argument("--attn-implementation", type=str, default="sdpa",
+                        choices=["flash_attention_2", "sdpa", "eager"],
+                        help="Attention implementation (default: sdpa — FA2 ELF mismatch on this system)")
     parser.add_argument("--top-k", type=int, default=5, help="Not used for LLaVA (kept for compatibility)")
     parser.add_argument("--labels-file", type=str, default=None, help="Not used for LLaVA (kept for compat)")
     args = parser.parse_args()
@@ -155,7 +160,8 @@ def main():
 
     warnings.filterwarnings("ignore", message=".*torch_dtype.*")
 
-    model, processor = load_model(args.model, device, quantize_4bit=args.quantize)
+    model, processor = load_model(args.model, device, quantize_4bit=args.quantize,
+                                   attn_implementation=args.attn_implementation)
 
     if args.prompt:
         prompt = args.prompt

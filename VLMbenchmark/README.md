@@ -19,28 +19,28 @@ Each model is automatically dispatched to its own virtual environment under `../
 
 ## Skill Matrix
 
-| Model | Det. | Pose | OBB | Ground | Caption | VQA | Class. | Seg. | Scene | Track | 6D Pose | OCR | Point |
-|-------|:----:|:----:|:---:|:------:|:-------:|:---:|:------:|:----:|:-----:|:-----:|:-------:|:---:|:-----:|
-| LocateAnything-3B | ✓ | — | — | ✓ | — | — | — | ✓ | — | — | — | ✓ | ✓ |
-| LocateAnything-3B (TRT) | ✓ | — | — | ✓ | — | — | — | ✓ | — | — | — | ✓ | ✓ |
-| Qwen3-VL-8B-Instruct | ✓ | — | ✓ | ✓ | ✓ | ✓ | — | — | ✓ | — | — | — | — |
-| Qwen3-VL-8B-Thinking | ✓ | — | ✓ | ✓ | ✓ | ✓ | — | — | ✓ | — | — | — | — |
-| YOLO26n / YOLO11n | ✓ | ✓ | ✓ | — | — | — | — | — | — | ✓ | ✓ | — | — |
-| Florence-2-large-ft | ✓ | — | — | ✓ | ✓ | ✓ | — | ✓ | ✓ | — | — | ✓ | — |
-| PaliGemma2-3B-mix | ✓* | — | — | — | ✓ | ✓ | — | — | ✓ | — | — | — | — |
-| Llama-3.2-11B-Vision | — | — | — | — | ✓ | ✓ | — | — | ✓ | — | — | — | — |
-| Phi-3.5-Vision-4.2B | — | — | — | — | ✓ | ✓ | — | — | ✓ | — | — | — | — |
-| Cosmos-Reason1-7B | — | — | — | — | ✓ | ✓ | — | — | ✓ | — | — | — | — |
-| LLaVA-v1.6-Mistral-7B | — | — | — | — | ✓ | ✓ | — | — | ✓ | — | — | — | — |
-| LLaVA-OneVision-Qwen2-7B | — | — | — | — | ✓ | ✓ | — | — | ✓ | — | — | — | — |
-| LLaVA-NeXT-Video-7B | — | — | — | — | ✓ | ✓ | — | — | ✓ | — | — | — | — |
-| LLaVA-NeXT-Video-34B (4-bit) | — | — | — | — | ✓ | ✓ | — | — | ✓ | — | — | — | — |
-| LLaVA-Phi-3-Mini-4B | — | — | — | — | ✓ | ✓ | — | — | ✓ | — | — | — | — |
-| DiffusionGemma-26B | — | — | — | — | ✓ | ✓ | — | — | — | — | — | — | — |
-| SigLIP2 (ZS) | — | — | — | — | ✓† | — | ✓ | — | — | — | — | — | — |
-| MoonViT (ZS) | — | — | — | — | ✓† | — | ✓ | — | — | — | — | — | — |
-| DINOv3 (ZS) | — | — | — | — | ✓† | — | ✓ | — | — | — | — | — | — |
-| DINOtool (ZS) | — | — | — | — | ✓† | — | ✓ | — | — | — | — | — | — |
+| Model | Det. | Pose | OBB | Ground | Caption | VQA | Class. | Seg. | Scene | Track | 6D Pose | OCR | Point | Count | Vis.Reas. | DocVQA | Emotion | HIR | DocUnd. |
+|-------|:----:|:----:|:---:|:------:|:-------:|:---:|:------:|:----:|:-----:|:-----:|:-------:|:---:|:-----:|:----:|:---------:|:------:|:-------:|:---:|:-------:|
+| LocateAnything-3B | ✓ | — | — | ✓ | — | — | — | ✓ | — | — | — | ✓ | ✓ | — | — | — | — | — | — |
+| LocateAnything-3B (TRT) | ✓ | — | — | ✓ | — | — | — | ✓ | — | — | — | ✓ | ✓ | — | — | — | — | — | — |
+| Qwen3-VL-8B-Instruct | ✓ | — | ✓ | ✓ | ✓ | ✓ | — | — | ✓ | — | — | — | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Qwen3-VL-8B-Thinking | ✓ | — | ✓ | ✓ | ✓ | ✓ | — | — | ✓ | — | — | — | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| YOLO26n / YOLO11n | ✓ | ✓ | ✓ | — | — | — | — | — | — | ✓ | ✓ | — | — | — | — | — | — | — | — |
+| Florence-2-large-ft | ✓ | — | — | ✓ | ✓ | ✓ | — | ✓ | ✓ | — | — | ✓ | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| PaliGemma2-3B-mix | ✓* | — | — | — | ✓ | ✓ | — | — | ✓ | — | — | — | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Llama-3.2-11B-Vision | — | — | — | — | ✓ | ✓ | — | — | ✓ | — | — | — | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Phi-3.5-Vision-4.2B | — | — | — | — | ✓ | ✓ | — | — | ✓ | — | — | — | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Cosmos-Reason1-7B | — | — | — | — | ✓ | ✓ | — | — | ✓ | — | — | — | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| LLaVA-v1.6-Mistral-7B | — | — | — | — | ✓ | ✓ | — | — | ✓ | — | — | — | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| LLaVA-OneVision-Qwen2-7B | — | — | — | — | ✓ | ✓ | — | — | ✓ | — | — | — | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| LLaVA-NeXT-Video-7B | — | — | — | — | ✓ | ✓ | — | — | ✓ | — | — | — | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| LLaVA-NeXT-Video-34B (4-bit) | — | — | — | — | ✓ | ✓ | — | — | ✓ | — | — | — | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| LLaVA-Phi-3-Mini-4B | — | — | — | — | ✓ | ✓ | — | — | ✓ | — | — | — | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| DiffusionGemma-26B | — | — | — | — | ✓ | ✓ | — | — | — | — | — | — | — | ✓ | — | — | — | — | — |
+| SigLIP2 (ZS) | — | — | — | — | ✓† | — | ✓ | — | — | — | — | — | — | — | — | — | — | — | — |
+| MoonViT (ZS) | — | — | — | — | ✓† | — | ✓ | — | — | — | — | — | — | — | — | — | — | — | — |
+| DINOv3 (ZS) | — | — | — | — | ✓† | — | ✓ | — | — | — | — | — | — | — | — | — | — | — | — |
+| DINOtool (ZS) | — | — | — | — | ✓† | — | ✓ | — | — | — | — | — | — | — | — | — | — | — | — |
 
 > `✓*` = PaliGemma OD is prompt-based (bbox tokens). `✓†` = Vision-only encoders output structured text, not freeform captions.
 
@@ -61,6 +61,12 @@ Each model is automatically dispatched to its own virtual environment under `../
 | `benchmark_6dpose.py` | 6D Pose Detection | Linemod | `yolo26`, `yolo26s-yolo26m`, `yolo11`, `yolo11s-yolo11m` |
 | `benchmark_ocr.py` | OCR / Text Det. | Synthetic COCO | `locate_anything`, `locate_anything_trt`, `florence2` |
 | `benchmark_pointing.py` | Pointing / 2D KP | COCO val2017 | `locate_anything`, `locate_anything_trt` |
+| `benchmark_counting.py` | Object Counting | COCO val2017 | `florence2`, `paligemma`, `llama_vision`, `phi_vision`, `cosmos_nemotron`, `qwen3_native`, `qwen3_thinking`, `diffusion_gemma*`, `llava*`, `phi3_vision` |
+| `benchmark_visual_reasoning.py` | Visual Reasoning | COCO val2017 | `florence2`, `paligemma`, `llama_vision`, `phi_vision`, `cosmos_nemotron`, `qwen3_native`, `qwen3_thinking`, `llava*`, `phi3_vision` |
+| `benchmark_docvqa.py` | Document VQA | COCO val2017 | `florence2`, `paligemma`, `llama_vision`, `phi_vision`, `cosmos_nemotron`, `qwen3_native`, `qwen3_thinking`, `llava*`, `phi3_vision` |
+| `benchmark_emotion.py` | Emotion Detection | COCO val2017 | `florence2`, `paligemma`, `llama_vision`, `phi_vision`, `cosmos_nemotron`, `qwen3_native`, `qwen3_thinking`, `llava*`, `phi3_vision` |
+| `benchmark_hir.py` | Human Intention Rec. | COCO val2017 | `florence2`, `paligemma`, `llama_vision`, `phi_vision`, `cosmos_nemotron`, `qwen3_native`, `qwen3_thinking`, `llava*`, `phi3_vision` |
+| `benchmark_doc_understanding.py` | Document Understanding | COCO val2017 | `florence2`, `paligemma`, `llama_vision`, `phi_vision`, `cosmos_nemotron`, `qwen3_native`, `qwen3_thinking`, `llava*`, `phi3_vision` |
 
 ## Model Reference
 
@@ -214,3 +220,9 @@ python3 generate_report.py
 | 6D Pose Detection | ADD(-S) accuracy, FPS |
 | OCR / Text Detection | F1 (text spotting), FPS |
 | Pointing | Accuracy (pixel distance < threshold), FPS |
+| Object Counting | MAE, RMSE, Exact accuracy, FPS |
+| Visual Reasoning | Accuracy (multi-step reasoning), FPS |
+| Document VQA | Accuracy (document-oriented questions), FPS |
+| Emotion Detection | Accuracy (emotion class templates), FPS |
+| Human Intention Recognition | Accuracy (intention class templates), FPS |
+| Document Understanding | Accuracy (document structure questions), FPS |

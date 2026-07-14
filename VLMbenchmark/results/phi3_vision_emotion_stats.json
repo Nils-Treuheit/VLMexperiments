@@ -1,0 +1,12 @@
+{
+  "model": "LLaVA-Phi-3-Mini-4B",
+  "model_key": "phi3_vision",
+  "task": "emotion_detection",
+  "dataset": "coco",
+  "questions": 50,
+  "skipped": 0,
+  "total_inference_time_s": 472.639,
+  "avg_inference_ms": 9452.78,
+  "fps": 0.11,
+  "accuracy": 0.06
+}

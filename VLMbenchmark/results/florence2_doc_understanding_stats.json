@@ -1,0 +1,12 @@
+{
+  "model": "Florence-2-large-ft",
+  "model_key": "florence2",
+  "task": "doc_understanding",
+  "dataset": "coco",
+  "questions": 20,
+  "skipped": 0,
+  "total_inference_time_s": 2.643,
+  "avg_inference_ms": 132.17,
+  "fps": 7.57,
+  "accuracy": 0.2
+}

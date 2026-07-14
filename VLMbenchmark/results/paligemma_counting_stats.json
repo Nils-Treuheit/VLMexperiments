@@ -1,0 +1,15 @@
+{
+  "model": "PaliGemma2-3B-mix",
+  "model_key": "paligemma",
+  "task": "object_counting",
+  "dataset": "coco",
+  "questions": 122,
+  "skipped": 0,
+  "total_inference_time_s": 7.746,
+  "avg_inference_ms": 63.49,
+  "fps": 15.75,
+  "MAE": 1.0164,
+  "RMSE": 2.6458,
+  "exact_accuracy": 0.6393,
+  "correct_exact": 78
+}

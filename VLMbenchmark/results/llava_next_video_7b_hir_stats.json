@@ -1,0 +1,12 @@
+{
+  "model": "LLaVA-NeXT-Video-7B",
+  "model_key": "llava_next_video_7b",
+  "task": "human_intention_recognition",
+  "dataset": "coco",
+  "questions": 50,
+  "skipped": 0,
+  "total_inference_time_s": 562.248,
+  "avg_inference_ms": 11244.97,
+  "fps": 0.09,
+  "accuracy": 0.12
+}

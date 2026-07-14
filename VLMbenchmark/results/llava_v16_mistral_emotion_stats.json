@@ -1,0 +1,12 @@
+{
+  "model": "LLaVA-v1.6-Mistral-7B",
+  "model_key": "llava_v16_mistral",
+  "task": "emotion_detection",
+  "dataset": "coco",
+  "questions": 50,
+  "skipped": 0,
+  "total_inference_time_s": 535.876,
+  "avg_inference_ms": 10717.51,
+  "fps": 0.09,
+  "accuracy": 0.06
+}

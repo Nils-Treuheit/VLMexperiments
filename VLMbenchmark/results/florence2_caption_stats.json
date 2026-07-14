@@ -3,12 +3,12 @@
   "model_key": "florence2",
   "task": "captioning",
   "dataset": "coco",
-  "images": 2,
+  "images": 20,
   "skipped": 0,
-  "total_inference_time_s": 10.437,
-  "avg_inference_ms": 5218.64,
-  "fps": 0.19,
-  "bleu_4": 0.0,
-  "rouge_l": 0.2121,
-  "cider": 0.3964
+  "total_inference_time_s": 7.348,
+  "avg_inference_ms": 367.41,
+  "fps": 2.72,
+  "bleu_4": 0.0214,
+  "rouge_l": 0.2092,
+  "cider": 0.3981
 }

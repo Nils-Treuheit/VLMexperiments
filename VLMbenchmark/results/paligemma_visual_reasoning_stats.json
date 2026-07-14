@@ -1,0 +1,12 @@
+{
+  "model": "PaliGemma2-3B-mix",
+  "model_key": "paligemma",
+  "task": "visual_reasoning",
+  "dataset": "coco",
+  "questions": 50,
+  "skipped": 0,
+  "total_inference_time_s": 4.627,
+  "avg_inference_ms": 92.54,
+  "fps": 10.81,
+  "accuracy": 0.3
+}

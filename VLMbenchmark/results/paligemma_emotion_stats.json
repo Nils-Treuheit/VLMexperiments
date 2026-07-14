@@ -1,0 +1,12 @@
+{
+  "model": "PaliGemma2-3B-mix",
+  "model_key": "paligemma",
+  "task": "emotion_detection",
+  "dataset": "coco",
+  "questions": 50,
+  "skipped": 0,
+  "total_inference_time_s": 2.723,
+  "avg_inference_ms": 54.46,
+  "fps": 18.36,
+  "accuracy": 0.1
+}

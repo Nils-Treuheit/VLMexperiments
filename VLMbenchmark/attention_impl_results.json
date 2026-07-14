@@ -1,0 +1,65 @@
+[
+  {
+    "model": "florence2",
+    "display": "Florence-2-large-ft",
+    "attn": "flash_attention_2",
+    "load_s": null,
+    "infer_ms": null,
+    "actual_attn": null,
+    "status": "FAIL: Input type (float) and bias type (c10::Half) should be the same"
+  },
+  {
+    "model": "florence2",
+    "display": "Florence-2-large-ft",
+    "attn": "sdpa",
+    "load_s": null,
+    "infer_ms": null,
+    "actual_attn": null,
+    "status": "FAIL: Input type (float) and bias type (c10::Half) should be the same"
+  },
+  {
+    "model": "florence2",
+    "display": "Florence-2-large-ft",
+    "attn": "eager",
+    "load_s": null,
+    "infer_ms": null,
+    "actual_attn": null,
+    "status": "FAIL: Input type (float) and bias type (c10::Half) should be the same"
+  },
+  {
+    "model": "paligemma",
+    "display": "PaliGemma2-3B",
+    "attn": "flash_attention_2",
+    "load_s": null,
+    "infer_ms": null,
+    "actual_attn": null,
+    "status": "FAIL: cannot access local variable 'seq_len' where it is not associated with a value"
+  },
+  {
+    "model": "llama_vision",
+    "display": "Llama-3.2-11B-Vision",
+    "attn": "flash_attention_2",
+    "load_s": null,
+    "infer_ms": null,
+    "actual_attn": null,
+    "status": "FAIL: cannot import name 'AutoModelForMultimodalLM' from 'transformers' (/mnt/HDD1/Project_Code/VLMexperim"
+  },
+  {
+    "model": "phi_vision",
+    "display": "Phi-3.5-vision-instruct",
+    "attn": "eager",
+    "load_s": null,
+    "infer_ms": null,
+    "actual_attn": null,
+    "status": "FAIL: total images must be the same as the number of image tags, got 0 image tags and 1 images"
+  },
+  {
+    "model": "cosmos_nemotron",
+    "display": "Cosmos-Reason1-7B",
+    "attn": "flash_attention_2",
+    "load_s": null,
+    "infer_ms": null,
+    "actual_attn": null,
+    "status": "FAIL: cannot import name 'AutoModelForMultimodalLM' from 'transformers' (/mnt/HDD1/Project_Code/VLMexperim"
+  }
+]

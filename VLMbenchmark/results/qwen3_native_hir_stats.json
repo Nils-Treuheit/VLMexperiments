@@ -1,0 +1,12 @@
+{
+  "model": "Qwen3-VL-8B-Instruct",
+  "model_key": "qwen3_native",
+  "task": "human_intention_recognition",
+  "dataset": "coco",
+  "questions": 50,
+  "skipped": 0,
+  "total_inference_time_s": 4.464,
+  "avg_inference_ms": 89.29,
+  "fps": 11.2,
+  "accuracy": 0.08
+}

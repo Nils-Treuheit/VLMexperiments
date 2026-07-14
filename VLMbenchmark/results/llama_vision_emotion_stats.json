@@ -1,0 +1,12 @@
+{
+  "model": "Llama-3.2-11B-Vision",
+  "model_key": "llama_vision",
+  "task": "emotion_detection",
+  "dataset": "coco",
+  "questions": 50,
+  "skipped": 0,
+  "total_inference_time_s": 32.036,
+  "avg_inference_ms": 640.72,
+  "fps": 1.56,
+  "accuracy": 0.04
+}

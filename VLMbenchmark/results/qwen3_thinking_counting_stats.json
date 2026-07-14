@@ -1,0 +1,15 @@
+{
+  "model": "Qwen3-VL-8B-Thinking",
+  "model_key": "qwen3_thinking",
+  "task": "object_counting",
+  "dataset": "coco",
+  "questions": 122,
+  "skipped": 0,
+  "total_inference_time_s": 680.931,
+  "avg_inference_ms": 5581.4,
+  "fps": 0.18,
+  "MAE": 2.2,
+  "RMSE": 9.2304,
+  "exact_accuracy": 0.5902,
+  "correct_exact": 72
+}

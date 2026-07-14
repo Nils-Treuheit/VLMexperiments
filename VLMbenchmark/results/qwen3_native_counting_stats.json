@@ -1,0 +1,15 @@
+{
+  "model": "Qwen3-VL-8B-Instruct",
+  "model_key": "qwen3_native",
+  "task": "object_counting",
+  "dataset": "coco",
+  "questions": 122,
+  "skipped": 0,
+  "total_inference_time_s": 12.748,
+  "avg_inference_ms": 104.5,
+  "fps": 9.57,
+  "MAE": 1.5246,
+  "RMSE": 8.0866,
+  "exact_accuracy": 0.6475,
+  "correct_exact": 79
+}

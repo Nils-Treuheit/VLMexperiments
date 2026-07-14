@@ -1,0 +1,12 @@
+{
+  "model": "Phi-3.5-Vision-4.2B",
+  "model_key": "phi_vision",
+  "task": "human_intention_recognition",
+  "dataset": "coco",
+  "questions": 50,
+  "skipped": 0,
+  "total_inference_time_s": 112.326,
+  "avg_inference_ms": 2246.51,
+  "fps": 0.45,
+  "accuracy": 0.18
+}

@@ -1,0 +1,12 @@
+{
+  "model": "Qwen3-VL-8B-Thinking",
+  "model_key": "qwen3_thinking",
+  "task": "docvqa",
+  "dataset": "coco",
+  "questions": 100,
+  "skipped": 0,
+  "total_inference_time_s": 543.326,
+  "avg_inference_ms": 5433.26,
+  "fps": 0.18,
+  "accuracy": 0.31
+}

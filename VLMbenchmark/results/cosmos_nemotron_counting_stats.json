@@ -1,0 +1,15 @@
+{
+  "model": "Cosmos-Reason1-7B",
+  "model_key": "cosmos_nemotron",
+  "task": "object_counting",
+  "dataset": "coco",
+  "questions": 122,
+  "skipped": 0,
+  "total_inference_time_s": 13.455,
+  "avg_inference_ms": 110.29,
+  "fps": 9.07,
+  "MAE": 0.8934,
+  "RMSE": 2.3626,
+  "exact_accuracy": 0.6639,
+  "correct_exact": 81
+}

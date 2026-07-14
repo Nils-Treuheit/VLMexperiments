@@ -108,6 +108,62 @@ TASKS = {
         "models": ["locate_anything", "locate_anything_trt"],
         "dataset": None,
     },
+    "counting": {
+        "script": "benchmark_counting.py",
+        "title": "Object Counting (COCO instances)",
+        "models": ["florence2", "paligemma", "llama_vision", "phi_vision", "cosmos_nemotron",
+                    "qwen3_native", "qwen3_thinking",
+                    "diffusion_gemma", "diffusion_gemma_yolo", "diffusion_gemma_yolo_pose",
+                    "diffusion_gemma_yolo_obb", "diffusion_gemma_siglip2", "diffusion_gemma_moonvit",
+                    "llava_v16_mistral", "llava_onevision", "llava_next_video_7b",
+                    "llava_next_video_34b", "phi3_vision"],
+        "dataset": None,
+    },
+    "visual_reasoning": {
+        "script": "benchmark_visual_reasoning.py",
+        "title": "Visual Reasoning (COCO)",
+        "models": ["florence2", "paligemma", "llama_vision", "phi_vision", "cosmos_nemotron",
+                    "qwen3_native", "qwen3_thinking",
+                    "llava_v16_mistral", "llava_onevision", "llava_next_video_7b",
+                    "llava_next_video_34b", "phi3_vision"],
+        "dataset": None,
+    },
+    "docvqa": {
+        "script": "benchmark_docvqa.py",
+        "title": "Document VQA (COCO)",
+        "models": ["florence2", "paligemma", "llama_vision", "phi_vision", "cosmos_nemotron",
+                    "qwen3_native", "qwen3_thinking",
+                    "llava_v16_mistral", "llava_onevision", "llava_next_video_7b",
+                    "llava_next_video_34b", "phi3_vision"],
+        "dataset": None,
+    },
+    "emotion": {
+        "script": "benchmark_emotion.py",
+        "title": "Emotion Detection (COCO)",
+        "models": ["florence2", "paligemma", "llama_vision", "phi_vision", "cosmos_nemotron",
+                    "qwen3_native", "qwen3_thinking",
+                    "llava_v16_mistral", "llava_onevision", "llava_next_video_7b",
+                    "llava_next_video_34b", "phi3_vision"],
+        "dataset": None,
+    },
+    "hir": {
+        "script": "benchmark_hir.py",
+        "title": "Human Intention Recognition (COCO)",
+        "models": ["florence2", "paligemma", "llama_vision", "phi_vision", "cosmos_nemotron",
+                    "qwen3_native", "qwen3_thinking",
+                    "llava_v16_mistral", "llava_onevision", "llava_next_video_7b",
+                    "llava_next_video_34b", "phi3_vision"],
+        "dataset": None,
+    },
+    "doc_understanding": {
+        "script": "benchmark_doc_understanding.py",
+        "title": "Document Understanding (COCO)",
+        "models": ["florence2", "paligemma", "llama_vision", "phi_vision", "cosmos_nemotron",
+                    "qwen3_native", "qwen3_thinking",
+                    "llava_v16_mistral", "llava_onevision", "llava_next_video_7b",
+                    "llava_next_video_34b", "phi3_vision"],
+        "dataset": None,
+    },
 }
 
 COLLECTION_DIR = Path("/mnt/HDD1/Project_Code/VLMexperiments/VLMcollection")
@@ -248,6 +304,18 @@ def extract_stats(model, script):
         fp = RESULTS_DIR / f"{prefix}_ocr_stats.json"
     elif "pointing" in script:
         fp = RESULTS_DIR / f"{prefix}_pointing_stats.json"
+    elif "counting" in script:
+        fp = RESULTS_DIR / f"{prefix}_counting_stats.json"
+    elif "visual_reasoning" in script:
+        fp = RESULTS_DIR / f"{prefix}_visual_reasoning_stats.json"
+    elif "docvqa" in script:
+        fp = RESULTS_DIR / f"{prefix}_docvqa_stats.json"
+    elif "emotion" in script:
+        fp = RESULTS_DIR / f"{prefix}_emotion_stats.json"
+    elif "hir" in script:
+        fp = RESULTS_DIR / f"{prefix}_hir_stats.json"
+    elif "doc_understanding" in script:
+        fp = RESULTS_DIR / f"{prefix}_doc_understanding_stats.json"
     else:
         fp = RESULTS_DIR / f"{prefix}_coco_od_stats.json"
         if fp.exists():

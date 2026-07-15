@@ -5,9 +5,9 @@
   "dataset": "coco",
   "images": 50,
   "skipped": 0,
-  "total_inference_time_s": 10.954,
-  "avg_inference_ms": 219.08,
-  "fps": 4.56,
+  "total_inference_time_s": 11.114,
+  "avg_inference_ms": 222.28,
+  "fps": 4.5,
   "bleu_4": 0.2995,
   "rouge_l": 0.5432,
   "cider": 1.7246

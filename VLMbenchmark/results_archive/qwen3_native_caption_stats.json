@@ -1,0 +1,14 @@
+{
+  "model": "Qwen3-VL-8B-Instruct",
+  "model_key": "qwen3_native",
+  "task": "captioning",
+  "dataset": "coco",
+  "images": 50,
+  "skipped": 0,
+  "total_inference_time_s": 219.973,
+  "avg_inference_ms": 4399.46,
+  "fps": 0.23,
+  "bleu_4": 0.0067,
+  "rouge_l": 0.073,
+  "cider": 0.1064
+}

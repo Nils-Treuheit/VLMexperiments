@@ -1,0 +1,14 @@
+{
+  "model": "Qwen3-VL-8B-Thinking",
+  "model_key": "qwen3_thinking",
+  "task": "captioning",
+  "dataset": "coco",
+  "images": 25,
+  "skipped": 0,
+  "total_inference_time_s": 436.634,
+  "avg_inference_ms": 17465.36,
+  "fps": 0.06,
+  "bleu_4": 0.0057,
+  "rouge_l": 0.0412,
+  "cider": 0.0614
+}

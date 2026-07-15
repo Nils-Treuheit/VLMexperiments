@@ -1,0 +1,14 @@
+{
+  "model": "YOLO26s (Pose)",
+  "model_key": "yolo26s_pose",
+  "task": "pose_estimation",
+  "images": 23,
+  "skipped": 27,
+  "total_inference_time_s": 1.158,
+  "avg_inference_ms": 50.37,
+  "fps": 19.85,
+  "total_gt_persons": 127,
+  "total_detected_persons": 56,
+  "AP@50:95_keypoints": 0.6537775131040157,
+  "AP@50_keypoints": 0.8398070576288398
+}

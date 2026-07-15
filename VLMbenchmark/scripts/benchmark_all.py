@@ -2,71 +2,97 @@ import argparse
 import json
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 SCRIPTS_DIR = Path(__file__).resolve().parent
 RESULTS_DIR = SCRIPTS_DIR.parent / "results"
 SAMPLES_DIR = SCRIPTS_DIR.parent / "samples"
 
+# Model categories by approximate VRAM usage (smallest first):
+#   tiny:    vision encoders, YOLO (< 2 GB)
+#   small:   florence2, locate_anything (2-4 GB)
+#   medium:  paligemma, phi_vision (4-8 GB)
+#   large:   cosmos, llama, qwen3 (8-14 GB)
+#   xlarge:  diffusion_gemma, LLaVA, phi4_mm (14-20+ GB)
+# Within each category, keep fast models before slow ones.
+
 TASKS = {
     "od": {
         "script": "benchmark_od.py",
         "title": "Object Detection (COCO)",
-        "models": ["locate_anything", "locate_anything_trt", "qwen3_native", "qwen3_thinking",
-                    "yolo26", "yolo26s", "yolo26m", "yolo26l", "yolo26x",
-                    "yolo11", "yolo11s", "yolo11m", "yolo11l", "yolo11x",
-                    "florence2", "paligemma"],
+        "models": [
+            "yolo11", "yolo11s", "yolo11m", "yolo11l", "yolo11x",
+            "yolo26", "yolo26s", "yolo26m", "yolo26l", "yolo26x",
+            "florence2", "paligemma",
+            "locate_anything", "locate_anything_trt",
+            "qwen3_native", "qwen3_thinking",
+        ],
         "dataset": "coco",
     },
     "pose": {
         "script": "benchmark_pose.py",
         "title": "Pose Estimation (COCO Keypoints)",
-        "models": ["yolo26_pose", "yolo26s_pose", "yolo11_pose", "yolo11s_pose"],
+        "models": ["yolo11_pose", "yolo11s_pose", "yolo26_pose", "yolo26s_pose"],
         "dataset": None,
     },
     "obb": {
         "script": "benchmark_obb.py",
         "title": "OBB Detection (DOTA-v1.0)",
-        "models": ["yolo26_obb", "yolo26s_obb", "yolo11_obb", "yolo11s_obb"],
+        "models": ["yolo11_obb", "yolo11s_obb", "yolo26_obb", "yolo26s_obb"],
         "dataset": None,
     },
     "grounding": {
         "script": "benchmark_grounding.py",
         "title": "Phrase Grounding (COCO)",
-        "models": ["locate_anything", "locate_anything_trt", "qwen3_native", "qwen3_thinking", "florence2"],
+        "models": ["florence2", "locate_anything", "locate_anything_trt",
+                    "qwen3_native", "qwen3_thinking"],
         "dataset": None,
     },
     "captioning": {
         "script": "benchmark_caption.py",
         "title": "Image Captioning (COCO Captions)",
-        "models": ["florence2", "paligemma", "llama_vision", "phi_vision", "cosmos_nemotron",
-                    "qwen3_native", "qwen3_thinking", "diffusion_gemma",
-                    "diffusion_gemma_yolo", "diffusion_gemma_yolo_pose",
-                    "diffusion_gemma_yolo_obb", "diffusion_gemma_siglip2",
-                    "diffusion_gemma_moonvit",
-                    "siglip2", "moonvit", "dinov3", "dinotool",
-                    "llava_v16_mistral", "llava_onevision", "llava_next_video_7b", "llava_next_video_34b",
-                    "phi3_vision"],
+        "models": [
+            "siglip2", "moonvit", "dinov3", "dinotool",
+            "florence2", "paligemma",
+            "cosmos_nemotron",
+            "llama_vision",
+            "qwen3_native", "qwen3_thinking",
+            "phi_vision",
+            "llava_v16_mistral", "llava_onevision",
+            "llava_next_video_7b", "phi3_vision",
+            "llava_next_video_34b",
+            "diffusion_gemma", "diffusion_gemma_yolo",
+            "diffusion_gemma_yolo_pose", "diffusion_gemma_yolo_obb",
+            "diffusion_gemma_siglip2", "diffusion_gemma_moonvit",
+        ],
         "dataset": None,
     },
     "vqa": {
         "script": "benchmark_vqa.py",
         "title": "Visual Question Answering (COCO)",
-        "models": ["florence2", "paligemma", "llama_vision", "phi_vision", "cosmos_nemotron",
-                    "qwen3_native", "qwen3_thinking",
-                    "diffusion_gemma", "diffusion_gemma_yolo", "diffusion_gemma_yolo_pose",
-                    "diffusion_gemma_yolo_obb", "diffusion_gemma_siglip2",
-                    "diffusion_gemma_moonvit",
-                    "llava_v16_mistral", "llava_onevision", "llava_next_video_7b", "llava_next_video_34b",
-                    "phi3_vision"],
+        "models": [
+            "florence2", "paligemma",
+            "cosmos_nemotron",
+            "llama_vision",
+            "qwen3_native", "qwen3_thinking",
+            "phi_vision",
+            "llava_v16_mistral", "llava_onevision",
+            "llava_next_video_7b", "phi3_vision",
+            "llava_next_video_34b",
+            "diffusion_gemma", "diffusion_gemma_yolo",
+            "diffusion_gemma_yolo_pose", "diffusion_gemma_yolo_obb",
+            "diffusion_gemma_siglip2", "diffusion_gemma_moonvit",
+        ],
         "dataset": None,
     },
     "classification": {
         "script": "benchmark_classification.py",
         "title": "Zero-Shot Classification (Tiny ImageNet)",
         "models": ["dinotool", "dinov3", "siglip2", "moonvit",
-                    "locate_anything", "locate_anything_trt", "qwen3_native", "qwen3_thinking",
-                    "florence2", "paligemma"],
+                    "florence2", "paligemma",
+                    "locate_anything", "locate_anything_trt",
+                    "qwen3_native", "qwen3_thinking"],
         "dataset": None,
     },
     "segmentation": {
@@ -78,28 +104,34 @@ TASKS = {
     "scene_analysis": {
         "script": "benchmark_scene.py",
         "title": "Semantic Scene Analysis (COCO)",
-        "models": ["florence2", "paligemma", "llama_vision", "phi_vision",
-                    "cosmos_nemotron", "qwen3_native", "qwen3_thinking",
-                    "llava_v16_mistral", "llava_onevision", "llava_next_video_7b", "llava_next_video_34b",
-                    "phi3_vision"],
+        "models": [
+            "florence2", "paligemma",
+            "cosmos_nemotron",
+            "llama_vision",
+            "qwen3_native", "qwen3_thinking",
+            "phi_vision",
+            "llava_v16_mistral", "llava_onevision",
+            "llava_next_video_7b", "phi3_vision",
+            "llava_next_video_34b",
+        ],
         "dataset": None,
     },
     "tracking": {
         "script": "benchmark_tracking.py",
         "title": "Multi-Object Tracking (MOT17)",
-        "models": ["yolo26", "yolo26s", "yolo26m", "yolo11", "yolo11s", "yolo11m"],
+        "models": ["yolo11", "yolo11s", "yolo11m", "yolo26", "yolo26s", "yolo26m"],
         "dataset": None,
     },
     "6d_pose": {
         "script": "benchmark_6dpose.py",
         "title": "6D Pose Estimation Detection (Linemod)",
-        "models": ["yolo26", "yolo26s", "yolo26m", "yolo11", "yolo11s", "yolo11m"],
+        "models": ["yolo11", "yolo11s", "yolo11m", "yolo26", "yolo26s", "yolo26m"],
         "dataset": None,
     },
     "ocr": {
         "script": "benchmark_ocr.py",
         "title": "OCR / Text Detection (Synthetic COCO)",
-        "models": ["locate_anything", "locate_anything_trt", "florence2"],
+        "models": ["florence2", "locate_anything", "locate_anything_trt"],
         "dataset": None,
     },
     "pointing": {
@@ -111,57 +143,94 @@ TASKS = {
     "counting": {
         "script": "benchmark_counting.py",
         "title": "Object Counting (COCO instances)",
-        "models": ["florence2", "paligemma", "llama_vision", "phi_vision", "cosmos_nemotron",
-                    "qwen3_native", "qwen3_thinking",
-                    "diffusion_gemma", "diffusion_gemma_yolo", "diffusion_gemma_yolo_pose",
-                    "diffusion_gemma_yolo_obb", "diffusion_gemma_siglip2", "diffusion_gemma_moonvit",
-                    "llava_v16_mistral", "llava_onevision", "llava_next_video_7b",
-                    "llava_next_video_34b", "phi3_vision"],
+        "models": [
+            "florence2", "paligemma",
+            "cosmos_nemotron",
+            "llama_vision",
+            "qwen3_native", "qwen3_thinking",
+            "phi_vision",
+            "llava_v16_mistral", "llava_onevision",
+            "llava_next_video_7b", "phi3_vision",
+            "llava_next_video_34b",
+            "diffusion_gemma", "diffusion_gemma_yolo",
+            "diffusion_gemma_yolo_pose", "diffusion_gemma_yolo_obb",
+            "diffusion_gemma_siglip2", "diffusion_gemma_moonvit",
+        ],
         "dataset": None,
     },
     "visual_reasoning": {
         "script": "benchmark_visual_reasoning.py",
         "title": "Visual Reasoning (COCO)",
-        "models": ["florence2", "paligemma", "llama_vision", "phi_vision", "cosmos_nemotron",
-                    "qwen3_native", "qwen3_thinking",
-                    "llava_v16_mistral", "llava_onevision", "llava_next_video_7b",
-                    "llava_next_video_34b", "phi3_vision"],
+        "models": [
+            "florence2", "paligemma",
+            "cosmos_nemotron",
+            "llama_vision",
+            "qwen3_native", "qwen3_thinking",
+            "phi_vision",
+            "llava_v16_mistral", "llava_onevision",
+            "llava_next_video_7b", "phi3_vision",
+            "llava_next_video_34b",
+        ],
         "dataset": None,
     },
     "docvqa": {
         "script": "benchmark_docvqa.py",
         "title": "Document VQA (COCO)",
-        "models": ["florence2", "paligemma", "llama_vision", "phi_vision", "cosmos_nemotron",
-                    "qwen3_native", "qwen3_thinking",
-                    "llava_v16_mistral", "llava_onevision", "llava_next_video_7b",
-                    "llava_next_video_34b", "phi3_vision"],
+        "models": [
+            "florence2", "paligemma",
+            "cosmos_nemotron",
+            "llama_vision",
+            "qwen3_native", "qwen3_thinking",
+            "phi_vision",
+            "llava_v16_mistral", "llava_onevision",
+            "llava_next_video_7b", "phi3_vision",
+            "llava_next_video_34b",
+        ],
         "dataset": None,
     },
     "emotion": {
         "script": "benchmark_emotion.py",
         "title": "Emotion Detection (COCO)",
-        "models": ["florence2", "paligemma", "llama_vision", "phi_vision", "cosmos_nemotron",
-                    "qwen3_native", "qwen3_thinking",
-                    "llava_v16_mistral", "llava_onevision", "llava_next_video_7b",
-                    "llava_next_video_34b", "phi3_vision"],
+        "models": [
+            "florence2", "paligemma",
+            "cosmos_nemotron",
+            "llama_vision",
+            "qwen3_native", "qwen3_thinking",
+            "phi_vision",
+            "llava_v16_mistral", "llava_onevision",
+            "llava_next_video_7b", "phi3_vision",
+            "llava_next_video_34b",
+        ],
         "dataset": None,
     },
     "hir": {
         "script": "benchmark_hir.py",
         "title": "Human Intention Recognition (COCO)",
-        "models": ["florence2", "paligemma", "llama_vision", "phi_vision", "cosmos_nemotron",
-                    "qwen3_native", "qwen3_thinking",
-                    "llava_v16_mistral", "llava_onevision", "llava_next_video_7b",
-                    "llava_next_video_34b", "phi3_vision"],
+        "models": [
+            "florence2", "paligemma",
+            "cosmos_nemotron",
+            "llama_vision",
+            "qwen3_native", "qwen3_thinking",
+            "phi_vision",
+            "llava_v16_mistral", "llava_onevision",
+            "llava_next_video_7b", "phi3_vision",
+            "llava_next_video_34b",
+        ],
         "dataset": None,
     },
     "doc_understanding": {
         "script": "benchmark_doc_understanding.py",
         "title": "Document Understanding (COCO)",
-        "models": ["florence2", "paligemma", "llama_vision", "phi_vision", "cosmos_nemotron",
-                    "qwen3_native", "qwen3_thinking",
-                    "llava_v16_mistral", "llava_onevision", "llava_next_video_7b",
-                    "llava_next_video_34b", "phi3_vision"],
+        "models": [
+            "florence2", "paligemma",
+            "cosmos_nemotron",
+            "llama_vision",
+            "qwen3_native", "qwen3_thinking",
+            "phi_vision",
+            "llava_v16_mistral", "llava_onevision",
+            "llava_next_video_7b", "phi3_vision",
+            "llava_next_video_34b",
+        ],
         "dataset": None,
     },
 }
@@ -248,34 +317,106 @@ def generate_samples(task_key, task, max_images):
     return str(sample_file)
 
 
-def run_model(model, script, max_images, dataset=None, sample_file=None):
+def wait_for_vram(min_free_mib=4096, check_interval=60, max_wait=7200):
+    """Wait until at least min_free_mib MiB of VRAM is free. Returns True once available."""
+    waited = 0
+    while waited < max_wait:
+        try:
+            import subprocess as _sp
+            out = _sp.run(
+                ["nvidia-smi", "--query-gpu=memory.free", "--format=csv,noheader"],
+                capture_output=True, text=True, timeout=10,
+            ).stdout.strip()
+            free = int(''.join(c for c in out if c.isdigit()))
+            if free >= min_free_mib:
+                return True
+            print(f"  [WAIT] Free VRAM: {free} MiB < {min_free_mib} MiB needed — waiting {check_interval}s...")
+        except Exception:
+            pass
+        time.sleep(check_interval)
+        waited += check_interval
+    print(f"  [SKIP] Timed out waiting for VRAM after {max_wait}s")
+    return False
+
+
+def run_model(model, script, max_images, dataset=None, sample_file=None, max_retries=3):
     venv_python = MODEL_VENV.get(model)
     if not venv_python:
         print(f"  [SKIP] No venv configured for {model}")
         return None
 
-    script_path = SCRIPTS_DIR / script
-    if "vqa" in script:
-        cmd = [venv_python, str(script_path), "--model", model, "--max-questions", str(max_images * 2)]
-    else:
-        cmd = [venv_python, str(script_path), "--model", model, "--max-images", str(max_images)]
-    if dataset:
-        cmd += ["--dataset", dataset]
-    if sample_file and "classification" not in script:
-        cmd += ["--samples-file", sample_file]
+    # Determine approximate VRAM needs (MiB free needed before loading)
+    vram_map = {
+        # tiny: vision encoders, YOLO
+        "siglip2": 1024, "moonvit": 1024, "dinov3": 1024, "dinotool": 1024,
+        "yolo11": 1024, "yolo11s": 1024, "yolo11m": 1024, "yolo11l": 1024, "yolo11x": 1024,
+        "yolo26": 1024, "yolo26s": 1024, "yolo26m": 1024, "yolo26l": 1024, "yolo26x": 1024,
+        "yolo11_pose": 1024, "yolo11s_pose": 1024, "yolo26_pose": 1024, "yolo26s_pose": 1024,
+        "yolo11_obb": 1024, "yolo11s_obb": 1024, "yolo26_obb": 1024, "yolo26s_obb": 1024,
+        # small: florence2, locate_anything
+        "florence2": 4096, "locate_anything": 4096, "locate_anything_trt": 4096,
+        # medium: paligemma
+        "paligemma": 6144,
+        # large: cosmos, llama, qwen3, phi_vision
+        "cosmos_nemotron": 12288, "llama_vision": 12288,
+        "qwen3_native": 12288, "qwen3_thinking": 12288,
+        "phi_vision": 12288,
+        # xlarge: diffusion_gemma, LLaVA
+        "diffusion_gemma": 16384, "diffusion_gemma_yolo": 16384,
+        "diffusion_gemma_yolo_pose": 16384, "diffusion_gemma_yolo_obb": 16384,
+        "diffusion_gemma_siglip2": 16384, "diffusion_gemma_moonvit": 16384,
+        "llava_v16_mistral": 16384, "llava_onevision": 16384,
+        "llava_next_video_7b": 16384, "llava_next_video_34b": 20480,
+        "phi3_vision": 16384,
+    }
+    needed = vram_map.get(model, 4096)
 
-    print(f"\n  ── Running: {model} via {venv_python.split('/')[-3]} ──")
-    sys.stdout.flush()
-    result = subprocess.run(cmd, capture_output=True, text=True, timeout=3600)
-    if result.stdout:
-        print(result.stdout)
-    if result.stderr:
-        print(result.stderr[-2000:] if len(result.stderr) > 2000 else result.stderr)
-    if result.returncode != 0:
-        print(f"  [ERROR] {model} failed (code {result.returncode})")
-        return None
+    for attempt in range(1, max_retries + 1):
+        if not wait_for_vram(min_free_mib=needed):
+            print(f"  [SKIP] {model}: insufficient VRAM after waiting")
+            return None
 
-    return extract_stats(model, script)
+        script_path = SCRIPTS_DIR / script
+        if "vqa" in script:
+            cmd = [venv_python, str(script_path), "--model", model, "--max-questions", str(max_images * 2)]
+        else:
+            cmd = [venv_python, str(script_path), "--model", model, "--max-images", str(max_images)]
+        if dataset:
+            cmd += ["--dataset", dataset]
+        if sample_file and "classification" not in script:
+            cmd += ["--samples-file", sample_file]
+
+        print(f"\n  ── Running: {model} via {venv_python.split('/')[-3]} (attempt {attempt}) ──")
+        sys.stdout.flush()
+
+        # Model timeout: 90 min for slow models (diffusion_gemma), 30 min for normal ones
+        mdl_timeout = 5400 if model.startswith("diffusion_gemma") else 1800
+        try:
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=mdl_timeout)
+        except subprocess.TimeoutExpired:
+            print(f"  [TIMEOUT] {model} exceeded {mdl_timeout}s")
+            continue
+
+        if result.stdout:
+            print(result.stdout)
+        if result.stderr:
+            # Show last 2000 chars of stderr
+            err = result.stderr[-3000:]
+            if "CUDA out of memory" in err or "out of memory" in err.lower():
+                print(f"  [OOM] {model} — waiting for VRAM to clear, retry {attempt}/{max_retries}")
+                time.sleep(120)
+                continue
+            print(err[-2000:] if len(err) > 2000 else err)
+
+        if result.returncode != 0:
+            print(f"  [ERROR] {model} failed (code {result.returncode}), retry {attempt}/{max_retries}")
+            time.sleep(30)
+            continue
+
+        return extract_stats(model, script)
+
+    print(f"  [FAIL] {model} exhausted all {max_retries} retries")
+    return None
 
 
 def extract_stats(model, script):

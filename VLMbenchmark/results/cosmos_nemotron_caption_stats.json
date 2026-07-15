@@ -5,10 +5,10 @@
   "dataset": "coco",
   "images": 50,
   "skipped": 0,
-  "total_inference_time_s": 147.192,
-  "avg_inference_ms": 2943.84,
+  "total_inference_time_s": 145.742,
+  "avg_inference_ms": 2914.84,
   "fps": 0.34,
-  "bleu_4": 0.0059,
-  "rouge_l": 0.0766,
-  "cider": 0.1177
+  "bleu_4": 0.0058,
+  "rouge_l": 0.0764,
+  "cider": 0.1145
 }

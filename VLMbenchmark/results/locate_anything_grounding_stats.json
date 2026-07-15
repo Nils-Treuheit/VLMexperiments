@@ -1,0 +1,14 @@
+{
+  "model": "LocateAnything-3B",
+  "model_key": "locate_anything",
+  "task": "grounding",
+  "dataset": "coco",
+  "images": 48,
+  "skipped": 2,
+  "total_inference_time_s": 19.154,
+  "avg_inference_ms": 399.05,
+  "fps": 2.51,
+  "total_gt": 250,
+  "total_correct": 38,
+  "acc@50": 0.152
+}

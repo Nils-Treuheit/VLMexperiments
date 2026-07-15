@@ -5,11 +5,11 @@
   "task": "object_detection",
   "images": 48,
   "skipped": 2,
-  "total_inference_time_s": 14.074,
-  "avg_inference_ms": 293.2,
-  "fps": 3.41,
+  "total_inference_time_s": 24.746,
+  "avg_inference_ms": 515.53,
+  "fps": 1.94,
   "total_gt": 382,
-  "total_detected": 288,
-  "mAP@50:95": 0.12554426571636385,
-  "mAP@50": 0.17578881715737138
+  "total_detected": 285,
+  "mAP@50:95": 0.12560445651738766,
+  "mAP@50": 0.17590531521999014
 }

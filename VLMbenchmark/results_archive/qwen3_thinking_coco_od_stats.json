@@ -1,0 +1,15 @@
+{
+  "model": "Qwen3-VL-8B-Thinking",
+  "model_key": "qwen3_thinking",
+  "dataset": "coco",
+  "task": "object_detection",
+  "images": 25,
+  "skipped": 0,
+  "total_inference_time_s": 130.378,
+  "avg_inference_ms": 5215.1,
+  "fps": 0.19,
+  "total_gt": 273,
+  "total_detected": 30,
+  "mAP@50:95": 0.05684150557912934,
+  "mAP@50": 0.07782178217821782
+}

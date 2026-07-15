@@ -5,11 +5,11 @@
   "dataset": "dota",
   "images": 50,
   "skipped": 0,
-  "total_inference_time_s": 4.287,
-  "avg_inference_ms": 85.75,
-  "fps": 11.66,
+  "total_inference_time_s": 4.304,
+  "avg_inference_ms": 86.07,
+  "fps": 11.62,
   "total_gt": 4054,
   "total_detected": 4016,
-  "mAP@50:95": null,
-  "mAP@50": null
+  "mAP@50:95": 0.441591936727668,
+  "mAP@50": 0.6712443516205675
 }

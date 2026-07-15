@@ -60,26 +60,20 @@ def describe(model, processor, image, top_k=8, label_overrides=None, prompt_temp
     tmpl = prompt_template or "This is a photo of {label}."
     candidate_texts = [tmpl.replace("{label}", l) for l in labels]
 
-    # SigLIP2 processes text and image together. For efficiency, pre-get pixel_values
+    # SigLIP2 processes text and image together. Pre-compute pixel_values once.
     img_inputs = processor(images=image, return_tensors="pt")
     pixel_values = img_inputs["pixel_values"].to(device=model.device, dtype=model.dtype)
 
-    # Encode text labels in batches, reusing pixel_values
-    batch_size = 32
-    logits_list = []
-    for i in range(0, len(candidate_texts), batch_size):
-        batch_texts = candidate_texts[i:i + batch_size]
-        inputs = processor(
-            text=batch_texts, images=image,
-            padding="max_length", max_length=64, return_tensors="pt",
-        )
-        inputs["pixel_values"] = pixel_values
-        inputs = {k: v.to(model.device) if hasattr(v, "to") else v for k, v in inputs.items()}
-        with torch.no_grad():
-            outputs = model(**inputs)
-        logits_list.append(outputs.logits_per_image)
-
-    logits = torch.cat(logits_list, dim=1)
+    # Encode all labels in a single batch (113 labels, trivially small for 0.4B model)
+    inputs = processor(
+        text=candidate_texts, images=image,
+        padding="max_length", max_length=64, return_tensors="pt",
+    )
+    inputs["pixel_values"] = pixel_values
+    inputs = {k: v.to(model.device) if hasattr(v, "to") else v for k, v in inputs.items()}
+    with torch.no_grad():
+        outputs = model(**inputs)
+    logits = outputs.logits_per_image
     probs = torch.sigmoid(logits)
     top_probs, top_indices = probs[0].topk(top_k)
     results = []

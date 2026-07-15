@@ -1,0 +1,14 @@
+{
+  "model": "Florence-2-large-ft",
+  "model_key": "florence2",
+  "task": "grounding",
+  "dataset": "coco",
+  "images": 48,
+  "skipped": 2,
+  "total_inference_time_s": 62.653,
+  "avg_inference_ms": 1305.27,
+  "fps": 0.77,
+  "total_gt": 250,
+  "total_correct": 0,
+  "acc@50": 0.0
+}

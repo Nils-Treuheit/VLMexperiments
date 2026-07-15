@@ -59,7 +59,17 @@ def benchmark_caption(model_name, max_images=100, verbose=True):
         detector = obj
     elif is_q3:
         processor, model = obj
-    elif is_dg or is_s2 or is_mv or is_dv or is_dt or is_llava:
+    elif is_s2:
+        sys.path.insert(0, str(PROJECT_DIR / "siglip2"))
+        import run as siglip2_run
+        from transformers import AutoModel, AutoProcessor
+        s2_model = AutoModel.from_pretrained(
+            "google/siglip2-base-patch16-224",
+            torch_dtype=torch.float16, device_map="cuda",
+            attn_implementation="sdpa",
+        ).eval()
+        s2_processor = AutoProcessor.from_pretrained("google/siglip2-base-patch16-224")
+    elif is_dg or is_mv or is_dv or is_dt or is_llava:
         pass  # subprocess-based; model/processor unused
     else:
         model, processor = obj
@@ -190,17 +200,18 @@ def benchmark_caption(model_name, max_images=100, verbose=True):
                 )
                 caption = result.stdout.strip()
             elif is_s2:
-                run_py = PROJECT_DIR / "siglip2" / "run.py"
-                result = subprocess.run(
-                    [sys.executable, str(run_py), "--image", str(img_path),
-                     "--task", "describe"],
-                    capture_output=True, text=True, timeout=120,
-                )
-                try:
-                    data = json.loads(result.stdout)
-                    caption = data.get("description_text", result.stdout)
-                except json.JSONDecodeError:
-                    caption = result.stdout
+                desc = siglip2_run.describe(s2_model, s2_processor, image, top_k=8)
+                text_parts = []
+                obj_lines = [f"{d['label']} ({d['probability']:.1%})" for d in desc if d.get("category") == "object"]
+                scene_lines = [f"{d['label']} ({d['probability']:.1%})" for d in desc if d.get("category") == "scene"]
+                attr_lines = [f"{d['label']} ({d['probability']:.1%})" for d in desc if d.get("category") == "attribute"]
+                if obj_lines:
+                    text_parts.append("Objects detected: " + ", ".join(obj_lines[:6]) + ".")
+                if scene_lines:
+                    text_parts.append("Scene: " + scene_lines[0] + ".")
+                if attr_lines:
+                    text_parts.append("Attributes: " + ", ".join(attr_lines[:4]) + ".")
+                caption = " ".join(text_parts) if text_parts else ", ".join(d["label"] for d in desc[:5])
             elif is_mv:
                 run_py = PROJECT_DIR / "moonvit" / "run.py"
                 result = subprocess.run(

@@ -1,0 +1,14 @@
+{
+  "model": "Cosmos-Reason1-7B",
+  "model_key": "cosmos_nemotron",
+  "task": "captioning",
+  "dataset": "coco",
+  "images": 50,
+  "skipped": 0,
+  "total_inference_time_s": 147.192,
+  "avg_inference_ms": 2943.84,
+  "fps": 0.34,
+  "bleu_4": 0.0059,
+  "rouge_l": 0.0766,
+  "cider": 0.1177
+}

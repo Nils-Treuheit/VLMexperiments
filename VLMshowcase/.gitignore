@@ -3,3 +3,7 @@ __pycache__/
 *.pyc
 *.egg-info/
 unsloth_compiled_cache/
+
+*.jpg
+*.jpeg
+*.png

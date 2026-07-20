@@ -220,7 +220,7 @@ def benchmark_warm():
     try:
         sys.path.insert(0, '/mnt/HDD1/Project_Code/vlm_det_test/yolo11-26')
         from ultralytics import YOLO
-        yolo = YOLO(str(Path("/mnt/HDD1/Project_Code/vlm_det_test/yolo11-26/models/yolo26m.pt")))
+        yolo = YOLO(str(Path(__file__).resolve().parent / ".." / "yolo11-26" / "models" / "yolo26m.pt"))
         yolo_times = []
         for img_path in test_images[:10]:
             torch.cuda.synchronize()

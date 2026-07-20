@@ -1,0 +1,14 @@
+{
+  "model": "DiffusionGemma-26B (SigLIP2)",
+  "model_key": "diffusion_gemma_siglip2",
+  "task": "captioning",
+  "dataset": "coco",
+  "images": 50,
+  "skipped": 0,
+  "total_inference_time_s": 794.573,
+  "avg_inference_ms": 15891.46,
+  "fps": 0.06,
+  "bleu_4": 0.0,
+  "rouge_l": 0.0,
+  "cider": 0.0
+}

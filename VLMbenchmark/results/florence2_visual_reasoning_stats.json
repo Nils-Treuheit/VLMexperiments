@@ -1,0 +1,12 @@
+{
+  "model": "Florence-2-large-ft",
+  "model_key": "florence2",
+  "task": "visual_reasoning",
+  "dataset": "coco",
+  "questions": 50,
+  "skipped": 0,
+  "total_inference_time_s": 6.635,
+  "avg_inference_ms": 132.7,
+  "fps": 7.54,
+  "accuracy": 0.26
+}

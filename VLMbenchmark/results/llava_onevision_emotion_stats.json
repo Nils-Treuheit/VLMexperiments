@@ -1,0 +1,12 @@
+{
+  "model": "LLaVA-OneVision-Qwen2-7B",
+  "model_key": "llava_onevision",
+  "task": "emotion_detection",
+  "dataset": "coco",
+  "questions": 50,
+  "skipped": 0,
+  "total_inference_time_s": 1102.069,
+  "avg_inference_ms": 22041.39,
+  "fps": 0.05,
+  "accuracy": 0.08
+}

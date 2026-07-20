@@ -1,0 +1,12 @@
+{
+  "model": "Llama-3.2-11B-Vision",
+  "model_key": "llama_vision",
+  "task": "human_intention_recognition",
+  "dataset": "coco",
+  "questions": 50,
+  "skipped": 0,
+  "total_inference_time_s": 46.094,
+  "avg_inference_ms": 921.87,
+  "fps": 1.08,
+  "accuracy": 0.1
+}

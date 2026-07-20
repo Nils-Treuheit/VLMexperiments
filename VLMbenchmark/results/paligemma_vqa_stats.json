@@ -1,0 +1,12 @@
+{
+  "model": "PaliGemma2-3B-mix",
+  "model_key": "paligemma",
+  "task": "vqa",
+  "dataset": "coco",
+  "questions": 100,
+  "skipped": 0,
+  "total_inference_time_s": 7.237,
+  "avg_inference_ms": 72.37,
+  "fps": 13.82,
+  "accuracy": 0.5
+}

@@ -1,24 +1,23 @@
 # Benchmark Results
 
-**Generated:** 2026-07-14
+**Generated:** 2026-07-17 23:38
 
 **Hardware:** NVIDIA GeForce RTX 5090 (32 GB VRAM)
 
 ## Overview
 
 This report summarizes benchmark results across multiple vision-language models (VLMs) 
-and vision encoders. Benchmarks cover 19 tasks: image captioning, visual question answering (VQA), 
+and vision encoders. Benchmarks cover 13 tasks: image captioning, visual question answering (VQA), 
 object detection (AABB + OBB), phrase grounding, pose estimation (2D keypoints + 6D), 
 segmentation, zero-shot classification, semantic scene analysis, multi-object tracking, 
-OCR / text detection, pointing / 2D keypoint localization, object counting, visual reasoning, 
-document VQA, emotion detection, human intention recognition, and document understanding.
+OCR / text detection, and pointing / 2D keypoint localization.
 
 ### Models Tested
 
 | Category | Models |
 |----------|--------|
 | Vision Encoders | DINOtool, DINOv3, SigLIP2, MoonViT |
-| VLMs (caption + VQA) | Florence-2, PaliGemma2, Phi-3.5-Vision, Cosmos-Reason1-7B, Llama-3.2-11B-Vision, Qwen3-VL-8B-Instruct, Qwen3-VL-8B-Thinking, LLaVA-1.6-Mistral-7B, LLaVA-Onevision-Qwen2-7B, LLaVA-NeXT-Video-7B, LLaVA-Phi-3-Mini-4B |
+| VLMs (caption + VQA) | Florence-2, PaliGemma2, Phi-3.5-Vision, Cosmos-Reason1-7B, Llama-3.2-11B-Vision, Qwen3-VL-8B-Instruct, Qwen3-VL-8B-Thinking |
 | VLMs (diffusion) | DiffusionGemma-26B (5 variants) |
 | Detection / OBB / Pose | YOLO11n/s/m, YOLO26n/s/m (detect, pose, OBB), LocateAnything-3B, LocateAnything-3B (TRT) |
 | OCR / Pointing | LocateAnything-3B, LocateAnything-3B (TRT) |
@@ -40,12 +39,6 @@ document VQA, emotion detection, human intention recognition, and document under
 | 6D Pose (detection) | Linemod (BOP) | 25 |
 | OCR / Text Detection | Synthetic text on COCO | 25 |
 | Pointing / 2D Keypoint | COCO Keypoints val2017 | 10-25 |
-| Object Counting | COCO val2017 + 3 categories | 50 |
-| Visual Reasoning | COCO val2017 + templated Qs | 50 questions |
-| Document VQA | COCO val2017 + templated Qs | 100 questions |
-| Emotion Detection | COCO val2017 + templated Qs | 50 questions |
-| Human Intention Recognition | COCO val2017 + templated Qs | 50 questions |
-| Document Understanding | COCO val2017 + templated Qs | 50 questions |
 
 ### Notes
 
@@ -53,14 +46,11 @@ document VQA, emotion detection, human intention recognition, and document under
 - **100 questions** per model for VQA
 - **500 images** (Tiny ImageNet) for classification
 - Vision encoders use zero-shot classification via DINO/transformer features + sentence-transformers (not trained for captioning)
-- Classification benchmark was rewritten to use inline scripts (load model once, encode all 200 labels, iterate images) — ~50-500× faster than previous per-image subprocess approach
-- Zero-shot classification accuracy for non-contrastive models (DINOv3, MoonViT, DINOtool) is near 0% because their visual embeddings are not aligned with any text encoder
 - Phi-3.5-Vision is very slow (~15s/image) without flash-attention on Blackwell GPU
 - DiffusionGemma variants need ~50-60s/image
 - LocateAnything-3B (TRT) uses TensorRT-accelerated vision encoder (9.8× faster vision, 1.6× faster end-to-end)
 - OCR benchmark uses synthetic text overlays on COCO images (5 random words per image)
 - Pointing benchmark evaluates COCO keypoints (nose, eyes, shoulders, etc.) with normalized distance thresholds
-- OBB mAP computation was fixed: OpenCV 4.13 requires float32 for minAreaRect; DOTA-to-YOLO class ID mapping added; TP matching logic rewritten
 
 ## 1. Image Captioning (COCO Captions)
 
@@ -71,21 +61,29 @@ document VQA, emotion detection, human intention recognition, and document under
 
 | Model | FPS | CIDEr | BLEU-4 | ROUGE-L | Avg (ms) | Images |
 |-------|-----|-------|--------|---------|----------|--------|
-| PaliGemma2-3B-mix | 4.56 | 1.7246 | 0.2995 | 0.5432 | 219.1 | 50 |
-| Florence-2-large-ft | 3.79 | 0.4999 | 0.0435 | 0.2471 | 264.2 | 50 |
-| Cosmos-Reason1-7B | 0.34 | 0.1177 | 0.0059 | 0.0766 | 2943.8 | 50 |
-| Qwen3-VL-8B-Instruct | 0.23 | 0.1064 | 0.0067 | 0.0730 | 4399.5 | 50 |
-| Llama-3.2-11B-Vision | 0.20 | 0.1764 | 0.0226 | 0.1009 | 5010.7 | 50 |
-| DINOv3 (Zero-shot) | 0.16 | 0.0146 | 0.0000 | 0.0129 | 6291.7 | 50 |
-| SigLIP2 (Zero-shot) | 0.12 | 0.1122 | 0.0000 | 0.0844 | 8651.5 | 50 |
-| DINOtool (DINOv2-s) | 0.10 | 0.0056 | 0.0000 | 0.0081 | 10230.1 | 50 |
-| MoonViT (Zero-shot) | 0.09 | 0.0050 | 0.0000 | 0.0041 | 10580.5 | 50 |
-| DiffusionGemma-26B (MoonViT) | 0.06 | 0.0000 | 0.0000 | 0.0000 | 16107.7 | 25 |
-| DiffusionGemma-26B (SigLIP2) | 0.06 | 0.0000 | 0.0000 | 0.0000 | 17445.0 | 25 |
-| Phi-3.5-Vision-4B | 0.06 | 0.2245 | 0.0208 | 0.1364 | 15626.0 | 50 |
-| Qwen3-VL-8B-Thinking | 0.06 | 0.0614 | 0.0057 | 0.0412 | 17465.4 | 25 |
-| DiffusionGemma-26B (YOLO) | 0.02 | 0.0963 | 0.0000 | 0.0744 | 61219.9 | 25 |
-| DiffusionGemma-26B | 0.01 | 0.0963 | 0.0000 | 0.0744 | 66734.7 | 25 |
+| DINOtool (DINOv2-s) | 10.25 | 0.0058 | 0.0000 | 0.0062 | 97.6 | 50 |
+| Florence-2-large-ft | 4.66 | 0.4999 | 0.0435 | 0.2471 | 214.6 | 50 |
+| PaliGemma2-3B-mix | 4.50 | 1.7246 | 0.2995 | 0.5432 | 222.3 | 50 |
+| DINOtool (DINOv3-s) | 4.04 | 0.0042 | 0.0000 | 0.0036 | 247.6 | 50 |
+| DiffusionGemma-26B (YOLO) | 0.46 | 0.0000 | 0.0000 | 0.0000 | 2190.1 | 50 |
+| DiffusionGemma-26B (YOLO+pose) | 0.46 | 0.0000 | 0.0000 | 0.0000 | 2163.9 | 50 |
+| DiffusionGemma-26B (YOLO+pose+obb) | 0.44 | 0.0000 | 0.0000 | 0.0000 | 2278.9 | 50 |
+| DiffusionGemma-26B | 0.43 | 0.0000 | 0.0000 | 0.0000 | 2300.1 | 50 |
+| Cosmos-Reason1-7B | 0.34 | 0.1145 | 0.0058 | 0.0764 | 2914.8 | 50 |
+| Qwen3-VL-8B-Instruct | 0.23 | 0.1064 | 0.0067 | 0.0730 | 4399.0 | 50 |
+| Llama-3.2-11B-Vision | 0.21 | 0.1861 | 0.0211 | 0.1079 | 4838.6 | 50 |
+| DINOv3 (Zero-shot) | 0.13 | 0.0146 | 0.0000 | 0.0129 | 7886.2 | 50 |
+| DINOtool (DINOv2-s) | 0.09 | 0.0056 | 0.0000 | 0.0081 | 11632.1 | 50 |
+| MoonViT (Zero-shot) | 0.08 | 0.0050 | 0.0000 | 0.0041 | 12201.1 | 50 |
+| phi3_vision | 0.07 | 0.1291 | 0.0074 | 0.0889 | 14025.5 | 50 |
+| Phi-3.5-Vision-4B | 0.07 | 0.2207 | 0.0209 | 0.1351 | 15120.1 | 50 |
+| SigLIP2 (Zero-shot) | 0.07 | 0.1122 | 0.0000 | 0.0844 | 14073.6 | 50 |
+| DiffusionGemma-26B (MoonViT) | 0.06 | 0.0000 | 0.0000 | 0.0000 | 15525.6 | 50 |
+| DiffusionGemma-26B (SigLIP2) | 0.06 | 0.0000 | 0.0000 | 0.0000 | 15891.5 | 50 |
+| llava_onevision | 0.06 | 0.1140 | 0.0096 | 0.0734 | 15577.6 | 50 |
+| llava_v16_mistral | 0.06 | 0.1359 | 0.0062 | 0.0915 | 15928.0 | 50 |
+| llava_next_video_7b | 0.05 | 0.1296 | 0.0065 | 0.0839 | 18787.3 | 50 |
+| Qwen3-VL-8B-Thinking | 0.05 | 0.0588 | 0.0046 | 0.0419 | 18845.4 | 50 |
 
 ## 2. Visual Question Answering (COCO)
 
@@ -94,13 +92,23 @@ document VQA, emotion detection, human intention recognition, and document under
 
 | Model | Accuracy | FPS | Avg (ms) | Questions |
 |-------|----------|-----|----------|-----------|
-| Llama-3.2-11B-Vision | 64.00% | 2.55 | 392.5 | 100 |
-| Phi-3.5-Vision-4B | 57.00% | 0.43 | 2299.7 | 100 |
-| Qwen3-VL-8B-Thinking | 56.00% | 0.27 | 3722.8 | 100 |
-| PaliGemma2-3B-mix | 54.00% | 15.51 | 64.5 | 100 |
-| Qwen3-VL-8B-Instruct | 41.00% | 11.68 | 85.6 | 100 |
-| Florence-2-large-ft | 37.00% | 11.19 | 89.3 | 100 |
-| Cosmos-Reason1-7B | 35.00% | 8.05 | 124.3 | 100 |
+| Llama-3.2-11B-Vision | 55.00% | 2.34 | 426.5 | 100 |
+| Qwen3-VL-8B-Thinking | 53.00% | 0.15 | 6483.1 | 100 |
+| PaliGemma2-3B-mix | 50.00% | 13.82 | 72.4 | 100 |
+| Phi-3.5-Vision-4B | 50.00% | 0.41 | 2464.8 | 100 |
+| phi3_vision | 46.00% | 0.10 | 10433.4 | 100 |
+| Florence-2-large-ft | 42.00% | 11.22 | 89.2 | 100 |
+| llava_next_video_7b | 40.00% | 0.07 | 13908.9 | 100 |
+| llava_onevision | 40.00% | 0.08 | 13266.1 | 100 |
+| llava_v16_mistral | 40.00% | 0.08 | 12367.6 | 100 |
+| Cosmos-Reason1-7B | 38.00% | 7.83 | 127.8 | 100 |
+| Qwen3-VL-8B-Instruct | 38.00% | 8.09 | 123.6 | 100 |
+| DiffusionGemma-26B (MoonViT) | 0.00% | 0.07 | 15312.5 | 100 |
+| DiffusionGemma-26B (SigLIP2) | 0.00% | 0.07 | 15143.1 | 100 |
+| DiffusionGemma-26B | 0.00% | 0.46 | 2191.2 | 100 |
+| DiffusionGemma-26B (YOLO+pose+obb) | 0.00% | 0.43 | 2329.8 | 100 |
+| DiffusionGemma-26B (YOLO+pose) | 0.00% | 0.46 | 2157.8 | 100 |
+| DiffusionGemma-26B (YOLO) | 0.00% | 0.45 | 2222.1 | 100 |
 
 ## 3. Object Detection (COCO)
 
@@ -110,18 +118,20 @@ document VQA, emotion detection, human intention recognition, and document under
 
 | Model | mAP@50:95 | mAP@50 | FPS | Avg (ms) | Images |
 |-------|-----------|--------|-----|----------|--------|
-| YOLO26m | 0.5141 | 0.6305 | 35.32 | 28.3 | 50 |
-| YOLO11m | 0.4973 | 0.5994 | 39.12 | 25.6 | 50 |
-| YOLO11s | 0.4856 | 0.5809 | 39.02 | 25.6 | 50 |
-| YOLO11x | 0.4812 | 0.5912 | 33.88 | 29.5 | 50 |
-| YOLO26s | 0.4579 | 0.5573 | 35.65 | 28.1 | 50 |
-| YOLO11l | 0.4460 | 0.5528 | 35.54 | 28.1 | 50 |
-| YOLO11n | 0.3946 | 0.5087 | 46.70 | 21.4 | 50 |
-| YOLO26n | 0.3820 | 0.4741 | 14.79 | 67.6 | 50 |
-| LocateAnything-3B (TRT) | 0.1263 | 0.1747 | 5.50 | 181.9 | 48 |
-| LocateAnything-3B | 0.1255 | 0.1758 | 3.41 | 293.2 | 48 |
-| Qwen3-VL-8B-Thinking | 0.0568 | 0.0778 | 0.19 | 5215.1 | 25 |
-| Qwen3-VL-8B-Instruct | 0.0134 | 0.0275 | 0.51 | 1959.2 | 48 |
+| YOLO26x | 0.5667 | 0.6936 | 25.70 | 38.9 | 50 |
+| YOLO26m | 0.5141 | 0.6305 | 29.43 | 34.0 | 50 |
+| YOLO26l | 0.5098 | 0.6264 | 25.81 | 38.7 | 50 |
+| YOLO11m | 0.4973 | 0.5994 | 29.04 | 34.4 | 50 |
+| YOLO11s | 0.4856 | 0.5809 | 29.47 | 33.9 | 50 |
+| YOLO11x | 0.4812 | 0.5912 | 25.46 | 39.3 | 50 |
+| YOLO26s | 0.4579 | 0.5573 | 26.63 | 37.5 | 50 |
+| YOLO11l | 0.4460 | 0.5528 | 26.65 | 37.5 | 50 |
+| YOLO11n | 0.3946 | 0.5087 | 12.21 | 81.9 | 50 |
+| YOLO26n | 0.3820 | 0.4741 | 25.81 | 38.8 | 50 |
+| LocateAnything-3B | 0.1256 | 0.1759 | 1.94 | 515.5 | 48 |
+| LocateAnything-3B (TRT) | 0.1242 | 0.1721 | 4.50 | 222.4 | 48 |
+| Qwen3-VL-8B-Instruct | 0.0134 | 0.0275 | 0.37 | 2677.5 | 48 |
+| Qwen3-VL-8B-Thinking | 0.0000 | 0.0000 | 0.12 | 8630.4 | 48 |
 
 ## 4. Pose Estimation (COCO Keypoints)
 
@@ -130,10 +140,10 @@ document VQA, emotion detection, human intention recognition, and document under
 
 | Model | mAP@50:95 | mAP@50 | FPS | Avg (ms) | Images |
 |-------|-----------|--------|-----|----------|--------|
-| YOLO11s (Pose) | — | — | 24.36 | 41.1 | 23 |
-| YOLO26s (Pose) | — | — | 19.85 | 50.4 | 23 |
-| YOLO26n (Pose) | — | — | 23.43 | 42.7 | 23 |
-| YOLO11n (Pose) | — | — | 23.04 | 43.4 | 23 |
+| YOLO11s (Pose) | — | — | 15.92 | 62.8 | 23 |
+| YOLO26s (Pose) | — | — | 16.88 | 59.2 | 23 |
+| YOLO26n (Pose) | — | — | 18.10 | 55.3 | 23 |
+| YOLO11n (Pose) | — | — | 17.57 | 56.9 | 23 |
 
 ## 5. Oriented Bounding Box (DOTA-v1.0)
 
@@ -142,10 +152,10 @@ document VQA, emotion detection, human intention recognition, and document under
 
 | Model | mAP@50:95 | mAP@50 | FPS | Avg (ms) | Images |
 |-------|-----------|--------|-----|----------|--------|
-| YOLO26n (OBB) | 0.2787 | 0.5802 | 11.66 | 85.8 | 5 |
-| YOLO11n (OBB) | — | — | 11.66 | 85.8 | 50 |
-| YOLO11s (OBB) | — | — | 12.60 | 79.4 | 50 |
-| YOLO26s (OBB) | — | — | 12.64 | 79.1 | 50 |
+| YOLO11s (OBB) | 0.4933 | 0.7511 | 11.99 | 83.4 | 50 |
+| YOLO26n (OBB) | 0.4873 | 0.7272 | 12.96 | 77.2 | 50 |
+| YOLO26s (OBB) | 0.4777 | 0.7136 | 12.93 | 77.3 | 50 |
+| YOLO11n (OBB) | 0.4416 | 0.6712 | 11.62 | 86.1 | 50 |
 
 ## 6. Phrase Grounding (COCO)
 
@@ -154,9 +164,11 @@ document VQA, emotion detection, human intention recognition, and document under
 
 | Model | Acc@50 | FPS | Avg (ms) | Images |
 |-------|--------|-----|----------|--------|
-| LocateAnything-3B (TRT) | 14.40% | 4.17 | 239.7 | 48 |
-| Qwen3-VL-8B-Thinking | 7.14% | 0.23 | 4339.8 | 25 |
-| Qwen3-VL-8B-Instruct | 3.60% | 0.53 | 1887.2 | 48 |
+| LocateAnything-3B | 15.20% | 2.51 | 399.1 | 48 |
+| LocateAnything-3B (TRT) | 14.40% | 4.54 | 220.3 | 48 |
+| Qwen3-VL-8B-Instruct | 3.60% | 0.41 | 2431.5 | 48 |
+| Florence-2-large-ft | 0.00% | 0.77 | 1305.3 | 48 |
+| Qwen3-VL-8B-Thinking | 0.00% | 0.14 | 7005.9 | 48 |
 
 ## 7. Zero-Shot Classification (Tiny ImageNet)
 
@@ -165,10 +177,12 @@ document VQA, emotion detection, human intention recognition, and document under
 
 | Model | Top-1 Acc | Top-5 Acc | FPS | Avg (ms) | Images |
 |-------|-----------|-----------|-----|----------|--------|
-| SigLIP2 (Zero-shot) | 2.00% | 14.00% | 40.00 | 25.0 | 50 |
-| MoonViT (Zero-shot) | 0.00% | 2.00% | 53.57 | 18.7 | 50 |
-| DINOv3 (Zero-shot) | 0.00% | 0.00% | 126.58 | 7.9 | 50 |
-| DINOtool (DINOv2-s) | 0.00% | 0.00% | 13.16 | 76.0 | 50 |
+| SigLIP2 (Zero-shot) | 2.00% | 14.00% | 29.64 | 33.7 | 50 |
+| DINOtool (DINOv3-s) | 0.50% | 2.00% | 20.58 | 48.6 | 200 |
+| DINOtool (DINOv2-s) | 0.00% | 0.00% | 5.49 | 182.0 | 50 |
+| DINOtool (DINOv2-s) | 0.00% | 1.50% | 29.20 | 34.2 | 200 |
+| DINOv3 (Zero-shot) | 0.00% | 0.00% | 31.99 | 31.3 | 50 |
+| MoonViT (Zero-shot) | 0.00% | 2.00% | 20.28 | 49.3 | 50 |
 
 ## 8. Segmentation (COCO)
 
@@ -178,7 +192,9 @@ document VQA, emotion detection, human intention recognition, and document under
 
 | Model | PQ | mIoU | FPS | Avg (ms) | Images |
 |-------|----|------|-----|----------|--------|
-| LocateAnything-3B (TRT) | 0.4727 | 0.3182 | 4.18 | 239.4 | 48 |
+| LocateAnything-3B | 0.4847 | 0.3735 | 3.19 | 313.2 | 48 |
+| LocateAnything-3B (TRT) | 0.4687 | 0.3178 | 5.45 | 183.4 | 48 |
+| Florence-2-large-ft | 0.0000 | 0.0000 | 6.41 | 155.9 | 48 |
 
 ## 9. Semantic Scene Analysis (COCO)
 
@@ -188,13 +204,17 @@ document VQA, emotion detection, human intention recognition, and document under
 
 | Model | Scene Acc | Object Recall | FPS | Avg (ms) | Images |
 |-------|-----------|---------------|-----|----------|--------|
-| PaliGemma2-3B-mix | 100.00% | 2.65% | 9.84 | 101.7 | 50 |
-| Llama-3.2-11B-Vision | 97.22% | 50.99% | 0.17 | 5731.4 | 50 |
-| Qwen3-VL-8B-Instruct | 95.83% | 54.30% | 0.21 | 4823.2 | 50 |
-| Phi-3.5-Vision-4B | 94.00% | 46.36% | 0.04 | 24148.1 | 50 |
-| Florence-2-large-ft | 92.31% | 41.06% | 3.87 | 258.2 | 50 |
-| Qwen3-VL-8B-Thinking | 91.30% | 68.21% | 0.05 | 20267.0 | 50 |
-| Cosmos-Reason1-7B | 88.37% | 52.32% | 0.31 | 3212.7 | 50 |
+| PaliGemma2-3B-mix | 100.00% | 2.65% | 9.57 | 104.5 | 50 |
+| Qwen3-VL-8B-Instruct | 95.83% | 54.30% | 0.21 | 4863.5 | 50 |
+| phi3_vision | 95.65% | 45.03% | 0.05 | 21765.2 | 50 |
+| Phi-3.5-Vision-4B | 94.00% | 45.03% | 0.04 | 23823.1 | 50 |
+| llava_onevision | 93.88% | 58.94% | 0.06 | 17097.9 | 50 |
+| Florence-2-large-ft | 92.31% | 41.06% | 4.21 | 237.7 | 50 |
+| llava_next_video_7b | 91.67% | 57.62% | 0.04 | 26471.2 | 50 |
+| llava_v16_mistral | 91.49% | 58.28% | 0.06 | 17105.3 | 50 |
+| Llama-3.2-11B-Vision | 90.48% | 47.02% | 0.17 | 5771.6 | 50 |
+| Qwen3-VL-8B-Thinking | 89.58% | 49.67% | 0.05 | 20672.9 | 50 |
+| Cosmos-Reason1-7B | 88.10% | 52.32% | 0.29 | 3389.9 | 50 |
 
 ## 10. Multi-Object Tracking (MOT17)
 
@@ -204,8 +224,12 @@ document VQA, emotion detection, human intention recognition, and document under
 
 | Model | MOTA | MOTP | FPS | Avg (ms) | Frames |
 |-------|------|------|-----|----------|--------|
-| YOLO11n | 0.0398 | 0.7983 | 32.46 | 30.8 | 200 |
-| YOLO26n | 0.0320 | 0.8047 | 32.00 | 31.3 | 200 |
+| YOLO11n | 0.0051 | 0.7886 | 3.05 | 328.1 | 24 |
+| YOLO26s | 0.0046 | 0.8103 | 13.94 | 71.7 | 24 |
+| YOLO26m | 0.0032 | 0.8297 | 14.11 | 70.9 | 24 |
+| YOLO11m | 0.0030 | 0.8165 | 14.17 | 70.6 | 24 |
+| YOLO11s | 0.0029 | 0.8102 | 14.78 | 67.7 | 24 |
+| YOLO26n | 0.0027 | 0.8278 | 14.80 | 67.6 | 24 |
 
 ## 11. 6D Pose Estimation (Linemod)
 
@@ -214,8 +238,12 @@ document VQA, emotion detection, human intention recognition, and document under
 
 | Model | Detection Rate | FPS | Avg (ms) | Images |
 |-------|----------------|-----|----------|--------|
-| YOLO26n | 476.00% | 5.34 | 187.3 | 25 |
-| YOLO11n | 468.00% | 25.72 | 38.9 | 25 |
+| YOLO11m | 692.00% | 39.55 | 25.3 | 50 |
+| YOLO26m | 662.00% | 37.56 | 26.6 | 50 |
+| YOLO11s | 646.00% | 41.03 | 24.4 | 50 |
+| YOLO26s | 574.00% | 35.19 | 28.4 | 50 |
+| YOLO11n | 480.00% | 9.02 | 110.8 | 50 |
+| YOLO26n | 446.00% | 29.65 | 33.7 | 50 |
 
 ## 12. OCR / Text Detection (Synthetic COCO)
 
@@ -224,8 +252,9 @@ document VQA, emotion detection, human intention recognition, and document under
 
 | Model | Detection Rate | FPS | Avg (ms) | Images |
 |-------|----------------|-----|----------|--------|
-| LocateAnything-3B (TRT) | 85.60% | 3.08 | 324.8 | 25 |
-| LocateAnything-3B | 75.20% | 2.09 | 478.4 | 25 |
+| Florence-2-large-ft | 73.20% | 3.81 | 262.8 | 50 |
+| LocateAnything-3B | 72.80% | 1.93 | 518.4 | 50 |
+| LocateAnything-3B (TRT) | 70.80% | 3.00 | 332.8 | 50 |
 
 ## 13. Pointing / 2D Keypoint (COCO Keypoints)
 
@@ -235,17 +264,81 @@ document VQA, emotion detection, human intention recognition, and document under
 
 | Model | Acc@0.05 | Acc@0.10 | FPS | Avg (ms) | Keypoints |
 |-------|----------|----------|-----|----------|-----------|
-| LocateAnything-3B | 22.81% | 27.76% | 0.25 | 151.1 | 263 |
-| LocateAnything-3B (TRT) | 19.77% | 24.71% | 0.36 | 106.9 | 263 |
+| LocateAnything-3B | 19.87% | 25.85% | 0.20 | 185.8 | 468 |
+| LocateAnything-3B (TRT) | 17.95% | 23.72% | 0.30 | 120.6 | 468 |
 
-## 14. Speed vs Quality Overview
+## 14. Visual Reasoning (COCO)
+
+| Model | Accuracy | FPS | Avg (ms) | Questions |
+|-------|----------|-----|----------|-----------|
+| Llama-3.2-11B-Vision | 48.00% | 1.88 | 531.4 | 50 |
+| Qwen3-VL-8B-Thinking | 46.00% | 0.07 | 13894.3 | 50 |
+| llava_next_video_7b | 40.00% | 0.05 | 21589.1 | 50 |
+| phi3_vision | 40.00% | 0.05 | 20776.1 | 50 |
+| llava_onevision | 38.00% | 0.04 | 23128.9 | 50 |
+| Phi-3.5-Vision-4B | 34.00% | 0.36 | 2773.6 | 50 |
+| Qwen3-VL-8B-Instruct | 34.00% | 6.50 | 153.9 | 50 |
+| Cosmos-Reason1-7B | 32.00% | 1.09 | 916.4 | 50 |
+| llava_v16_mistral | 32.00% | 0.04 | 24872.3 | 50 |
+| PaliGemma2-3B-mix | 30.00% | 8.80 | 113.7 | 50 |
+| Florence-2-large-ft | 26.00% | 7.54 | 132.7 | 50 |
+
+## 15. Emotion Detection (COCO)
+
+| Model | Accuracy | FPS | Avg (ms) | Questions |
+|-------|----------|-----|----------|-----------|
+| Qwen3-VL-8B-Thinking | 22.00% | 0.06 | 15677.3 | 50 |
+| Florence-2-large-ft | 14.00% | 4.17 | 239.9 | 50 |
+| PaliGemma2-3B-mix | 10.00% | 5.43 | 184.0 | 50 |
+| Phi-3.5-Vision-4B | 10.00% | 0.38 | 2665.7 | 50 |
+| llava_onevision | 8.00% | 0.05 | 22041.4 | 50 |
+| llava_next_video_7b | 6.00% | 0.05 | 21017.8 | 50 |
+| llava_v16_mistral | 6.00% | 0.05 | 22124.8 | 50 |
+| phi3_vision | 6.00% | 0.06 | 17736.0 | 50 |
+| Cosmos-Reason1-7B | 4.00% | 3.95 | 253.2 | 50 |
+| Llama-3.2-11B-Vision | 4.00% | 1.14 | 880.0 | 50 |
+| Qwen3-VL-8B-Instruct | 4.00% | 3.47 | 288.1 | 50 |
+
+## 16. Human Intention Recognition (COCO)
+
+| Model | Accuracy | FPS | Avg (ms) | Questions |
+|-------|----------|-----|----------|-----------|
+| phi3_vision | 30.00% | 0.06 | 17775.0 | 50 |
+| Qwen3-VL-8B-Thinking | 26.00% | 0.07 | 14832.9 | 50 |
+| llava_onevision | 20.00% | 0.04 | 22861.3 | 50 |
+| Phi-3.5-Vision-4B | 18.00% | 0.37 | 2714.4 | 50 |
+| Cosmos-Reason1-7B | 16.00% | 3.98 | 251.4 | 50 |
+| llava_next_video_7b | 12.00% | 0.05 | 21334.2 | 50 |
+| llava_v16_mistral | 12.00% | 0.04 | 22526.0 | 50 |
+| Llama-3.2-11B-Vision | 10.00% | 1.08 | 921.9 | 50 |
+| Qwen3-VL-8B-Instruct | 8.00% | 3.49 | 286.2 | 50 |
+| Florence-2-large-ft | 4.00% | 4.06 | 246.3 | 50 |
+| PaliGemma2-3B-mix | 2.00% | 5.73 | 174.5 | 50 |
+
+## 17. Document Understanding (COCO)
+
+| Model | Accuracy | FPS | Avg (ms) | Questions |
+|-------|----------|-----|----------|-----------|
+| Qwen3-VL-8B-Thinking | 26.00% | 0.12 | 8634.3 | 50 |
+| Florence-2-large-ft | 22.00% | 4.43 | 225.6 | 50 |
+| llava_onevision | 22.00% | 0.04 | 22278.1 | 50 |
+| PaliGemma2-3B-mix | 22.00% | 5.98 | 167.3 | 50 |
+| phi3_vision | 20.00% | 0.06 | 18132.8 | 50 |
+| Cosmos-Reason1-7B | 18.00% | 3.88 | 257.9 | 50 |
+| Llama-3.2-11B-Vision | 18.00% | 1.01 | 986.1 | 50 |
+| Phi-3.5-Vision-4B | 18.00% | 0.37 | 2722.3 | 50 |
+| Qwen3-VL-8B-Instruct | 16.00% | 3.78 | 264.5 | 50 |
+| llava_next_video_7b | 12.00% | 0.04 | 22568.4 | 50 |
+| llava_v16_mistral | 12.00% | 0.04 | 22596.8 | 50 |
+
+## 18. Speed vs Quality Overview
 
 ![Combined FPS](charts/combined_fps.png)
 
 ![Quality Comparison](charts/quality_comparison.png)
 
 
-## 15. Key Takeaways
+## 19. Key Takeaways
 
 ### Fastest Models by Task
 - **Detection:** YOLO11n at 46.7 FPS, YOLO26n at 14.8 FPS (medium: 35 FPS)
@@ -256,6 +349,10 @@ document VQA, emotion detection, human intention recognition, and document under
 - **Tracking:** YOLO + ByteTrack achieves ~50 FPS on MOT17
 - **6D Pose (detection):** YOLO models on Linemod
 - **OCR (text detection):** LocateAnything-3B TRT at 3.08 FPS, 85.6% detection rate
+- **Visual Reasoning:** Best models achieve moderate accuracy on template-based COCO questions
+- **Emotion Detection:** Models show limited accuracy on COCO without dedicated emotion training data
+- **Human Intention Recognition:** Best models achieve decent accuracy on interaction-focused questions
+- **Document Understanding:** COCO images contain few documents; models default to 'no'
 
 ### Best Quality by Task
 - **Captioning CIDEr:** PaliGemma2-3B (1.7246), Florence-2 (0.4999)
@@ -272,7 +369,6 @@ document VQA, emotion detection, human intention recognition, and document under
 - LocateAnything-3B OCR: TRT achieves 85.6% detection rate vs 75.2% PT (~10% improvement)
 - LocateAnything-3B Pointing: ~20-28% accuracy at 0.05-0.10 normalized distance thresholds
 - Vision encoders (DINOtool, DINOv3, SigLIP2, MoonViT) achieve near-zero CIDEr — expected as they use zero-shot label matching, not generative captioning
-- Similarly, zero-shot classification top-1 accuracy for non-contrastive encoders is essentially 0% — their visual features are not aligned with any text encoder embedding space
 - Phi-3.5-Vision is 15-60x slower than other models (~15.6s/image) without flash-attention on Blackwell GPUs
 - Qwen3-VL-8B-Thinking produces more detailed captions but at ~4-10x slower speed vs Instruct variant
 - DiffusionGemma-26B takes 50-60s per image for caption generation
@@ -280,140 +376,10 @@ document VQA, emotion detection, human intention recognition, and document under
 - LocateAnything-3B (TRT) achieves 5.50 FPS on COCO OD (1.6× faster than PT) with bit-exact identical quality
 - TRT vision encoder runs at 9.6ms (9.8× faster than PyTorch bf16) — LLM decoder dominates at ~170ms
 - Florence-2 is the most versatile model, supporting captioning, VQA, OD, segmentation, and scene analysis
-- YOLO26n-OBB mAP fixed: previous dashes due to OpenCV 4.13 float64→float32 incompatibility and DOTA/YOLO class ordering mismatch
 
 ### Missing / Future Benchmarks
-- **LLaVA-NeXT-Video-34B:** too large for RTX 5090 (32GB) without quantization — 5-8 min/image, needs 4-bit quantization or reduced resolution
-- **OD for Florence-2, PaliGemma:** missing pycocotools dependency in their venvs
-- **Grounding for Florence-2, LocateAnything:** missing pycocotools
 - **Phi-4-Multimodal:** not fully tested (missing from model choices in some tasks)
 - **6D Pose ADD/ADD-S:** pose refinement metrics not yet implemented
 - **Semantic / Panoptic Segmentation:** more comprehensive mask evaluation needed
 - **Video understanding:** action recognition, temporal reasoning
-- **OBB mAP:** computed from only 5 test images (was debugging the pipeline); full 50-image run pending
-
-## 16. Object Counting (COCO)
-
-| Model | MAE | RMSE | Exact Acc | FPS | Avg (ms) | Images |
-|-------|-----|------|-----------|-----|----------|--------|
-| Llama-3.2-11B-Vision | 0.9322 | 2.9773 | 62.30% | 2.79 | 358.1 | 50 |
-| Cosmos-Reason1-7B | 0.8934 | 2.3626 | 66.39% | 9.07 | 110.3 | 50 |
-| LLaVA-Phi-3-Mini-4B | 0.9167 | 2.1794 | 50.82% | 0.10 | 9767.9 | 50 |
-| Llama-3.2-11B-Vision | 0.9322 | 2.9773 | 62.30% | 2.79 | 358.1 | 50 |
-| PaliGemma2-3B-mix | 1.0164 | 2.6458 | 63.93% | 15.75 | 63.5 | 50 |
-| LLaVA-NeXT-Video-7B | 1.0833 | 2.3004 | 25.41% | 0.08 | 12697.4 | 50 |
-| Phi-3.5-Vision-4.2B | 1.1158 | 3.1422 | 49.18% | 1.39 | 720.6 | 50 |
-| Qwen3-VL-8B-Instruct | 1.5246 | 8.0866 | 64.75% | 9.57 | 104.5 | 50 |
-| LLaVA-OneVision-Qwen2-7B | 1.5902 | 8.2163 | 65.57% | 0.08 | 12550.0 | 50 |
-| Florence-2-large-ft | 1.5656 | 8.2218 | 68.03% | 19.45 | 51.4 | 50 |
-| Qwen3-VL-8B-Thinking | 2.2000 | 9.2304 | 59.02% | 0.18 | 5546.5 | 50 |
-| DiffusionGemma-26B (YOLO) | 2.0000 | 3.7859 | 33.33% | 0.02 | 62304.8 | 5 |
-| LLaVA-v1.6-Mistral-7B | 4.6250 | 9.5525 | 1.64% | 0.09 | 10822.8 | 50 |
-
-## 17. Visual Reasoning (COCO)
-
-| Model | Accuracy | FPS | Avg (ms) | Questions |
-|-------|----------|-----|----------|-----------|
-| Qwen3-VL-8B-Thinking | 50.00% | 0.16 | 6139.8 | 50 |
-| Llama-3.2-11B-Vision | 48.00% | 2.32 | 430.8 | 50 |
-| LLaVA-Phi-3-Mini-4B | 40.00% | 0.11 | 9281.1 | 50 |
-| LLaVA-NeXT-Video-7B | 40.00% | 0.09 | 11343.6 | 50 |
-| LLaVA-OneVision-Qwen2-7B | 38.00% | 0.09 | 11717.9 | 50 |
-| DiffusionGemma-26B (YOLO) | 35.00% | 0.01 | 78719.7 | 20 |
-| Cosmos-Reason1-7B | 34.00% | 6.68 | 149.8 | 50 |
-| Qwen3-VL-8B-Instruct | 34.00% | 11.21 | 89.2 | 50 |
-| Phi-3.5-Vision-4.2B | 34.00% | 0.43 | 2332.0 | 50 |
-| LLaVA-v1.6-Mistral-7B | 32.00% | 0.09 | 10652.9 | 50 |
-| PaliGemma2-3B-mix | 30.00% | 10.81 | 92.5 | 50 |
-| Florence-2-large-ft | 25.00% | 9.73 | 102.8 | 20 |
-
-## 18. Document VQA (COCO)
-
-| Model | Accuracy | FPS | Avg (ms) | Questions |
-|-------|----------|-----|----------|-----------|
-| Qwen3-VL-8B-Thinking | 31.00% | 0.18 | 5654.3 | 100 |
-| LLaVA-NeXT-Video-7B | 20.00% | 0.09 | 11287.0 | 50 |
-| Cosmos-Reason1-7B | 13.00% | 8.80 | 113.6 | 100 |
-| Llama-3.2-11B-Vision | 12.00% | 1.34 | 743.9 | 100 |
-| LLaVA-v1.6-Mistral-7B | 12.00% | 0.09 | 11573.8 | 100 |
-| LLaVA-Phi-3-Mini-4B | 12.00% | 0.11 | 9280.7 | 50 |
-| Phi-3.5-Vision-4.2B | 10.00% | 0.44 | 2285.8 | 100 |
-| DiffusionGemma-26B (YOLO) | 10.00% | 0.02 | 61881.0 | 20 |
-| LLaVA-OneVision-Qwen2-7B | 10.00% | 0.09 | 11585.9 | 50 |
-| Qwen3-VL-8B-Instruct | 9.00% | 9.14 | 109.4 | 100 |
-| PaliGemma2-3B-mix | 7.00% | 16.01 | 62.4 | 100 |
-| Florence-2-large-ft | 3.00% | 12.22 | 81.9 | 100 |
-
-## 19. Emotion Detection (COCO)
-
-| Model | Accuracy | FPS | Avg (ms) | Questions |
-|-------|----------|-----|----------|-----------|
-| DiffusionGemma-26B (YOLO) | 15.00% | 0.01 | 100079.9 | 20 |
-| Florence-2-large-ft | 15.00% | 7.00 | 142.8 | 20 |
-| PaliGemma2-3B-mix | 10.00% | 18.36 | 54.5 | 50 |
-| Phi-3.5-Vision-4.2B | 10.00% | 0.39 | 2545.1 | 50 |
-| Qwen3-VL-8B-Thinking | 8.00% | 0.15 | 6457.8 | 50 |
-| LLaVA-OneVision-Qwen2-7B | 8.00% | 0.09 | 11588.1 | 50 |
-| LLaVA-v1.6-Mistral-7B | 6.00% | 0.09 | 10717.5 | 50 |
-| LLaVA-NeXT-Video-7B | 6.00% | 0.09 | 11291.0 | 50 |
-| LLaVA-Phi-3-Mini-4B | 6.00% | 0.11 | 9452.8 | 50 |
-| Cosmos-Reason1-7B | 4.00% | 3.87 | 258.3 | 50 |
-| Llama-3.2-11B-Vision | 4.00% | 1.56 | 642.4 | 50 |
-| Qwen3-VL-8B-Instruct | 4.00% | 3.79 | 264.1 | 50 |
-
-## 20. Human Intention Recognition (COCO)
-
-| Model | Accuracy | FPS | Avg (ms) | Questions |
-|-------|----------|-----|----------|-----------|
-| Qwen3-VL-8B-Thinking | 26.00% | 0.19 | 5206.3 | 50 |
-| DiffusionGemma-26B (YOLO) | 25.00% | 0.01 | 73142.0 | 20 |
-| LLaVA-Phi-3-Mini-4B | 30.00% | 0.11 | 9227.4 | 50 |
-| Phi-3.5-Vision-4.2B | 18.00% | 0.45 | 2207.8 | 50 |
-| Cosmos-Reason1-7B | 16.00% | 4.68 | 213.8 | 50 |
-| LLaVA-v1.6-Mistral-7B | 12.00% | 0.09 | 10658.1 | 50 |
-| LLaVA-NeXT-Video-7B | 12.00% | 0.09 | 11245.0 | 50 |
-| Llama-3.2-11B-Vision | 12.00% | 1.45 | 689.7 | 50 |
-| Florence-2-large-ft | 10.00% | 7.06 | 141.6 | 20 |
-| Qwen3-VL-8B-Instruct | 8.00% | 11.20 | 89.3 | 50 |
-| LLaVA-OneVision-Qwen2-7B | 20.00% | 0.09 | 11539.6 | 50 |
-| PaliGemma2-3B-mix | 2.00% | 17.37 | 57.6 | 50 |
-
-## 21. Document Understanding (COCO)
-
-| Model | Accuracy | FPS | Avg (ms) | Questions |
-|-------|----------|-----|----------|-----------|
-| Qwen3-VL-8B-Thinking | 34.00% | 0.22 | 4618.8 | 50 |
-| PaliGemma2-3B-mix | 22.00% | 9.86 | 101.4 | 50 |
-| LLaVA-OneVision-Qwen2-7B | 22.00% | 0.08 | 12175.4 | 50 |
-| Cosmos-Reason1-7B | 20.00% | 4.75 | 210.5 | 50 |
-| Florence-2-large-ft | 20.00% | 7.57 | 132.1 | 20 |
-| DiffusionGemma-26B (YOLO) | 20.00% | 0.01 | 72142.8 | 20 |
-| LLaVA-Phi-3-Mini-4B | 20.00% | 0.11 | 9198.9 | 50 |
-| Llama-3.2-11B-Vision | 18.00% | 1.33 | 753.2 | 50 |
-| Phi-3.5-Vision-4.2B | 18.00% | 0.44 | 2296.0 | 50 |
-| Qwen3-VL-8B-Instruct | 16.00% | 11.62 | 86.1 | 50 |
-| LLaVA-v1.6-Mistral-7B | 12.00% | 0.09 | 10676.2 | 50 |
-| LLaVA-NeXT-Video-7B | 12.00% | 0.09 | 11298.5 | 50 |
-
-## 22. Key Takeaways (New Benchmarks)
-
-### Best Quality by Task
-- **Counting (MAE):** Cosmos-Reason1-7B (0.89), LLaVA-Phi-3 (0.92), Llama-3.2 (0.93)
-- **Counting (Acc):** Florence-2 (68%), LLaVA-OneVision (66%), Cosmos (66%)
-- **Visual Reasoning:** Qwen3-Thinking (50%), Llama-3.2 (48%), Phi-3-Vision/LLaVA-NeXT-7B (40%)
-- **DocVQA:** Qwen3-Thinking (31%), LLaVA-NeXT-Video-7B (20%), Cosmos (13%)
-- **Emotion Detection:** DiffusionGemma/Florence-2 (15%), all others near/below random (4-10%)
-- **HIR:** LLaVA-Phi-3-Mini (30%), Qwen3-Thinking (26%), DiffusionGemma (25%)
-- **Document Understanding:** Qwen3-Thinking (34%), PaliGemma2/LLaVA-OneVision (22%)
-
-### Key Observations
-- **Qwen3-VL-8B-Thinking** leads across all 5 VQA-style benchmarks — chain-of-thought adds 5-20% accuracy over Instruct variant, at 50-100× speed cost
-- **LLaVA models are now complete** for 5 of 6 new benchmarks — LLaVA-OneVision-Qwen2-7B and LLaVA-Phi-3-Mini-4B show strong reasoning (38-40% visual reasoning acc, 20-30% HIR)
-- **LLaVA-Phi-3-Mini-4B** is the smallest LLaVA (4B) but achieves best HIR (30%) and strong counting (MAE=0.92)
-- **PaliGemma2 is fastest** (10-18 FPS across tasks) but accuracy is inconsistent — worst HIR (2%)
-- **Emotion detection** is hardest task — most models perform at/below random (4-15%), suggesting binary yes/no sentiment from COCO scenes is inherently ambiguous
-- **DocVQA** similarly hard — Qwen3-Thinking at 31% is the only model above background noise
-- **Florence-2** leads counting accuracy (68% exact) despite being smaller than LLaVA models
-- **DiffusionGemma** extremely slow (0.01-0.02 FPS) via YOLO→text→LLM pipeline; reasonable accuracy for VR (35%) and HIR (25%)
-- **Phi-3.5-Vision** was ~15-60× slower than peers due to `eager` attention — changed to `sdpa` for future runs
-- **LLaVA-NeXT-Video-34B** too large for RTX 5090 (32GB) without quantization — each image takes 5-8 min, needs 4-bit or smaller resolution
+- **Visual Reasoning / Emotion / HIR / Doc Understanding:** template-based evaluation on COCO (no dedicated labels)

@@ -40,7 +40,7 @@ for name in ("transformers_modules", "urllib3", "huggingface_hub"):
 warnings.filterwarnings("ignore")
 
 LA_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "model")
-YOLO_PATH = "/mnt/HDD1/Project_Code/vlm_det_test/yolo11-26/models/yolo26m.pt"
+YOLO_PATH = str(Path(__file__).resolve().parent.parent / "yolo11-26" / "models" / "yolo26m.pt")
 COCO_LABELS = [
     "person", "bicycle", "car", "motorcycle", "airplane", "bus", "train", "truck", "boat",
     "traffic light", "fire hydrant", "stop sign", "parking meter", "bench", "bird", "cat",

@@ -1,0 +1,18 @@
+{
+  "model": "LLaVA-v1.6-Mistral-7B",
+  "model_key": "llava_v16_mistral",
+  "task": "scene_analysis",
+  "dataset": "COCO",
+  "images": 50,
+  "skipped": 0,
+  "total_inference_time_s": 855.267,
+  "avg_inference_ms": 17105.35,
+  "fps": 0.06,
+  "scene_type_accuracy": 0.9149,
+  "scene_type_correct": 43,
+  "scene_type_total": 47,
+  "object_recall": 0.5828,
+  "objects_recalled": 88,
+  "objects_total": 151,
+  "description_quality": 195.8
+}

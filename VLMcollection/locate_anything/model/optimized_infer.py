@@ -319,10 +319,12 @@ class OptimizedLocateAnything:
         return vit_embeds, inputs.get("image_grid_hws", None)
 
 
-def benchmark_yolo(image_path, model_path="/mnt/HDD1/Project_Code/vlm_det_test/yolo11-26/models/yolo26m.pt"):
+def benchmark_yolo(image_path, model_path=None):
     """Benchmark YOLO26 inference speed."""
     try:
-        sys.path.insert(0, '/mnt/HDD1/Project_Code/vlm_det_test/yolo11-26')
+        if model_path is None:
+            model_path = Path(__file__).resolve().parent.parent.parent / "yolo11-26" / "models" / "yolo26m.pt"
+        sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent / "yolo11-26"))
         from ultralytics import YOLO as YOLOModel
         model = YOLOModel(str(model_path))
         results = model.predict(source=image_path, imgsz=640, conf=0.25, iou=0.45, device='0', verbose=False)

@@ -1,0 +1,12 @@
+{
+  "model": "Llama-3.2-11B-Vision",
+  "model_key": "llama_vision",
+  "task": "docvqa",
+  "dataset": "coco",
+  "questions": 100,
+  "skipped": 0,
+  "total_inference_time_s": 89.551,
+  "avg_inference_ms": 895.51,
+  "fps": 1.12,
+  "accuracy": 0.11
+}

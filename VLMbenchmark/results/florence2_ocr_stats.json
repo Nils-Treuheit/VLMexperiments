@@ -1,0 +1,13 @@
+{
+  "model": "Florence-2-large-ft",
+  "model_key": "florence2",
+  "task": "ocr",
+  "dataset": "synthetic_coco",
+  "images": 50,
+  "total_gt_text_regions": 250,
+  "total_detected": 183,
+  "detection_rate": 0.732,
+  "total_inference_time_s": 13.139,
+  "avg_inference_ms": 262.8,
+  "fps": 3.81
+}

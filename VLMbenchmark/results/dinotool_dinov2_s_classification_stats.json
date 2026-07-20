@@ -1,0 +1,12 @@
+{
+  "model": "Tiny ImageNet Classification (DINOtool (DINOv2-s))",
+  "model_key": "dinotool_dinov2_s",
+  "task": "classification",
+  "dataset": "tiny-imagenet-200",
+  "images": 200,
+  "top1_accuracy": 0.0,
+  "top5_accuracy": 0.015,
+  "total_inference_time_s": 6.85,
+  "avg_inference_ms": 34.2,
+  "fps": 29.2
+}

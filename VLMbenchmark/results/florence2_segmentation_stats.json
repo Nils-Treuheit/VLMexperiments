@@ -1,0 +1,112 @@
+{
+  "model": "Florence-2-large-ft",
+  "model_key": "florence2",
+  "task": "segmentation",
+  "dataset": "coco",
+  "images": 48,
+  "skipped": 2,
+  "total_inference_time_s": 7.484,
+  "avg_inference_ms": 155.93,
+  "fps": 6.41,
+  "total_gt_masks": 250,
+  "total_predicted_masks": 60,
+  "PQ": 0.0,
+  "mIoU": 0.0,
+  "per_class_metrics": {
+    "bowl": {
+      "pq": 0.0,
+      "miou": 0.0,
+      "count": 1
+    },
+    "orange": {
+      "pq": 0.0,
+      "miou": 0.0,
+      "count": 2
+    },
+    "person": {
+      "pq": 0.0,
+      "miou": 0.0,
+      "count": 13
+    },
+    "car": {
+      "pq": 0.0,
+      "miou": 0.0,
+      "count": 4
+    },
+    "toilet": {
+      "pq": 0.0,
+      "miou": 0.0,
+      "count": 4
+    },
+    "book": {
+      "pq": 0.0,
+      "miou": 0.0,
+      "count": 2
+    },
+    "potted plant": {
+      "pq": 0.0,
+      "miou": 0.0,
+      "count": 1
+    },
+    "bird": {
+      "pq": 0.0,
+      "miou": 0.0,
+      "count": 3
+    },
+    "boat": {
+      "pq": 0.0,
+      "miou": 0.0,
+      "count": 2
+    },
+    "sheep": {
+      "pq": 0.0,
+      "miou": 0.0,
+      "count": 1
+    },
+    "bus": {
+      "pq": 0.0,
+      "miou": 0.0,
+      "count": 1
+    },
+    "giraffe": {
+      "pq": 0.0,
+      "miou": 0.0,
+      "count": 1
+    },
+    "train": {
+      "pq": 0.0,
+      "miou": 0.0,
+      "count": 1
+    },
+    "stop sign": {
+      "pq": 0.0,
+      "miou": 0.0,
+      "count": 3
+    },
+    "couch": {
+      "pq": 0.0,
+      "miou": 0.0,
+      "count": 1
+    },
+    "cat": {
+      "pq": 0.0,
+      "miou": 0.0,
+      "count": 3
+    },
+    "cow": {
+      "pq": 0.0,
+      "miou": 0.0,
+      "count": 2
+    },
+    "tv": {
+      "pq": 0.0,
+      "miou": 0.0,
+      "count": 1
+    },
+    "elephant": {
+      "pq": 0.0,
+      "miou": 0.0,
+      "count": 2
+    }
+  }
+}

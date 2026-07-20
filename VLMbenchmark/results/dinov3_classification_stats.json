@@ -1,0 +1,12 @@
+{
+  "model": "Tiny ImageNet Classification (dinov3)",
+  "model_key": "dinov3",
+  "task": "classification",
+  "dataset": "tiny-imagenet-200",
+  "images": 50,
+  "top1_accuracy": 0.0,
+  "top5_accuracy": 0.0,
+  "total_inference_time_s": 1.56,
+  "avg_inference_ms": 31.3,
+  "fps": 31.99
+}

@@ -1,0 +1,15 @@
+{
+  "model": "Llama-3.2-11B-Vision",
+  "model_key": "llama_vision",
+  "task": "object_counting",
+  "dataset": "coco",
+  "questions": 122,
+  "skipped": 0,
+  "total_inference_time_s": 55.944,
+  "avg_inference_ms": 458.56,
+  "fps": 2.18,
+  "MAE": 0.9661,
+  "RMSE": 2.9516,
+  "exact_accuracy": 0.623,
+  "correct_exact": 76
+}

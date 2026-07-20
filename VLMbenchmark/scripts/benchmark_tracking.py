@@ -18,7 +18,12 @@ from common import BASE_DIR, RESULTS_DIR, PROJECT_DIR, save_stats, print_compari
 MOT17_DIR = Path("/mnt/HDD1/Project_Data/public_datasets/mot17/train")
 MOT17_MINIMAL_DIR = Path("/mnt/HDD1/Project_Data/public_datasets/mot17_minimal")
 
-TRACKING_MODELS = {"yolo26", "yolo11"}
+TRACKING_MODELS = {"yolo11", "yolo11s", "yolo11m", "yolo26", "yolo26s", "yolo26m"}
+
+MODEL_TO_YOLO_NAME = {
+    "yolo11": "yolo11n", "yolo11s": "yolo11s", "yolo11m": "yolo11m",
+    "yolo26": "yolo26n", "yolo26s": "yolo26s", "yolo26m": "yolo26m",
+}
 
 
 def find_mot17_sequences():
@@ -162,11 +167,15 @@ def main():
                         help="Number of MOT17 sequences to evaluate (default: 2)")
     parser.add_argument("--max-frames", type=int, default=100,
                         help="Max frames per sequence (default: 100)")
+    parser.add_argument("--max-images", type=int, default=None,
+                        help="Total images per model (mapped to --max-frames, overrides default)")
     parser.add_argument("--tracker", type=str, default="botsort",
                         choices=["botsort", "bytetrack"],
                         help="Tracker type (default: botsort)")
     parser.add_argument("--samples-file", type=str, default=None, help="Path to samples file (unused, for compatibility)")
     args = parser.parse_args()
+    if args.max_images is not None:
+        args.max_frames = args.max_images // args.max_sequences
     
     # Find MOT17 sequences
     sequences, mot_dir = find_mot17_sequences()
@@ -181,7 +190,7 @@ def main():
     
     # Load model
     sys.path.insert(0, str(PROJECT_DIR / "yolo11-26"))
-    model_name = f"{args.model}n"  # yolo26 -> yolo26n, yolo11 -> yolo11n
+    model_name = MODEL_TO_YOLO_NAME.get(args.model, f"{args.model}n")
     from ultralytics import YOLO
     
     models_dir = PROJECT_DIR / "yolo11-26" / "models"

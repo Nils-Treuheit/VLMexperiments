@@ -1,0 +1,12 @@
+{
+  "model": "LLaVA-v1.6-Mistral-7B",
+  "model_key": "llava_v16_mistral",
+  "task": "docvqa",
+  "dataset": "coco",
+  "questions": 100,
+  "skipped": 0,
+  "total_inference_time_s": 1387.129,
+  "avg_inference_ms": 13871.29,
+  "fps": 0.07,
+  "accuracy": 0.12
+}

@@ -1,0 +1,12 @@
+{
+  "model": "Phi-3.5-Vision-4.2B",
+  "model_key": "phi_vision",
+  "task": "emotion_detection",
+  "dataset": "coco",
+  "questions": 50,
+  "skipped": 0,
+  "total_inference_time_s": 133.287,
+  "avg_inference_ms": 2665.73,
+  "fps": 0.38,
+  "accuracy": 0.1
+}

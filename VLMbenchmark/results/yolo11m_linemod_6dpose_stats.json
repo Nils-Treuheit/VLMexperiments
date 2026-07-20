@@ -1,0 +1,14 @@
+{
+  "model": "YOLO11m (Detect)",
+  "model_key": "yolo11m",
+  "task": "6d_pose",
+  "dataset": "linemod",
+  "images": 50,
+  "skipped": 0,
+  "total_inference_time_s": 1.264,
+  "avg_inference_ms": 25.28,
+  "fps": 39.55,
+  "detection_rate": 6.92,
+  "total_gt_objects": 50,
+  "total_detected": 346
+}

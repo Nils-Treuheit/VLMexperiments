@@ -1,0 +1,12 @@
+{
+  "model": "Qwen3-VL-8B-Instruct",
+  "model_key": "qwen3_native",
+  "task": "vqa",
+  "dataset": "coco",
+  "questions": 100,
+  "skipped": 0,
+  "total_inference_time_s": 12.36,
+  "avg_inference_ms": 123.6,
+  "fps": 8.09,
+  "accuracy": 0.38
+}

@@ -1,0 +1,18 @@
+{
+  "model": "LLaVA-NeXT-Video-7B",
+  "model_key": "llava_next_video_7b",
+  "task": "scene_analysis",
+  "dataset": "COCO",
+  "images": 50,
+  "skipped": 0,
+  "total_inference_time_s": 1323.561,
+  "avg_inference_ms": 26471.21,
+  "fps": 0.04,
+  "scene_type_accuracy": 0.9167,
+  "scene_type_correct": 44,
+  "scene_type_total": 48,
+  "object_recall": 0.5762,
+  "objects_recalled": 87,
+  "objects_total": 151,
+  "description_quality": 177.8
+}

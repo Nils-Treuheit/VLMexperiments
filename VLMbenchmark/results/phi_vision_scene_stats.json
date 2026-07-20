@@ -1,0 +1,18 @@
+{
+  "model": "Phi-3.5-Vision-4.2B",
+  "model_key": "phi_vision",
+  "task": "scene_analysis",
+  "dataset": "COCO",
+  "images": 50,
+  "skipped": 0,
+  "total_inference_time_s": 1191.157,
+  "avg_inference_ms": 23823.14,
+  "fps": 0.04,
+  "scene_type_accuracy": 0.94,
+  "scene_type_correct": 47,
+  "scene_type_total": 50,
+  "object_recall": 0.4503,
+  "objects_recalled": 68,
+  "objects_total": 151,
+  "description_quality": 171.9
+}

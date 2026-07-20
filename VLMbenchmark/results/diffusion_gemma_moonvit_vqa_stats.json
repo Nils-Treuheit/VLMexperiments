@@ -1,0 +1,12 @@
+{
+  "model": "DiffusionGemma-26B (MoonViT)",
+  "model_key": "diffusion_gemma_moonvit",
+  "task": "vqa",
+  "dataset": "coco",
+  "questions": 100,
+  "skipped": 0,
+  "total_inference_time_s": 1531.25,
+  "avg_inference_ms": 15312.5,
+  "fps": 0.07,
+  "accuracy": 0.0
+}

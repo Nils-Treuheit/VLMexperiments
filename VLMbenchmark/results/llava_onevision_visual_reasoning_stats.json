@@ -1,0 +1,12 @@
+{
+  "model": "LLaVA-OneVision-Qwen2-7B",
+  "model_key": "llava_onevision",
+  "task": "visual_reasoning",
+  "dataset": "coco",
+  "questions": 50,
+  "skipped": 0,
+  "total_inference_time_s": 1156.445,
+  "avg_inference_ms": 23128.9,
+  "fps": 0.04,
+  "accuracy": 0.38
+}

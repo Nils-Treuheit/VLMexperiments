@@ -1,0 +1,15 @@
+{
+  "model": "Florence-2-large-ft",
+  "model_key": "florence2",
+  "task": "object_counting",
+  "dataset": "coco",
+  "questions": 122,
+  "skipped": 0,
+  "total_inference_time_s": 7.817,
+  "avg_inference_ms": 64.08,
+  "fps": 15.61,
+  "MAE": 1.5656,
+  "RMSE": 8.2218,
+  "exact_accuracy": 0.6803,
+  "correct_exact": 83
+}

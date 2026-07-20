@@ -1,0 +1,12 @@
+{
+  "model": "LLaVA-Phi-3-Mini-4B",
+  "model_key": "phi3_vision",
+  "task": "visual_reasoning",
+  "dataset": "coco",
+  "questions": 50,
+  "skipped": 0,
+  "total_inference_time_s": 1038.804,
+  "avg_inference_ms": 20776.08,
+  "fps": 0.05,
+  "accuracy": 0.4
+}

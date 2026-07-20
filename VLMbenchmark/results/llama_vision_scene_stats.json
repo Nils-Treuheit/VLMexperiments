@@ -1,0 +1,18 @@
+{
+  "model": "Llama-3.2-11B-Vision",
+  "model_key": "llama_vision",
+  "task": "scene_analysis",
+  "dataset": "COCO",
+  "images": 50,
+  "skipped": 0,
+  "total_inference_time_s": 288.579,
+  "avg_inference_ms": 5771.58,
+  "fps": 0.17,
+  "scene_type_accuracy": 0.9048,
+  "scene_type_correct": 38,
+  "scene_type_total": 42,
+  "object_recall": 0.4702,
+  "objects_recalled": 71,
+  "objects_total": 151,
+  "description_quality": 206.6
+}

@@ -1,0 +1,12 @@
+{
+  "model": "PaliGemma2-3B-mix",
+  "model_key": "paligemma",
+  "task": "human_intention_recognition",
+  "dataset": "coco",
+  "questions": 50,
+  "skipped": 0,
+  "total_inference_time_s": 8.725,
+  "avg_inference_ms": 174.49,
+  "fps": 5.73,
+  "accuracy": 0.02
+}

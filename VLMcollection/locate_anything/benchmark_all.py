@@ -40,7 +40,7 @@ def add_result(model, task, img_name, time_ms, notes=""):
 def bench_yolo(images, n_warmup=3, n_run=5):
     from ultralytics import YOLO
     print("\n=== YOLO26 ===", file=sys.stderr)
-    yolo = YOLO("/mnt/HDD1/Project_Code/vlm_det_test/yolo11-26/models/yolo26m.pt")
+    yolo = YOLO(Path(__file__).resolve().parent / ".." / "yolo11-26" / "models" / "yolo26m.pt")
     # Warmup
     for _ in range(n_warmup):
         _ = yolo.predict(source=images[0], imgsz=640, conf=0.25, iou=0.45, device='0', verbose=False)

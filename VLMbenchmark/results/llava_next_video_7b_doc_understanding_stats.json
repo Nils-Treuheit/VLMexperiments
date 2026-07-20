@@ -1,0 +1,12 @@
+{
+  "model": "LLaVA-NeXT-Video-7B",
+  "model_key": "llava_next_video_7b",
+  "task": "doc_understanding",
+  "dataset": "coco",
+  "questions": 50,
+  "skipped": 0,
+  "total_inference_time_s": 1128.418,
+  "avg_inference_ms": 22568.36,
+  "fps": 0.04,
+  "accuracy": 0.12
+}

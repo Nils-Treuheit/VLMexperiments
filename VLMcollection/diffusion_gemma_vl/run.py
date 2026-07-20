@@ -133,10 +133,11 @@ def describe_obb(results) -> str:
 # encoder dispatch
 # ---------------------------------------------------------------------------
 
+YOLO_MODELS_DIR = Path(__file__).resolve().parent.parent / "yolo11-26" / "models"
 YOLO_MODELS = {
-    "aabb": "yolo11n.pt",
-    "pose": "yolo11n-pose.pt",
-    "obb": "yolo11n-obb.pt",
+    "aabb": str(YOLO_MODELS_DIR / "yolo11n.pt"),
+    "pose": str(YOLO_MODELS_DIR / "yolo11n-pose.pt"),
+    "obb": str(YOLO_MODELS_DIR / "yolo11n-obb.pt"),
 }
 
 

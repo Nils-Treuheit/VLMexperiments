@@ -11,6 +11,13 @@ from PIL import Image
 
 import torch
 
+# Cache/environment config
+os.environ.setdefault("UNSLOTH_COMPILED_CACHE",
+    "/mnt/HDD1/unsloth_and_hugging_face_models/unsloth_compiled_cache")
+os.environ.setdefault("HF_HOME",
+    "/mnt/HDD1/unsloth_and_hugging_face_models/huggingface")
+os.environ.setdefault("XFORMERS_DISABLED", "1")
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 RESULTS_DIR = BASE_DIR / "results"
 SAMPLES_DIR = BASE_DIR / "samples"

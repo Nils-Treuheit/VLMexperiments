@@ -1,0 +1,14 @@
+{
+  "model": "DiffusionGemma-26B (MoonViT)",
+  "model_key": "diffusion_gemma_moonvit",
+  "task": "captioning",
+  "dataset": "coco",
+  "images": 50,
+  "skipped": 0,
+  "total_inference_time_s": 776.279,
+  "avg_inference_ms": 15525.58,
+  "fps": 0.06,
+  "bleu_4": 0.0,
+  "rouge_l": 0.0,
+  "cider": 0.0
+}

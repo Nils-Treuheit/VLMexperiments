@@ -1,0 +1,12 @@
+{
+  "model": "DiffusionGemma-26B (YOLO)",
+  "model_key": "diffusion_gemma_yolo",
+  "task": "vqa",
+  "dataset": "coco",
+  "questions": 100,
+  "skipped": 0,
+  "total_inference_time_s": 222.207,
+  "avg_inference_ms": 2222.07,
+  "fps": 0.45,
+  "accuracy": 0.0
+}

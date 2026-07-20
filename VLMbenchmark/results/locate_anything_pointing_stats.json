@@ -1,0 +1,13 @@
+{
+  "model": "LocateAnything-3B",
+  "model_key": "locate_anything",
+  "task": "pointing",
+  "dataset": "coco_keypoints",
+  "images": 17,
+  "total_keypoints": 468,
+  "acc@0.05": 0.1987,
+  "acc@0.10": 0.2585,
+  "total_inference_time_s": 86.975,
+  "avg_inference_ms": 185.8,
+  "fps": 0.2
+}

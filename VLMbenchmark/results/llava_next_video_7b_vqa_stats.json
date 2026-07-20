@@ -1,0 +1,12 @@
+{
+  "model": "LLaVA-NeXT-Video-7B",
+  "model_key": "llava_next_video_7b",
+  "task": "vqa",
+  "dataset": "coco",
+  "questions": 100,
+  "skipped": 0,
+  "total_inference_time_s": 1390.894,
+  "avg_inference_ms": 13908.94,
+  "fps": 0.07,
+  "accuracy": 0.4
+}

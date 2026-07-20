@@ -1,9 +1,15 @@
 import argparse
 import json
+import os
 import subprocess
 import sys
 import time
 from pathlib import Path
+
+os.environ.setdefault("UNSLOTH_COMPILED_CACHE",
+    "/mnt/HDD1/unsloth_and_hugging_face_models/unsloth_compiled_cache")
+os.environ.setdefault("HF_HOME",
+    "/mnt/HDD1/unsloth_and_hugging_face_models/huggingface")
 
 SCRIPTS_DIR = Path(__file__).resolve().parent
 RESULTS_DIR = SCRIPTS_DIR.parent / "results"
@@ -377,7 +383,8 @@ def run_model(model, script, max_images, dataset=None, sample_file=None, max_ret
             return None
 
         script_path = SCRIPTS_DIR / script
-        if "vqa" in script:
+        q_scripts = ("vqa", "emotion", "hir", "visual_reasoning", "docvqa", "doc_understanding")
+        if any(s in script for s in q_scripts):
             cmd = [venv_python, str(script_path), "--model", model, "--max-questions", str(max_images * 2)]
         else:
             cmd = [venv_python, str(script_path), "--model", model, "--max-images", str(max_images)]
@@ -438,7 +445,11 @@ def extract_stats(model, script):
     elif "scene" in script:
         fp = RESULTS_DIR / f"{prefix}_scene_stats.json"
     elif "tracking" in script:
-        fp = RESULTS_DIR / f"{prefix}_tracking_stats.json"
+        fp = RESULTS_DIR / f"{prefix}_botsort_tracking_stats.json"
+        if not fp.exists():
+            fp = RESULTS_DIR / f"{prefix}_bytetrack_tracking_stats.json"
+        if not fp.exists():
+            fp = RESULTS_DIR / f"{prefix}_tracking_stats.json"
     elif "6dpose" in script:
         fp = RESULTS_DIR / f"{prefix}_linemod_6dpose_stats.json"
     elif "ocr" in script:

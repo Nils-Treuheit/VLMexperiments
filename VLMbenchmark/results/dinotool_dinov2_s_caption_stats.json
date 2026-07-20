@@ -1,0 +1,14 @@
+{
+  "model": "Image Captioning (DINOtool (DINOv2-s))",
+  "model_key": "dinotool_dinov2_s",
+  "task": "caption",
+  "dataset": "coco-captions-val2017",
+  "images": 50,
+  "skipped": 0,
+  "fps": 10.25,
+  "avg_inference_ms": 97.6,
+  "total_inference_time_s": 4.88,
+  "cider": 0.0058,
+  "bleu_4": 0.0,
+  "rouge_l": 0.0062
+}

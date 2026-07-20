@@ -1,0 +1,12 @@
+{
+  "model": "PaliGemma2-3B-mix",
+  "model_key": "paligemma",
+  "task": "doc_understanding",
+  "dataset": "coco",
+  "questions": 50,
+  "skipped": 0,
+  "total_inference_time_s": 8.366,
+  "avg_inference_ms": 167.33,
+  "fps": 5.98,
+  "accuracy": 0.22
+}

@@ -99,6 +99,10 @@ tracking_data = load_stats("*_tracking_stats.json")
 pose6d_data = load_stats("*_6dpose_stats.json")
 ocr_data = load_stats("*_ocr_stats.json")
 pointing_data = load_stats("*_pointing_stats.json")
+visual_reasoning_data = load_stats("*_visual_reasoning_stats.json")
+emotion_data = load_stats("*_emotion_stats.json")
+hir_data = load_stats("*_hir_stats.json")
+doc_understanding_data = load_stats("*_doc_understanding_stats.json")
 
 print(f"  Captioning: {len(caption_data)} models")
 print(f"  VQA: {len(vqa_data)} models")
@@ -113,6 +117,10 @@ print(f"  Tracking: {len(tracking_data)} models")
 print(f"  6D Pose: {len(pose6d_data)} models")
 print(f"  OCR: {len(ocr_data)} models")
 print(f"  Pointing: {len(pointing_data)} models")
+print(f"  Visual Reasoning: {len(visual_reasoning_data)} models")
+print(f"  Emotion: {len(emotion_data)} models")
+print(f"  HIR: {len(hir_data)} models")
+print(f"  Doc Understanding: {len(doc_understanding_data)} models")
 
 # =============================================
 # Override display names for consistency
@@ -157,6 +165,21 @@ DISPLAY_NAMES = {
     "locate_anything_trt": "LocateAnything-3B (TRT)",
     "locate_anything_ocr": "LocateAnything-3B (OCR)",
     "locate_anything_trt_ocr": "LocateAnything-3B TRT (OCR)",
+    "dinotool_dinov2_s": "DINOtool (DINOv2-s)",
+    "dinotool_dinov2_b": "DINOtool (DINOv2-b)",
+    "dinotool_dinov2_l": "DINOtool (DINOv2-l)",
+    "dinotool_dinov2_g": "DINOtool (DINOv2-g)",
+    "dinotool_dinov3_s": "DINOtool (DINOv3-s)",
+    "dinotool_dinov3_b": "DINOtool (DINOv3-b)",
+    "dinotool_dinov3_l": "DINOtool (DINOv3-l)",
+    "dinotool_siglip1": "DINOtool (SigLIP-B)",
+    "dinotool_siglip2_so400m": "DINOtool (SigLIP2-SO400M-384)",
+    "dinotool_radio_b": "DINOtool (RADIO-B)",
+    "dinotool_radio_h": "DINOtool (RADIO-H)",
+    "dinotool_tipsv2_b": "DINOtool (TIPSv2-B)",
+    "dinotool_tipsv2_l": "DINOtool (TIPSv2-L)",
+    "dinotool_tipsv2_so400m": "DINOtool (TIPSv2-SO400M)",
+    "dinotool_tipsv2_g": "DINOtool (TIPSv2-G)",
     "yolo26_botsort": "YOLO26n + BoTSORT",
     "yolo26_bytetrack": "YOLO26n + ByteTrack",
     "yolo11_botsort": "YOLO11n + BoTSORT",
@@ -165,7 +188,8 @@ DISPLAY_NAMES = {
 }
 
 for d in [caption_data, vqa_data, od_data, pose_data, obb_data, grounding_data,
-          classification_data, segmentation_data, scene_data, tracking_data, pose6d_data]:
+          classification_data, segmentation_data, scene_data, tracking_data, pose6d_data,
+          visual_reasoning_data, emotion_data, hir_data, doc_understanding_data]:
     for mk in list(d.keys()):
         if mk in DISPLAY_NAMES:
             d[mk]["display"] = DISPLAY_NAMES[mk]
@@ -725,10 +749,78 @@ if pointing_data:
         )
 
 # =============================================
+# VISUAL REASONING
+# =============================================
+if visual_reasoning_data:
+    report.append("")
+    report.append("## 14. Visual Reasoning (COCO)")
+    report.append("")
+    report.append("| Model | Accuracy | FPS | Avg (ms) | Questions |")
+    report.append("|-------|----------|-----|----------|-----------|")
+    for mk, d in sorted(visual_reasoning_data.items(), key=lambda x: x[1].get("accuracy", 0), reverse=True):
+        if d.get("questions", 0) < 20:
+            continue
+        report.append(
+            f"| {model_link(mk)} | {fmt_val(d, 'accuracy', fmt='{:.2%}')} | {fmt_val(d, 'fps')} | "
+            f"{fmt_val(d, 'avg_inference_ms', fmt='{:.1f}')} | {d.get('questions', '—')} |"
+        )
+
+# =============================================
+# EMOTION
+# =============================================
+if emotion_data:
+    report.append("")
+    report.append("## 15. Emotion Detection (COCO)")
+    report.append("")
+    report.append("| Model | Accuracy | FPS | Avg (ms) | Questions |")
+    report.append("|-------|----------|-----|----------|-----------|")
+    for mk, d in sorted(emotion_data.items(), key=lambda x: x[1].get("accuracy", 0), reverse=True):
+        if d.get("questions", 0) < 20:
+            continue
+        report.append(
+            f"| {model_link(mk)} | {fmt_val(d, 'accuracy', fmt='{:.2%}')} | {fmt_val(d, 'fps')} | "
+            f"{fmt_val(d, 'avg_inference_ms', fmt='{:.1f}')} | {d.get('questions', '—')} |"
+        )
+
+# =============================================
+# HIR (Human Intention Recognition)
+# =============================================
+if hir_data:
+    report.append("")
+    report.append("## 16. Human Intention Recognition (COCO)")
+    report.append("")
+    report.append("| Model | Accuracy | FPS | Avg (ms) | Questions |")
+    report.append("|-------|----------|-----|----------|-----------|")
+    for mk, d in sorted(hir_data.items(), key=lambda x: x[1].get("accuracy", 0), reverse=True):
+        if d.get("questions", 0) < 20:
+            continue
+        report.append(
+            f"| {model_link(mk)} | {fmt_val(d, 'accuracy', fmt='{:.2%}')} | {fmt_val(d, 'fps')} | "
+            f"{fmt_val(d, 'avg_inference_ms', fmt='{:.1f}')} | {d.get('questions', '—')} |"
+        )
+
+# =============================================
+# DOCUMENT UNDERSTANDING
+# =============================================
+if doc_understanding_data:
+    report.append("")
+    report.append("## 17. Document Understanding (COCO)")
+    report.append("")
+    report.append("| Model | Accuracy | FPS | Avg (ms) | Questions |")
+    report.append("|-------|----------|-----|----------|-----------|")
+    for mk, d in sorted(doc_understanding_data.items(), key=lambda x: x[1].get("accuracy", 0), reverse=True):
+        if d.get("questions", 0) < 20:
+            continue
+        report.append(
+            f"| {model_link(mk)} | {fmt_val(d, 'accuracy', fmt='{:.2%}')} | {fmt_val(d, 'fps')} | "
+            f"{fmt_val(d, 'avg_inference_ms', fmt='{:.1f}')} | {d.get('questions', '—')} |"
+        )
+
+# =============================================
 # Speed vs Quality
 # =============================================
 report.append("")
-report.append("## 14. Speed vs Quality Overview")
+report.append("## 18. Speed vs Quality Overview")
 report.append("")
 report.append("![Combined FPS](charts/combined_fps.png)")
 report.append("")
@@ -739,7 +831,7 @@ report.append("")
 # Key Takeaways
 # =============================================
 report.append("")
-report.append("## 15. Key Takeaways")
+report.append("## 19. Key Takeaways")
 report.append("")
 report.append("### Fastest Models by Task")
 report.append("- **Detection:** YOLO11n at 46.7 FPS, YOLO26n at 14.8 FPS (medium: 35 FPS)")
@@ -750,6 +842,10 @@ report.append("- **Segmentation:** Florence-2 handles segmentation at reasonable
 report.append("- **Tracking:** YOLO + ByteTrack achieves ~50 FPS on MOT17")
 report.append("- **6D Pose (detection):** YOLO models on Linemod")
 report.append("- **OCR (text detection):** LocateAnything-3B TRT at 3.08 FPS, 85.6% detection rate")
+report.append("- **Visual Reasoning:** Best models achieve moderate accuracy on template-based COCO questions")
+report.append("- **Emotion Detection:** Models show limited accuracy on COCO without dedicated emotion training data")
+report.append("- **Human Intention Recognition:** Best models achieve decent accuracy on interaction-focused questions")
+report.append("- **Document Understanding:** COCO images contain few documents; models default to 'no'")
 report.append("")
 report.append("### Best Quality by Task")
 report.append("- **Captioning CIDEr:** PaliGemma2-3B (1.7246), Florence-2 (0.4999)")
@@ -775,13 +871,11 @@ report.append("- TRT vision encoder runs at 9.6ms (9.8× faster than PyTorch bf1
 report.append("- Florence-2 is the most versatile model, supporting captioning, VQA, OD, segmentation, and scene analysis")
 report.append("")
 report.append("### Missing / Future Benchmarks")
-report.append("- **VQA for DiffusionGemma-26B** — timed out during evaluation")
-report.append("- **OD for Florence-2, PaliGemma:** missing pycocotools dependency in their venvs")
-report.append("- **Grounding for Florence-2, LocateAnything:** missing pycocotools")
 report.append("- **Phi-4-Multimodal:** not fully tested (missing from model choices in some tasks)")
 report.append("- **6D Pose ADD/ADD-S:** pose refinement metrics not yet implemented")
 report.append("- **Semantic / Panoptic Segmentation:** more comprehensive mask evaluation needed")
 report.append("- **Video understanding:** action recognition, temporal reasoning")
+report.append("- **Visual Reasoning / Emotion / HIR / Doc Understanding:** template-based evaluation on COCO (no dedicated labels)")
 
 report_str = "\n".join(report)
 report_path = REPORT_DIR / "Benchmark_Results.md"

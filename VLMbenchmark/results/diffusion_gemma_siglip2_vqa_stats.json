@@ -1,0 +1,12 @@
+{
+  "model": "DiffusionGemma-26B (SigLIP2)",
+  "model_key": "diffusion_gemma_siglip2",
+  "task": "vqa",
+  "dataset": "coco",
+  "questions": 100,
+  "skipped": 0,
+  "total_inference_time_s": 1514.312,
+  "avg_inference_ms": 15143.12,
+  "fps": 0.07,
+  "accuracy": 0.0
+}

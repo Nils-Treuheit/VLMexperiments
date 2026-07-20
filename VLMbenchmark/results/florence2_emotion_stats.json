@@ -1,0 +1,12 @@
+{
+  "model": "Florence-2-large-ft",
+  "model_key": "florence2",
+  "task": "emotion_detection",
+  "dataset": "coco",
+  "questions": 50,
+  "skipped": 0,
+  "total_inference_time_s": 11.994,
+  "avg_inference_ms": 239.88,
+  "fps": 4.17,
+  "accuracy": 0.14
+}

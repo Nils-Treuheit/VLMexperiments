@@ -1,0 +1,11 @@
+{
+  "model": "dinotool (Embedding)",
+  "model_key": "dinotool",
+  "task": "embedding",
+  "dataset": "coco",
+  "images": 50,
+  "embedding_dim": 384,
+  "total_inference_time_s": 0.62,
+  "avg_inference_ms": 12.4,
+  "fps": 80.65
+}

@@ -1,0 +1,14 @@
+{
+  "model": "Qwen3-VL-8B-Instruct",
+  "model_key": "qwen3_native",
+  "task": "zeroshot_detection",
+  "dataset": "coco",
+  "images": 28,
+  "skipped": 2,
+  "total_inference_time_s": 77.469,
+  "avg_inference_ms": 2766.74,
+  "fps": 0.36,
+  "total_gt": 174,
+  "total_correct": 7,
+  "acc@50": 0.0402
+}

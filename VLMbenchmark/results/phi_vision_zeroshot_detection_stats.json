@@ -1,0 +1,14 @@
+{
+  "model": "Phi-3.5-Vision-4.2B",
+  "model_key": "phi_vision",
+  "task": "zeroshot_detection",
+  "dataset": "coco",
+  "images": 28,
+  "skipped": 2,
+  "total_inference_time_s": 653.995,
+  "avg_inference_ms": 23356.98,
+  "fps": 0.04,
+  "total_gt": 174,
+  "total_correct": 0,
+  "acc@50": 0.0
+}

@@ -1,0 +1,11 @@
+{
+  "model": "moonvit (Embedding)",
+  "model_key": "moonvit",
+  "task": "embedding",
+  "dataset": "coco",
+  "images": 50,
+  "embedding_dim": 1152,
+  "total_inference_time_s": 3.091,
+  "avg_inference_ms": 61.82,
+  "fps": 16.18
+}

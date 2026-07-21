@@ -103,6 +103,8 @@ visual_reasoning_data = load_stats("*_visual_reasoning_stats.json")
 emotion_data = load_stats("*_emotion_stats.json")
 hir_data = load_stats("*_hir_stats.json")
 doc_understanding_data = load_stats("*_doc_understanding_stats.json")
+embedding_data = load_stats("*_embedding_stats.json")
+zeroshot_detection_data = load_stats("*_zeroshot_detection_stats.json")
 
 print(f"  Captioning: {len(caption_data)} models")
 print(f"  VQA: {len(vqa_data)} models")
@@ -121,6 +123,8 @@ print(f"  Visual Reasoning: {len(visual_reasoning_data)} models")
 print(f"  Emotion: {len(emotion_data)} models")
 print(f"  HIR: {len(hir_data)} models")
 print(f"  Doc Understanding: {len(doc_understanding_data)} models")
+print(f"  Embedding: {len(embedding_data)} models")
+print(f"  Zero-shot Detection: {len(zeroshot_detection_data)} models")
 
 # =============================================
 # Override display names for consistency
@@ -189,7 +193,8 @@ DISPLAY_NAMES = {
 
 for d in [caption_data, vqa_data, od_data, pose_data, obb_data, grounding_data,
           classification_data, segmentation_data, scene_data, tracking_data, pose6d_data,
-          visual_reasoning_data, emotion_data, hir_data, doc_understanding_data]:
+          visual_reasoning_data, emotion_data, hir_data, doc_understanding_data,
+          embedding_data, zeroshot_detection_data]:
     for mk in list(d.keys()):
         if mk in DISPLAY_NAMES:
             d[mk]["display"] = DISPLAY_NAMES[mk]
@@ -317,6 +322,18 @@ make_chart(pointing_data, "fps", "Pointing / 2D Keypoint — FPS",
 # =============================================
 # Combined FPS overview across tasks
 # =============================================
+print("\n--- Embedding ---")
+make_chart(embedding_data, "fps", "Embedding Extraction — FPS (higher is better)",
+           "FPS", "embedding_fps.png")
+make_chart(embedding_data, "embedding_dim", "Embedding Extraction — Output Dimension",
+           "Embedding dim", "embedding_dim.png", higher_better=False)
+
+print("\n--- Zero-shot Detection ---")
+make_chart(zeroshot_detection_data, "acc@50", "Zero-Shot Detection — Acc@50",
+           "Acc@50", "zeroshot_detection_acc.png", fmt="{:.2%}")
+make_chart(zeroshot_detection_data, "fps", "Zero-Shot Detection — FPS",
+           "FPS", "zeroshot_detection_fps.png")
+
 print("\n--- Combined charts ---")
 
 # Gather FPS for each model across tasks
@@ -428,10 +445,11 @@ report.append("")
 report.append("## Overview")
 report.append("")
 report.append("This report summarizes benchmark results across multiple vision-language models (VLMs) ")
-report.append("and vision encoders. Benchmarks cover 13 tasks: image captioning, visual question answering (VQA), ")
+report.append("and vision encoders. Benchmarks cover 15 tasks: image captioning, visual question answering (VQA), ")
 report.append("object detection (AABB + OBB), phrase grounding, pose estimation (2D keypoints + 6D), ")
 report.append("segmentation, zero-shot classification, semantic scene analysis, multi-object tracking, ")
-report.append("OCR / text detection, and pointing / 2D keypoint localization.")
+report.append("OCR / text detection, pointing / 2D keypoint localization, ")
+report.append("embedding extraction, and zero-shot detection.")
 report.append("")
 
 report.append("### Models Tested")
@@ -462,6 +480,8 @@ report.append("| Multi-Object Tracking | MOT17 | 200 frames (2 seqs) |")
 report.append("| 6D Pose (detection) | Linemod (BOP) | 25 |")
 report.append("| OCR / Text Detection | Synthetic text on COCO | 25 |")
 report.append("| Pointing / 2D Keypoint | COCO Keypoints val2017 | 10-25 |")
+report.append("| Embedding Extraction | COCO val2017 | 100 |")
+report.append("| Zero-Shot Detection | COCO val2017 | 100 |")
 report.append("")
 
 report.append("### Notes")
@@ -817,10 +837,50 @@ if doc_understanding_data:
         )
 
 # =============================================
+# EMBEDDING
+# =============================================
+if embedding_data:
+    report.append("")
+    report.append("## 18. Embedding Extraction (COCO)")
+    report.append("")
+    report.append("![FPS](charts/embedding_fps.png)")
+    report.append("![Dimension](charts/embedding_dim.png)")
+    report.append("")
+    report.append("| Model | FPS | Embedding Dim | Avg (ms) | Images |")
+    report.append("|-------|-----|---------------|----------|--------|")
+    for mk, d in sorted(embedding_data.items(), key=lambda x: x[1].get("fps", 0), reverse=True):
+        if d.get("images", 0) < 5:
+            continue
+        report.append(
+            f"| {model_link(mk)} | {fmt_val(d, 'fps')} | {d.get('embedding_dim', '—')} | "
+            f"{fmt_val(d, 'avg_inference_ms', fmt='{:.1f}')} | {d.get('images', '—')} |"
+        )
+
+# =============================================
+# ZERO-SHOT DETECTION
+# =============================================
+if zeroshot_detection_data:
+    report.append("")
+    report.append("## 19. Zero-Shot Detection (COCO)")
+    report.append("")
+    report.append("![Acc@50](charts/zeroshot_detection_acc.png)")
+    report.append("![FPS](charts/zeroshot_detection_fps.png)")
+    report.append("")
+    report.append("| Model | Acc@50 | FPS | Avg (ms) | Images |")
+    report.append("|-------|--------|-----|----------|--------|")
+    for mk, d in sorted(zeroshot_detection_data.items(), key=lambda x: x[1].get("acc@50", 0), reverse=True):
+        if d.get("images", 0) < 5:
+            continue
+        report.append(
+            f"| {model_link(mk)} | {fmt_val(d, 'acc@50', fmt='{:.2%}')} | {fmt_val(d, 'fps')} | "
+            f"{fmt_val(d, 'avg_inference_ms', fmt='{:.1f}')} | {d.get('images', '—')} |"
+        )
+
+# =============================================
 # Speed vs Quality
 # =============================================
 report.append("")
-report.append("## 18. Speed vs Quality Overview")
+report.append("## 20. Speed vs Quality Overview")
 report.append("")
 report.append("![Combined FPS](charts/combined_fps.png)")
 report.append("")
@@ -831,7 +891,7 @@ report.append("")
 # Key Takeaways
 # =============================================
 report.append("")
-report.append("## 19. Key Takeaways")
+report.append("## 21. Key Takeaways")
 report.append("")
 report.append("### Fastest Models by Task")
 report.append("- **Detection:** YOLO11n at 46.7 FPS, YOLO26n at 14.8 FPS (medium: 35 FPS)")

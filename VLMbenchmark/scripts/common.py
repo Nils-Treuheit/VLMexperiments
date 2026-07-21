@@ -720,6 +720,20 @@ TASK_ROWS = {
         ("detection_rate", "Detection rate", "{:.4f}"),
         ("images", "Images processed", "{}"),
     ],
+    "embedding": [
+        ("fps", "FPS", "{:.2f}"),
+        ("avg_inference_ms", "Avg inference (ms)", "{:.1f}"),
+        ("embedding_dim", "Embedding dim", "{}"),
+        ("images", "Images processed", "{}"),
+    ],
+    "zeroshot_detection": [
+        ("fps", "FPS", "{:.2f}"),
+        ("avg_inference_ms", "Avg inference (ms)", "{:.1f}"),
+        ("acc@50", "Acc@50", "{:.4f}"),
+        ("images", "Images processed", "{}"),
+        ("total_gt", "Total GT objects", "{}"),
+        ("total_correct", "Correct@IoU50", "{}"),
+    ],
 }
 
 

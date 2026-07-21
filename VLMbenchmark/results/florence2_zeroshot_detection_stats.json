@@ -1,0 +1,14 @@
+{
+  "model": "Florence-2-large-ft",
+  "model_key": "florence2",
+  "task": "zeroshot_detection",
+  "dataset": "coco",
+  "images": 28,
+  "skipped": 2,
+  "total_inference_time_s": 12.604,
+  "avg_inference_ms": 450.13,
+  "fps": 2.22,
+  "total_gt": 174,
+  "total_correct": 0,
+  "acc@50": 0.0
+}

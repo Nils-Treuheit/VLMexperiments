@@ -1,0 +1,11 @@
+{
+  "model": "siglip2 (Embedding)",
+  "model_key": "siglip2",
+  "task": "embedding",
+  "dataset": "coco",
+  "images": 50,
+  "embedding_dim": 768,
+  "total_inference_time_s": 0.96,
+  "avg_inference_ms": 19.2,
+  "fps": 52.08
+}

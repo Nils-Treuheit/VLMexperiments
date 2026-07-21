@@ -1,0 +1,14 @@
+{
+  "model": "PaliGemma2-3B-mix",
+  "model_key": "paligemma",
+  "task": "zeroshot_detection",
+  "dataset": "coco",
+  "images": 28,
+  "skipped": 2,
+  "total_inference_time_s": 10.461,
+  "avg_inference_ms": 373.61,
+  "fps": 2.68,
+  "total_gt": 174,
+  "total_correct": 0,
+  "acc@50": 0.0
+}

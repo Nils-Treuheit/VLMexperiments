@@ -1,16 +1,17 @@
 # Benchmark Results
 
-**Generated:** 2026-07-17 23:38
+**Generated:** 2026-07-20 21:14
 
 **Hardware:** NVIDIA GeForce RTX 5090 (32 GB VRAM)
 
 ## Overview
 
 This report summarizes benchmark results across multiple vision-language models (VLMs) 
-and vision encoders. Benchmarks cover 13 tasks: image captioning, visual question answering (VQA), 
+and vision encoders. Benchmarks cover 15 tasks: image captioning, visual question answering (VQA), 
 object detection (AABB + OBB), phrase grounding, pose estimation (2D keypoints + 6D), 
 segmentation, zero-shot classification, semantic scene analysis, multi-object tracking, 
-OCR / text detection, and pointing / 2D keypoint localization.
+OCR / text detection, pointing / 2D keypoint localization, 
+embedding extraction, and zero-shot detection.
 
 ### Models Tested
 
@@ -39,6 +40,8 @@ OCR / text detection, and pointing / 2D keypoint localization.
 | 6D Pose (detection) | Linemod (BOP) | 25 |
 | OCR / Text Detection | Synthetic text on COCO | 25 |
 | Pointing / 2D Keypoint | COCO Keypoints val2017 | 10-25 |
+| Embedding Extraction | COCO val2017 | 100 |
+| Zero-Shot Detection | COCO val2017 | 100 |
 
 ### Notes
 
@@ -331,14 +334,45 @@ OCR / text detection, and pointing / 2D keypoint localization.
 | llava_next_video_7b | 12.00% | 0.04 | 22568.4 | 50 |
 | llava_v16_mistral | 12.00% | 0.04 | 22596.8 | 50 |
 
-## 18. Speed vs Quality Overview
+## 18. Embedding Extraction (COCO)
+
+![FPS](charts/embedding_fps.png)
+![Dimension](charts/embedding_dim.png)
+
+| Model | FPS | Embedding Dim | Avg (ms) | Images |
+|-------|-----|---------------|----------|--------|
+| DINOtool (DINOv2-s) | 80.65 | 384 | 12.4 | 50 |
+| DINOv3 (Zero-shot) | 64.43 | 384 | 15.5 | 50 |
+| SigLIP2 (Zero-shot) | 52.08 | 768 | 19.2 | 50 |
+| MoonViT (Zero-shot) | 16.18 | 1152 | 61.8 | 50 |
+
+## 19. Zero-Shot Detection (COCO)
+
+![Acc@50](charts/zeroshot_detection_acc.png)
+![FPS](charts/zeroshot_detection_fps.png)
+
+| Model | Acc@50 | FPS | Avg (ms) | Images |
+|-------|--------|-----|----------|--------|
+| Cosmos-Reason1-7B | 24.71% | 0.53 | 1899.7 | 28 |
+| Qwen3-VL-8B-Instruct | 4.02% | 0.36 | 2766.7 | 28 |
+| Qwen3-VL-8B-Thinking | 0.57% | 0.05 | 21437.1 | 28 |
+| Florence-2-large-ft | 0.00% | 2.22 | 450.1 | 28 |
+| Llama-3.2-11B-Vision | 0.00% | 0.23 | 4337.2 | 28 |
+| llava_next_video_7b | 0.00% | 0.04 | 26289.5 | 24 |
+| llava_onevision | 0.00% | 0.04 | 26091.9 | 28 |
+| llava_v16_mistral | 0.00% | 0.04 | 28070.6 | 28 |
+| PaliGemma2-3B-mix | 0.00% | 2.68 | 373.6 | 28 |
+| phi3_vision | 0.00% | 0.05 | 20889.9 | 28 |
+| Phi-3.5-Vision-4B | 0.00% | 0.04 | 23357.0 | 28 |
+
+## 20. Speed vs Quality Overview
 
 ![Combined FPS](charts/combined_fps.png)
 
 ![Quality Comparison](charts/quality_comparison.png)
 
 
-## 19. Key Takeaways
+## 21. Key Takeaways
 
 ### Fastest Models by Task
 - **Detection:** YOLO11n at 46.7 FPS, YOLO26n at 14.8 FPS (medium: 35 FPS)

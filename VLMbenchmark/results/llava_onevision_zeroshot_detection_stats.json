@@ -1,0 +1,14 @@
+{
+  "model": "LLaVA-OneVision-Qwen2-7B",
+  "model_key": "llava_onevision",
+  "task": "zeroshot_detection",
+  "dataset": "coco",
+  "images": 28,
+  "skipped": 2,
+  "total_inference_time_s": 730.573,
+  "avg_inference_ms": 26091.89,
+  "fps": 0.04,
+  "total_gt": 174,
+  "total_correct": 0,
+  "acc@50": 0.0
+}

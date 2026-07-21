@@ -239,6 +239,30 @@ TASKS = {
         ],
         "dataset": None,
     },
+    "embedding": {
+        "script": "benchmark_embedding.py",
+        "title": "Embedding Extraction (COCO)",
+        "models": ["siglip2", "dinov3", "moonvit", "dinotool"],
+        "dataset": None,
+    },
+    "zeroshot_detection": {
+        "script": "benchmark_zeroshot_detection.py",
+        "title": "Zero-Shot Detection (COCO)",
+        "models": [
+            "florence2", "paligemma",
+            "cosmos_nemotron",
+            "llama_vision",
+            "qwen3_native", "qwen3_thinking",
+            "phi_vision",
+            "llava_v16_mistral", "llava_onevision",
+            "llava_next_video_7b", "phi3_vision",
+            "llava_next_video_34b",
+            "diffusion_gemma", "diffusion_gemma_yolo",
+            "diffusion_gemma_yolo_pose", "diffusion_gemma_yolo_obb",
+            "diffusion_gemma_siglip2", "diffusion_gemma_moonvit",
+        ],
+        "dataset": None,
+    },
 }
 
 COLLECTION_DIR = Path("/mnt/HDD1/Project_Code/VLMexperiments/VLMcollection")
@@ -468,6 +492,10 @@ def extract_stats(model, script):
         fp = RESULTS_DIR / f"{prefix}_hir_stats.json"
     elif "doc_understanding" in script:
         fp = RESULTS_DIR / f"{prefix}_doc_understanding_stats.json"
+    elif "embedding" in script:
+        fp = RESULTS_DIR / f"{prefix}_embedding_stats.json"
+    elif "zeroshot_detection" in script:
+        fp = RESULTS_DIR / f"{prefix}_zeroshot_detection_stats.json"
     else:
         fp = RESULTS_DIR / f"{prefix}_coco_od_stats.json"
         if fp.exists():

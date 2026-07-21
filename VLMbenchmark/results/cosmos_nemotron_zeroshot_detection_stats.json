@@ -1,0 +1,14 @@
+{
+  "model": "Cosmos-Reason1-7B",
+  "model_key": "cosmos_nemotron",
+  "task": "zeroshot_detection",
+  "dataset": "coco",
+  "images": 28,
+  "skipped": 2,
+  "total_inference_time_s": 53.192,
+  "avg_inference_ms": 1899.71,
+  "fps": 0.53,
+  "total_gt": 174,
+  "total_correct": 43,
+  "acc@50": 0.2471
+}

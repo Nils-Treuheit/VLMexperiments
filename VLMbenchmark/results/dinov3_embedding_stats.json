@@ -1,0 +1,11 @@
+{
+  "model": "dinov3 (Embedding)",
+  "model_key": "dinov3",
+  "task": "embedding",
+  "dataset": "coco",
+  "images": 50,
+  "embedding_dim": 384,
+  "total_inference_time_s": 0.776,
+  "avg_inference_ms": 15.52,
+  "fps": 64.43
+}

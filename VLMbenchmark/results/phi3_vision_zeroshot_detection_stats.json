@@ -1,0 +1,14 @@
+{
+  "model": "LLaVA-Phi-3-Mini-4B",
+  "model_key": "phi3_vision",
+  "task": "zeroshot_detection",
+  "dataset": "coco",
+  "images": 28,
+  "skipped": 2,
+  "total_inference_time_s": 584.918,
+  "avg_inference_ms": 20889.93,
+  "fps": 0.05,
+  "total_gt": 174,
+  "total_correct": 0,
+  "acc@50": 0.0
+}

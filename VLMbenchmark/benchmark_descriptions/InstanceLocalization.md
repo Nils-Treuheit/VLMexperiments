@@ -1,4 +1,4 @@
-### Instance Localization Benchmark
+# Instance Localization Benchmark
 
 The goal of **instance localization** is to evaluate a vision-language model's ability to identify and localize objects in an image based on natural-language prompts. Unlike **image captioning**, **VQA**, or **visual reasoning**, which produce textual outputs, instance localization requires the model to output **spatial information**, such as bounding boxes, segmentation masks, or object coordinates. Modern vision-language models enable **zero-shot localization**, allowing them to detect or segment objects specified by text without task-specific training.
 

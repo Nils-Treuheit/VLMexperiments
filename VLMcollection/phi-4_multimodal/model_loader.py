@@ -23,7 +23,11 @@ def load_model(
     os.makedirs(cache_dir, exist_ok=True)
 
     if use_flash_attention and torch.cuda.is_available():
-        attn_impl = "flash_attention_2"
+        try:
+            import flash_attn
+            attn_impl = "flash_attention_2"
+        except ImportError:
+            attn_impl = "sdpa"
     else:
         attn_impl = "eager"
 

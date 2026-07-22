@@ -1,4 +1,4 @@
-### Video Understanding Benchmark
+# Video Understanding Benchmark
 
 The goal of **video understanding** is to evaluate a vision-language model's ability to interpret and reason over visual content that evolves over time. Unlike **image understanding**, which operates on a single static image, video understanding requires the model to capture **temporal relationships**, including object motion, interactions, and events across multiple frames.
 

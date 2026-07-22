@@ -3,12 +3,20 @@
   "model_key": "cosmos_nemotron",
   "task": "zeroshot_detection",
   "dataset": "coco",
-  "images": 28,
+  "images": 98,
+  "passes": 3,
   "skipped": 2,
-  "total_inference_time_s": 53.192,
-  "avg_inference_ms": 1899.71,
-  "fps": 0.53,
-  "total_gt": 174,
-  "total_correct": 43,
-  "acc@50": 0.2471
+  "total_inference_time_s": 689.784,
+  "avg_inference_ms": 898.16,
+  "fps": 1.11,
+  "total_gt": 658,
+  "total_correct": 247,
+  "acc@50": 0.3754,
+  "acc@50_b3": 0.3754,
+  "acc@50_avg": 0.3678,
+  "acc@50_pass": [
+    0.3678,
+    0.3647,
+    0.3708
+  ]
 }

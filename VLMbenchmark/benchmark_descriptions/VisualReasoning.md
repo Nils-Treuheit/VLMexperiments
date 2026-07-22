@@ -1,4 +1,4 @@
-### Visual Reasoning Benchmark
+# Visual Reasoning Benchmark
 
 The goal of **visual reasoning** is to evaluate a vision-language model's ability to solve problems that require **multi-step reasoning** over visual information. Unlike **Visual Question Answering (VQA)**, where many questions can be answered through direct visual recognition, visual reasoning requires the model to combine multiple observations, perform logical inference or calculations, and often apply external knowledge before producing an answer. Typical tasks include interpreting diagrams, solving mathematical problems, analyzing charts, understanding scientific figures, reasoning about medical images, or completing multi-step GUI interactions.
 

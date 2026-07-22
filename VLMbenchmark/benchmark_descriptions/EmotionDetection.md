@@ -1,4 +1,4 @@
-### Emotion Detection Benchmark
+# Emotion Detection Benchmark
 
 The goal of **emotion detection** is to evaluate a vision-language model's ability to recognize and interpret human emotional states from visual information, such as facial expressions, body language, gestures, and situational context. Unlike **human intention recognition**, which focuses on understanding a person's goals or future actions, emotion detection focuses on identifying **affective states** (e.g., happiness, sadness, anger, surprise, fear) expressed by individuals.
 

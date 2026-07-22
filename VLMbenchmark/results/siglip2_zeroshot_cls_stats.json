@@ -1,0 +1,12 @@
+{
+  "model": "siglip2",
+  "model_key": "siglip2",
+  "task": "classification",
+  "dataset": "tiny-imagenet-200",
+  "images": 50,
+  "top1_accuracy": 0.62,
+  "top5_accuracy": 0.92,
+  "total_inference_time_s": 0.31,
+  "avg_inference_ms": 6.3,
+  "fps": 159.24
+}

@@ -1,4 +1,4 @@
-### Semantic Scene Analysis Benchmark
+# Semantic Scene Analysis Benchmark
 
 The goal of **semantic scene analysis** is to evaluate a vision-language model's ability to understand the overall meaning and structure of a visual scene, including objects, their attributes, relationships, activities, spatial organization, and the context in which they appear. Unlike **VQA**, which evaluates whether a model can answer a specific question about an image, semantic scene analysis requires a broader understanding of the entire scene and its underlying concepts. The model should be able to describe *what exists, how elements relate to each other, and what is happening in the environment*.
 

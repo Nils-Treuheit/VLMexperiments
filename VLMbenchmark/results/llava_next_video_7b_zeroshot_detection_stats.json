@@ -10,5 +10,8 @@
   "fps": 0.04,
   "total_gt": 140,
   "total_correct": 0,
-  "acc@50": 0.0
+  "acc@50": 0.0,
+  "acc@50_b3": 0.0,
+  "acc@50_avg": 0.0,
+  "passes": 1
 }

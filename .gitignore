@@ -7,9 +7,11 @@
 **/model_cache/
 **/blobs/
 **/*.pt
+**/*.ts
 
 *.mp4
 *.deb
+
 
 
 ### Python gitignore ###

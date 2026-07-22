@@ -3,12 +3,20 @@
   "model_key": "florence2",
   "task": "zeroshot_detection",
   "dataset": "coco",
-  "images": 28,
+  "images": 98,
+  "passes": 3,
   "skipped": 2,
-  "total_inference_time_s": 12.604,
-  "avg_inference_ms": 450.13,
-  "fps": 2.22,
-  "total_gt": 174,
-  "total_correct": 0,
-  "acc@50": 0.0
+  "total_inference_time_s": 141.463,
+  "avg_inference_ms": 184.2,
+  "fps": 5.43,
+  "total_gt": 658,
+  "total_correct": 456,
+  "acc@50": 0.693,
+  "acc@50_b3": 0.693,
+  "acc@50_avg": 0.6884,
+  "acc@50_pass": [
+    0.6884,
+    0.6884,
+    0.6884
+  ]
 }

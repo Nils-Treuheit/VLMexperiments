@@ -1,4 +1,4 @@
-### Object Counting Benchmark
+# Object Counting Benchmark
 
 The goal of **object counting** is to evaluate a vision-language model's ability to accurately count instances of objects specified by a natural-language prompt. Unlike **object detection**, which outputs object locations, object counting focuses on predicting the correct number of instances while often relying on detection or localization as an intermediate step. Modern VLMs can count objects by identifying each instance and, in some cases, tracking them across video frames.
 

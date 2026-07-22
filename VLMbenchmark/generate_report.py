@@ -329,8 +329,10 @@ make_chart(embedding_data, "embedding_dim", "Embedding Extraction — Output Dim
            "Embedding dim", "embedding_dim.png", higher_better=False)
 
 print("\n--- Zero-shot Detection ---")
-make_chart(zeroshot_detection_data, "acc@50", "Zero-Shot Detection — Acc@50",
-           "Acc@50", "zeroshot_detection_acc.png", fmt="{:.2%}")
+make_chart(zeroshot_detection_data, "acc@50_b3", "Zero-Shot Detection — B3 Acc@50",
+           "B3 Acc@50", "zeroshot_detection_b3_acc.png", fmt="{:.2%}")
+make_chart(zeroshot_detection_data, "acc@50_avg", "Zero-Shot Detection — AVG Acc@50",
+           "AVG Acc@50", "zeroshot_detection_avg_acc.png", fmt="{:.2%}")
 make_chart(zeroshot_detection_data, "fps", "Zero-Shot Detection — FPS",
            "FPS", "zeroshot_detection_fps.png")
 
@@ -863,16 +865,18 @@ if zeroshot_detection_data:
     report.append("")
     report.append("## 19. Zero-Shot Detection (COCO)")
     report.append("")
-    report.append("![Acc@50](charts/zeroshot_detection_acc.png)")
+    report.append("![B3 Acc@50](charts/zeroshot_detection_b3_acc.png)")
+    report.append("![AVG Acc@50](charts/zeroshot_detection_avg_acc.png)")
     report.append("![FPS](charts/zeroshot_detection_fps.png)")
     report.append("")
-    report.append("| Model | Acc@50 | FPS | Avg (ms) | Images |")
-    report.append("|-------|--------|-----|----------|--------|")
-    for mk, d in sorted(zeroshot_detection_data.items(), key=lambda x: x[1].get("acc@50", 0), reverse=True):
+    report.append("| Model | B3 Acc@50 | AVG Acc@50 | FPS | Avg (ms) | Images |")
+    report.append("|-------|-----------|------------|-----|----------|--------|")
+    for mk, d in sorted(zeroshot_detection_data.items(), key=lambda x: x[1].get("acc@50_b3", 0), reverse=True):
         if d.get("images", 0) < 5:
             continue
         report.append(
-            f"| {model_link(mk)} | {fmt_val(d, 'acc@50', fmt='{:.2%}')} | {fmt_val(d, 'fps')} | "
+            f"| {model_link(mk)} | {fmt_val(d, 'acc@50_b3', fmt='{:.2%}')} | "
+            f"{fmt_val(d, 'acc@50_avg', fmt='{:.2%}')} | {fmt_val(d, 'fps')} | "
             f"{fmt_val(d, 'avg_inference_ms', fmt='{:.1f}')} | {d.get('images', '—')} |"
         )
 

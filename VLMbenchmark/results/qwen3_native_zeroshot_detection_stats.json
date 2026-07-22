@@ -3,12 +3,20 @@
   "model_key": "qwen3_native",
   "task": "zeroshot_detection",
   "dataset": "coco",
-  "images": 28,
+  "images": 98,
+  "passes": 3,
   "skipped": 2,
-  "total_inference_time_s": 77.469,
-  "avg_inference_ms": 2766.74,
-  "fps": 0.36,
-  "total_gt": 174,
-  "total_correct": 7,
-  "acc@50": 0.0402
+  "total_inference_time_s": 1047.762,
+  "avg_inference_ms": 1364.27,
+  "fps": 0.73,
+  "total_gt": 658,
+  "total_correct": 51,
+  "acc@50": 0.0775,
+  "acc@50_b3": 0.0775,
+  "acc@50_avg": 0.0775,
+  "acc@50_pass": [
+    0.0775,
+    0.0775,
+    0.0775
+  ]
 }

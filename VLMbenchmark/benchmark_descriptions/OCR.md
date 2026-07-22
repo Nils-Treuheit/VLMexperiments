@@ -1,4 +1,4 @@
-### Text Retrieval from Images (OCR) Benchmark
+# Text Retrieval from Images (OCR) Benchmark
 
 The goal of **text retrieval from images (OCR)** is to evaluate a vision-language model's ability to detect, recognize, and understand textual information embedded within visual content. Unlike **image understanding**, which focuses on interpreting objects, scenes, and visual concepts, OCR requires models to extract **fine-grained textual details** from images, including printed text, handwritten text, scene text, and structured documents.
 

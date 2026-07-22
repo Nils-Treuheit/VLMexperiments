@@ -3,12 +3,20 @@
   "model_key": "paligemma",
   "task": "zeroshot_detection",
   "dataset": "coco",
-  "images": 28,
+  "images": 98,
+  "passes": 3,
   "skipped": 2,
-  "total_inference_time_s": 10.461,
-  "avg_inference_ms": 373.61,
-  "fps": 2.68,
-  "total_gt": 174,
-  "total_correct": 0,
-  "acc@50": 0.0
+  "total_inference_time_s": 107.717,
+  "avg_inference_ms": 140.26,
+  "fps": 7.13,
+  "total_gt": 658,
+  "total_correct": 219,
+  "acc@50": 0.3328,
+  "acc@50_b3": 0.3328,
+  "acc@50_avg": 0.3313,
+  "acc@50_pass": [
+    0.3313,
+    0.3313,
+    0.3313
+  ]
 }

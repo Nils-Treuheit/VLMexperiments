@@ -1,4 +1,4 @@
-### Document Visual Question Answering (DocVQA) Benchmark
+# Document Visual Question Answering (DocVQA) Benchmark
 
 The goal of **Document Visual Question Answering (DocVQA)** is to evaluate a vision-language model's ability to answer natural-language questions about document images. Unlike **document understanding**, which focuses on interpreting the overall content and structure of a document, DocVQA requires the model to retrieve and reason over the specific information needed to answer a given question. Depending on the task, this information may come from text, tables, charts, forms, or infographics.
 

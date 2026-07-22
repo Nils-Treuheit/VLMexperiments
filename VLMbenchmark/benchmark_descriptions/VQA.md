@@ -1,4 +1,4 @@
-### Visual Question Answering (VQA) Benchmark
+# Visual Question Answering (VQA) Benchmark
 
 The goal of **Visual Question Answering (VQA)** is to evaluate a vision-language model's ability to answer natural-language questions about an image. Unlike **image captioning**, which generates a general description of an image, VQA requires the model to interpret both the image and the accompanying question, focusing only on the information relevant to the query. Questions may involve object recognition, counting, localization, comparison, or commonsense reasoning.
 

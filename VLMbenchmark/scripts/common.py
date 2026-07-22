@@ -103,6 +103,41 @@ def extract_narrative_boxes(text):
     return boxes
 
 
+def parse_loc_tokens(text):
+    """Parse PaliGemma-style <locXXXX> tokens — groups of 4 as y1,x1,y2,x2, range 0-1023."""
+    locs = [int(x) for x in re.findall(r'<loc(\d{4})>', text)]
+    boxes = []
+    for i in range(0, len(locs), 4):
+        if i + 3 < len(locs):
+            y1, x1, y2, x2 = locs[i], locs[i+1], locs[i+2], locs[i+3]
+            boxes.append([x1, y1, x2, y2])
+    return boxes
+
+
+def auto_scale_boxes(boxes, ow, oh):
+    """Detect coordinate range and scale to pixel coords [x1,y1,x2,y2]."""
+    if not boxes:
+        return boxes
+    all_vals = [v for b in boxes for v in b]
+    mx = max(all_vals)
+    if mx <= 1.0:
+        return [[x * ow, y * oh, x2 * ow, y2 * oh] for x, y, x2, y2 in boxes]
+    if 900 <= mx <= 1100:
+        max_dim = max(ow, oh)
+        if mx <= max_dim:
+            return boxes
+        if mx <= 1024:
+            return [[x1 / 1024 * ow, y1 / 1024 * oh, x2 / 1024 * ow, y2 / 1024 * oh]
+                    for x1, y1, x2, y2 in boxes]
+        return [[x1 / mx * ow, y1 / mx * oh, x2 / mx * ow, y2 / mx * oh]
+                for x1, y1, x2, y2 in boxes]
+    if mx > max(ow, oh):
+        s = max(ow, oh) / mx
+        return [[x1 * s, y1 * s, x2 * s, y2 * s] for x1, y1, x2, y2 in boxes]
+    return boxes
+
+
+# Keep legacy scale functions for backwards compat
 def scale_la(boxes, ow, oh):
     return [[x1 / 1000 * ow, y1 / 1000 * oh, x2 / 1000 * ow, y2 / 1000 * oh]
             for x1, y1, x2, y2 in boxes]
@@ -114,9 +149,9 @@ def scale_qwen(boxes, ow, oh):
         mx = max(x1, y1, x2, y2)
         if mx <= 1.0:
             x1 *= ow; y1 *= oh; x2 *= ow; y2 *= oh
-        elif mx > max(ow, oh):
-            s = max(ow, oh) / mx
-            x1 *= s; y1 *= s; x2 *= s; y2 *= s
+        elif mx > max(ow, oh) and mx <= 1024:
+            x1 = x1 / 999.0 * ow; y1 = y1 / 999.0 * oh
+            x2 = x2 / 999.0 * ow; y2 = y2 / 999.0 * oh
         out.append([x1, y1, x2, y2])
     return out
 
@@ -330,30 +365,154 @@ def load_qwen3():
 def load_qwen3_thinking():
     sys.path.insert(0, str(PROJECT_DIR / "qwen3-vl_thinking"))
     from qwen_detector import QwenVLDetector
-    return QwenVLDetector(max_seq_length=2048), {}
+    return QwenVLDetector(), {}
+
+
+def load_phi4_multimodal():
+    sys.path.insert(0, str(PROJECT_DIR / "phi-4_multimodal"))
+    from model_loader import load_model as _load_phi4
+    model, processor = _load_phi4()
+    return (model, processor), {}
 
 
 def load_yolo26(model_name="yolo26n"):
-    sys.path.insert(0, str(PROJECT_DIR / "yolo11-26"))
+    sys.path.insert(0, str(PROJECT_DIR / "YOLO"))
     from ultralytics import YOLO
     # Prefer local pre-downloaded weights; fall back to ultralytics built-in
-    models_dir = PROJECT_DIR / "yolo11-26" / "models"
+    models_dir = PROJECT_DIR / "YOLO" / "models"
     local = models_dir / f"{model_name}.pt"
     if local.exists():
         return YOLO(str(local)), {}
     return YOLO(model_name), {}
 
 
+def load_yolo_world(model_name="yolov8x-worldv2"):
+    sys.path.insert(0, str(PROJECT_DIR / "YOLO"))
+    from ultralytics import YOLO
+    models_dir = PROJECT_DIR / "YOLO" / "models"
+    local = models_dir / f"{model_name}.pt"
+    if local.exists():
+        model = YOLO(str(local))
+    else:
+        model = YOLO(model_name)
+    model.to("cuda")
+    all_names = list(COCO_CAT_NAME_TO_ID.keys())
+    model.set_classes(all_names)
+    model._yolo_world_all_names = all_names
+    return model, {}
+
+
+def load_yoloe(model_name="yoloe-v8l-seg"):
+    sys.path.insert(0, str(PROJECT_DIR / "YOLO"))
+    from ultralytics import YOLO
+    models_dir = PROJECT_DIR / "YOLO" / "models"
+    local = models_dir / f"{model_name}.pt"
+    if local.exists():
+        model = YOLO(str(local))
+    else:
+        model = YOLO(model_name)
+    model.to("cuda")
+    all_names = list(COCO_CAT_NAME_TO_ID.keys())
+    model.set_classes(all_names)
+    model._yolo_world_all_names = all_names
+    return model, {}
+
+
 def load_florence2():
-    sys.path.insert(0, str(PROJECT_DIR / "florence-2"))
+    _patch_florence_model_class()
     from transformers import AutoModelForCausalLM, AutoProcessor
     dev = "cuda" if torch.cuda.is_available() else "cpu"
     model = AutoModelForCausalLM.from_pretrained(
         "microsoft/Florence-2-large-ft", torch_dtype=torch.float16,
-        device_map=dev, trust_remote_code=True, attn_implementation="sdpa",
+        device_map=dev, trust_remote_code=True,
     )
     processor = AutoProcessor.from_pretrained("microsoft/Florence-2-large-ft", trust_remote_code=True)
     return (model, processor), {}
+
+
+def _patch_florence_model_class():
+    """Monkey-patch Florence-2 custom modeling to work with transformers >=4.57."""
+    from transformers.dynamic_module_utils import get_class_from_dynamic_module
+
+    def _get_cls(ref):
+        return get_class_from_dynamic_module(ref, "microsoft/Florence-2-large-ft")
+
+    try:
+        cls_main = _get_cls("modeling_florence2.Florence2ForConditionalGeneration")
+        cls_main._supports_sdpa = True
+
+        # Fix outer generate(): the original passes **kwargs (including original
+        # attention_mask) to language_model.generate(), but the correct merged
+        # attention_mask must be substituted.
+        _orig_gen = cls_main.generate
+
+        def _patched_gen(self, input_ids=None, inputs_embeds=None, pixel_values=None,
+                         **kwargs):
+            if inputs_embeds is None:
+                if input_ids is not None:
+                    inputs_embeds = self.get_input_embeddings()(input_ids)
+                if pixel_values is not None:
+                    image_features = self._encode_image(pixel_values)
+                    merged_embeds, merged_attn = \
+                        self._merge_input_ids_with_image_features(
+                            image_features, inputs_embeds
+                        )
+                    inputs_embeds = merged_embeds
+                    kwargs["attention_mask"] = merged_attn
+            kwargs.pop("pixel_values", None)
+            kwargs.pop("input_ids", None)
+            return self.language_model.generate(
+                input_ids=None, inputs_embeds=inputs_embeds, **kwargs,
+            )
+
+        cls_main.generate = _patched_gen
+
+        # Fix decoder forward: handle past_key_values that is (None,) instead of None
+        cls_dec = _get_cls("modeling_florence2.Florence2Decoder")
+        _orig_dec_fwd = cls_dec.forward
+
+        def _patched_dec_fwd(self, *args, **kw):
+            pkv = kw.get("past_key_values")
+            if pkv is not None:
+                try:
+                    _ = pkv[0][0].shape[2]
+                except (AttributeError, TypeError, IndexError):
+                    kw["past_key_values"] = None
+            return _orig_dec_fwd(self, *args, **kw)
+
+        cls_dec.forward = _patched_dec_fwd
+
+        # Fix language_model forward: ensure past_key_values is sanitized
+        cls_lm = _get_cls(
+            "modeling_florence2.Florence2LanguageForConditionalGeneration"
+        )
+        _orig_lm_prep = cls_lm.prepare_inputs_for_generation
+
+        def _patched_lm_prep(self, decoder_input_ids, past_key_values=None, **kw):
+            if past_key_values is not None:
+                try:
+                    return _orig_lm_prep(
+                        self, decoder_input_ids, past_key_values=past_key_values,
+                        **kw,
+                    )
+                except (AttributeError, TypeError, IndexError):
+                    pass
+            return {
+                "input_ids": None,
+                "encoder_outputs": kw.get("encoder_outputs"),
+                "past_key_values": None,
+                "decoder_input_ids": decoder_input_ids,
+                "attention_mask": kw.get("attention_mask"),
+                "decoder_attention_mask": kw.get("decoder_attention_mask"),
+                "head_mask": kw.get("head_mask"),
+                "decoder_head_mask": kw.get("decoder_head_mask"),
+                "cross_attn_head_mask": kw.get("cross_attn_head_mask"),
+                "use_cache": kw.get("use_cache"),
+            }
+
+        cls_lm.prepare_inputs_for_generation = _patched_lm_prep
+    except Exception as e:
+        print(f"  [warn] Florence-2 patch failed: {e}")
 
 
 def load_paligemma():
@@ -389,8 +548,8 @@ def load_phi_vision():
 
 
 def load_cosmos_nemotron():
-    from transformers import AutoModelForMultimodalLM, AutoProcessor
-    model = AutoModelForMultimodalLM.from_pretrained(
+    from transformers import AutoModelForVision2Seq, AutoProcessor
+    model = AutoModelForVision2Seq.from_pretrained(
         "nvidia/Cosmos-Reason1-7B", torch_dtype=torch.bfloat16,
         device_map="auto", attn_implementation="sdpa",
     )
@@ -493,6 +652,16 @@ MODEL_LOADERS = {
     # YOLO11 OBB
     "yolo11_obb": lambda: load_yolo26("yolo11n-obb"),
     "yolo11s_obb": lambda: load_yolo26("yolo11s-obb"),
+    # YOLO-World zero-shot detection
+    "yolo_world": lambda: load_yolo_world("yolov8x-worldv2"),
+    "yolo_worlds": lambda: load_yolo_world("yolov8s-worldv2"),
+    "yolo_worldm": lambda: load_yolo_world("yolov8m-worldv2"),
+    "yolo_worldl": lambda: load_yolo_world("yolov8l-worldv2"),
+    # YOLOE zero-shot detection
+    "yoloe": lambda: load_yoloe("yoloe-v8l-seg"),
+    "yoloe_11l": lambda: load_yoloe("yoloe-11l-seg"),
+    "yoloe_26m": lambda: load_yoloe("yoloe-26m-seg"),
+    "yoloe_26n": lambda: load_yoloe("yoloe-26n-seg"),
     # LLaVA models
     "llava_v16_mistral": load_llava_v16_mistral,
     "llava_onevision": load_llava_onevision,
@@ -505,6 +674,7 @@ MODEL_LOADERS = {
     "llama_vision": load_llama_vision,
     "phi_vision": load_phi_vision,
     "cosmos_nemotron": load_cosmos_nemotron,
+    "phi4_multimodal": load_phi4_multimodal,
     # DiffusionGemma (YOLO feeder + text-only diffusion model)
     "diffusion_gemma": load_diffusion_gemma,
     "diffusion_gemma_yolo": load_diffusion_gemma_yolo,
@@ -533,6 +703,9 @@ MODEL_ALIASES = {
     "ultralytics": "yolo26",
     "yolo_pose": "yolo26_pose",
     "yolo_obb": "yolo26_obb",
+    "yolo_world": "yolo_world",
+    "world": "yolo_world",
+    "yoloe": "yoloe",
     "f2": "florence2",
     "florence": "florence2",
     "pg": "paligemma",
@@ -590,10 +763,19 @@ MODEL_DISPLAY = {
     "yolo11s_pose": "YOLO11s (Pose)",
     "yolo11_obb": "YOLO11n (OBB)",
     "yolo11s_obb": "YOLO11s (OBB)",
+    "yolo_world": "YOLO-Worldv2-x",
+    "yolo_worlds": "YOLO-Worldv2-s",
+    "yolo_worldm": "YOLO-Worldv2-m",
+    "yolo_worldl": "YOLO-Worldv2-l",
+    "yoloe": "YOLOE-v8l",
+    "yoloe_11l": "YOLOE-11l",
+    "yoloe_26m": "YOLOE-26m",
+    "yoloe_26n": "YOLOE-26n",
     "florence2": "Florence-2-large-ft",
     "paligemma": "PaliGemma2-3B-mix",
     "llama_vision": "Llama-3.2-11B-Vision",
     "phi_vision": "Phi-3.5-Vision-4.2B",
+    "phi4_multimodal": "Phi-4-Multimodal-14B",
     "cosmos_nemotron": "Cosmos-Reason1-7B",
     # LLaVA models
     "llava_v16_mistral": "LLaVA-v1.6-Mistral-7B",
@@ -729,10 +911,23 @@ TASK_ROWS = {
     "zeroshot_detection": [
         ("fps", "FPS", "{:.2f}"),
         ("avg_inference_ms", "Avg inference (ms)", "{:.1f}"),
-        ("acc@50", "Acc@50", "{:.4f}"),
+        ("acc@50_b3", "B3 Acc@50", "{:.4f}"),
+        ("acc@50_avg", "AVG Acc@50", "{:.4f}"),
         ("images", "Images processed", "{}"),
         ("total_gt", "Total GT objects", "{}"),
-        ("total_correct", "Correct@IoU50", "{}"),
+        ("total_correct", "Correct@IoU50 (B3)", "{}"),
+    ],
+    "veq": [
+        ("fps", "FPS", "{:.2f}"),
+        ("avg_inference_ms", "Avg inference (ms)", "{:.1f}"),
+        ("embedding_dim", "Embedding dim", "{}"),
+        ("retrieval_mAP", "Retrieval mAP", "{:.4f}"),
+        ("retrieval_Recall@1", "Recall@1", "{:.4f}"),
+        ("retrieval_Recall@5", "Recall@5", "{:.4f}"),
+        ("retrieval_Recall@10", "Recall@10", "{:.4f}"),
+        ("clustering_NMI", "Clustering NMI", "{:.4f}"),
+        ("clustering_ARI", "Clustering ARI", "{:.4f}"),
+        ("images", "Images", "{}"),
     ],
 }
 

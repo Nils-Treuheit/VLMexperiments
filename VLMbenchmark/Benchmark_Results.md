@@ -1,6 +1,6 @@
 # Benchmark Results
 
-**Generated:** 2026-07-20 21:14
+**Generated:** 2026-07-21 10:03
 
 **Hardware:** NVIDIA GeForce RTX 5090 (32 GB VRAM)
 
@@ -348,22 +348,23 @@ embedding extraction, and zero-shot detection.
 
 ## 19. Zero-Shot Detection (COCO)
 
-![Acc@50](charts/zeroshot_detection_acc.png)
+![B3 Acc@50](charts/zeroshot_detection_b3_acc.png)
+![AVG Acc@50](charts/zeroshot_detection_avg_acc.png)
 ![FPS](charts/zeroshot_detection_fps.png)
 
-| Model | Acc@50 | FPS | Avg (ms) | Images |
-|-------|--------|-----|----------|--------|
-| Cosmos-Reason1-7B | 24.71% | 0.53 | 1899.7 | 28 |
-| Qwen3-VL-8B-Instruct | 4.02% | 0.36 | 2766.7 | 28 |
-| Qwen3-VL-8B-Thinking | 0.57% | 0.05 | 21437.1 | 28 |
-| Florence-2-large-ft | 0.00% | 2.22 | 450.1 | 28 |
-| Llama-3.2-11B-Vision | 0.00% | 0.23 | 4337.2 | 28 |
-| llava_next_video_7b | 0.00% | 0.04 | 26289.5 | 24 |
-| llava_onevision | 0.00% | 0.04 | 26091.9 | 28 |
-| llava_v16_mistral | 0.00% | 0.04 | 28070.6 | 28 |
-| PaliGemma2-3B-mix | 0.00% | 2.68 | 373.6 | 28 |
-| phi3_vision | 0.00% | 0.05 | 20889.9 | 28 |
-| Phi-3.5-Vision-4B | 0.00% | 0.04 | 23357.0 | 28 |
+| Model | B3 Acc@50 | AVG Acc@50 | FPS | Avg (ms) | Images |
+|-------|-----------|------------|-----|----------|--------|
+| Cosmos-Reason1-7B | 25.86% | 24.14% | 0.18 | 1814.1 | 28 |
+| Qwen3-VL-8B-Instruct | 4.02% | 4.02% | 0.12 | 2708.4 | 28 |
+| Qwen3-VL-8B-Thinking | 0.57% | 0.57% | 0.05 | 21437.1 | 28 |
+| Florence-2-large-ft | 0.00% | 0.00% | 1.91 | 174.5 | 28 |
+| Llama-3.2-11B-Vision | 0.00% | 0.00% | 0.08 | 4205.1 | 28 |
+| llava_next_video_7b | 0.00% | 0.00% | 0.04 | 26289.5 | 24 |
+| llava_onevision | 0.00% | 0.00% | 0.04 | 26091.9 | 28 |
+| llava_v16_mistral | 0.00% | 0.00% | 0.04 | 28070.6 | 28 |
+| PaliGemma2-3B-mix | 0.00% | 0.00% | 1.25 | 266.1 | 28 |
+| phi3_vision | 0.00% | 0.00% | 0.05 | 20889.9 | 28 |
+| Phi-3.5-Vision-4B | 0.00% | 0.00% | 0.04 | 23357.0 | 28 |
 
 ## 20. Speed vs Quality Overview
 

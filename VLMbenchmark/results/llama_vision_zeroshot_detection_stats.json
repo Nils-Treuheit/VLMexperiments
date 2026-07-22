@@ -4,11 +4,19 @@
   "task": "zeroshot_detection",
   "dataset": "coco",
   "images": 28,
+  "passes": 3,
   "skipped": 2,
-  "total_inference_time_s": 121.44,
-  "avg_inference_ms": 4337.16,
-  "fps": 0.23,
+  "total_inference_time_s": 353.228,
+  "avg_inference_ms": 4205.09,
+  "fps": 0.08,
   "total_gt": 174,
   "total_correct": 0,
-  "acc@50": 0.0
+  "acc@50": 0.0,
+  "acc@50_b3": 0.0,
+  "acc@50_avg": 0.0,
+  "acc@50_pass": [
+    0.0,
+    0.0,
+    0.0
+  ]
 }

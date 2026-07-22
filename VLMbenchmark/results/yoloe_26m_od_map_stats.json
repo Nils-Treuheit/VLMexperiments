@@ -1,0 +1,15 @@
+{
+  "model": "YOLOE-26m",
+  "model_key": "yoloe_26m",
+  "task": "object_detection",
+  "dataset": "coco",
+  "images": 100,
+  "skipped": 0,
+  "total_inference_time_s": 1.47,
+  "avg_inference_ms": 14.7,
+  "fps": 68.03,
+  "total_gt": 714,
+  "total_detected": 611,
+  "mAP@50": 0.5881,
+  "mAP@50:95": 0.4422
+}

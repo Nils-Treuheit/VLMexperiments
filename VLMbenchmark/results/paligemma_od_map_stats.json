@@ -1,0 +1,15 @@
+{
+  "model": "PaliGemma2-3B-mix",
+  "model_key": "paligemma",
+  "task": "object_detection",
+  "dataset": "coco",
+  "images": 100,
+  "skipped": 0,
+  "total_inference_time_s": 39.908,
+  "avg_inference_ms": 138.57,
+  "fps": 7.22,
+  "total_gt": 714,
+  "total_detected": 365,
+  "mAP@50": 0.4575,
+  "mAP@50:95": 0.3183
+}

@@ -1,4 +1,4 @@
-### Action Recognition in Videos Benchmark
+# Action Recognition in Videos Benchmark
 
 The goal of **action recognition in videos** is to evaluate a vision-language model's ability to identify and classify human actions or activities from video sequences. Unlike static image understanding tasks, action recognition requires the model to understand **temporal dynamics**, including movement, object interactions, and the progression of events across multiple frames.
 

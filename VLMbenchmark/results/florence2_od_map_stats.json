@@ -1,0 +1,15 @@
+{
+  "model": "Florence-2-large-ft",
+  "model_key": "florence2",
+  "task": "object_detection",
+  "dataset": "coco",
+  "images": 100,
+  "skipped": 0,
+  "total_inference_time_s": 54.792,
+  "avg_inference_ms": 190.25,
+  "fps": 5.26,
+  "total_gt": 714,
+  "total_detected": 584,
+  "mAP@50": 0.7057,
+  "mAP@50:95": 0.5323
+}

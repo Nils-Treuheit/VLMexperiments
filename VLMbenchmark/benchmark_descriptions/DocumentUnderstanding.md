@@ -1,4 +1,4 @@
-### Document Understanding Benchmark
+# Document Understanding Benchmark
 
 The goal of **document understanding** is to evaluate a vision-language model's ability to extract, interpret, and reason over information contained in documents. Unlike **visual language retrieval**, which identifies the most relevant document, document understanding focuses on interpreting the retrieved document's content, including text, tables, charts, diagrams, forms, and layout.
 

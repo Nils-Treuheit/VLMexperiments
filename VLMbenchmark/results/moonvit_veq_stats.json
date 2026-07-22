@@ -1,0 +1,17 @@
+{
+  "model": "moonvit",
+  "model_key": "moonvit",
+  "task": "veq",
+  "dataset": "coco",
+  "images": 200,
+  "embedding_dim": 1152,
+  "total_inference_time_s": 12.144,
+  "avg_inference_ms": 60.72,
+  "fps": 16.47,
+  "retrieval_Recall@1": 0.48,
+  "retrieval_Recall@5": 0.705,
+  "retrieval_Recall@10": 0.775,
+  "retrieval_mAP": 0.3386,
+  "clustering_NMI": 0.5943,
+  "clustering_ARI": 0.0572
+}

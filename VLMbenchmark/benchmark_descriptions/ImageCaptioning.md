@@ -1,4 +1,4 @@
-### Image Captioning Benchmark
+# Image Captioning Benchmark
 
 When evaluating **image captioning**, the goal is to measure a vision-language model's ability to generate a coherent and accurate natural-language description of an image. Unlike **Visual Question Answering (VQA)**, where the model answers a user-specified question about an image, image captioning requires the model to independently identify the most relevant objects, attributes, actions, and relationships and summarize them in a descriptive caption.
 

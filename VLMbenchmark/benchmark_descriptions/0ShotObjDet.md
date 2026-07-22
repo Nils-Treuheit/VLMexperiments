@@ -1,4 +1,4 @@
-### Zero-Shot Object Detection Benchmark
+# Zero-Shot Object Detection Benchmark
 
 The goal of **zero-shot object detection** is to evaluate a vision-language model's ability to detect and localize objects specified by **natural-language prompts** without task-specific training. Unlike traditional object detectors, which are trained on a fixed set of object classes, zero-shot detectors support **open-vocabulary detection**, enabling them to recognize previously unseen object categories through text descriptions.
 

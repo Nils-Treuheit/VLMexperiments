@@ -1,0 +1,15 @@
+{
+  "model": "Cosmos-Reason1-7B",
+  "model_key": "cosmos_nemotron",
+  "task": "object_detection",
+  "dataset": "coco",
+  "images": 100,
+  "skipped": 0,
+  "total_inference_time_s": 292.48,
+  "avg_inference_ms": 1015.55,
+  "fps": 0.98,
+  "total_gt": 714,
+  "total_detected": 431,
+  "mAP@50": 0.3482,
+  "mAP@50:95": 0.198
+}

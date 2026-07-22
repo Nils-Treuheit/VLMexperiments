@@ -1,4 +1,4 @@
-### Visual Language Retrieval Benchmark
+# Visual Language Retrieval Benchmark
 
 The goal of **visual language retrieval** is to evaluate a vision-language model's ability to retrieve the most relevant images, documents, or text passages for a given query. Unlike **image captioning**, **VQA**, or **visual reasoning**, retrieval does not generate new content. Instead, it ranks existing items by semantic similarity within a shared image-text embedding space.
 

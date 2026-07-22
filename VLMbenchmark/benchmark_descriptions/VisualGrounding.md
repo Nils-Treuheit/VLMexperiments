@@ -1,4 +1,4 @@
-### Visual Grounding Benchmark
+# Visual Grounding Benchmark
 
 The goal of **visual grounding** is to evaluate a vision-language model's ability to connect natural-language expressions with their corresponding regions in an image. Unlike **image captioning** or **VQA**, which mainly produce text outputs, visual grounding requires the model to **locate the visual referent of a phrase** by predicting spatial coordinates, bounding boxes, or regions.
 

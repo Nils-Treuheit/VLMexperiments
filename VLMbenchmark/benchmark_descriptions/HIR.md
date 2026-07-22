@@ -1,4 +1,4 @@
-### Human Intention Recognition Benchmark
+# Human Intention Recognition Benchmark
 
 The goal of **human intention recognition** is to evaluate a vision-language model's ability to infer a person's goals, plans, or likely next actions from visual observations. Unlike **object detection**, **visual grounding**, or **VQA**, which focus on identifying visible entities and answering explicit questions, intention recognition requires the model to interpret **implicit human behavior**, including body language, interactions, context, and environmental cues.
 

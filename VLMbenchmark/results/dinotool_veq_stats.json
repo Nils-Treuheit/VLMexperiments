@@ -1,0 +1,17 @@
+{
+  "model": "dinotool",
+  "model_key": "dinotool",
+  "task": "veq",
+  "dataset": "coco",
+  "images": 200,
+  "embedding_dim": 384,
+  "total_inference_time_s": 3.211,
+  "avg_inference_ms": 16.05,
+  "fps": 62.29,
+  "retrieval_Recall@1": 0.465,
+  "retrieval_Recall@5": 0.74,
+  "retrieval_Recall@10": 0.81,
+  "retrieval_mAP": 0.3472,
+  "clustering_NMI": 0.6132,
+  "clustering_ARI": 0.0604
+}

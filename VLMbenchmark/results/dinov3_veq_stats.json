@@ -1,0 +1,17 @@
+{
+  "model": "dinov3",
+  "model_key": "dinov3",
+  "task": "veq",
+  "dataset": "coco",
+  "images": 200,
+  "embedding_dim": 384,
+  "total_inference_time_s": 6.719,
+  "avg_inference_ms": 33.59,
+  "fps": 29.77,
+  "retrieval_Recall@1": 0.49,
+  "retrieval_Recall@5": 0.75,
+  "retrieval_Recall@10": 0.78,
+  "retrieval_mAP": 0.3329,
+  "clustering_NMI": 0.6145,
+  "clustering_ARI": 0.0622
+}

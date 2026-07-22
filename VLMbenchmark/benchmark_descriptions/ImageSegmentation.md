@@ -1,4 +1,4 @@
-### Image Segmentation Benchmark
+# Image Segmentation Benchmark
 
 The goal of **image segmentation** is to evaluate a vision-language model's ability to identify and precisely outline objects or regions in an image based on natural-language prompts. Unlike **object detection**, which predicts bounding boxes, segmentation requires the model to generate detailed pixel-level masks describing the exact shape and boundaries of the target object.
 

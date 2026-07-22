@@ -1,0 +1,22 @@
+{
+  "model": "YOLO-Worldv2-x",
+  "model_key": "yolo_world",
+  "task": "zeroshot_detection",
+  "dataset": "coco",
+  "images": 98,
+  "passes": 3,
+  "skipped": 2,
+  "total_inference_time_s": 1.679,
+  "avg_inference_ms": 2.19,
+  "fps": 457.52,
+  "total_gt": 658,
+  "total_correct": 445,
+  "acc@50": 0.6763,
+  "acc@50_b3": 0.6763,
+  "acc@50_avg": 0.6733,
+  "acc@50_pass": [
+    0.6733,
+    0.6733,
+    0.6733
+  ]
+}

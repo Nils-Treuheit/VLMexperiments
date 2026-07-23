@@ -1,0 +1,15 @@
+{
+  "model": "Phi-3.5-Vision-4.2B",
+  "model_key": "phi_vision",
+  "task": "object_detection",
+  "dataset": "coco",
+  "images": 5,
+  "skipped": 0,
+  "total_inference_time_s": 96.726,
+  "avg_inference_ms": 4836.29,
+  "fps": 0.21,
+  "total_gt": 47,
+  "total_detected": 17,
+  "mAP@50": 0.0,
+  "mAP@50:95": 0.0
+}

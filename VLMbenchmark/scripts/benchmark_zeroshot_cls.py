@@ -7,11 +7,15 @@ Supports both vision-encoder models (via text-image similarity) and VLMs
 
 import argparse
 import json
+import re
 import subprocess
 import sys
 import time
 import warnings
 from pathlib import Path
+
+import numpy as np
+import torch
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from common import BASE_DIR, RESULTS_DIR, PROJECT_DIR, save_stats, print_comparison
@@ -225,8 +229,33 @@ print(json.dumps({'results': results, 'total_time': round(sum(times), 3)}))
     return script
 
 
+EMBEDDINGS_FILE = RESULTS_DIR / "tiny_imagenet_label_embeddings.npz"
+
+
+def load_label_embeddings():
+    """Load pre-computed Tiny ImageNet label embeddings (MiniLM-L6-v2)."""
+    data = np.load(str(EMBEDDINGS_FILE), allow_pickle=True)
+    return list(data["labels"]), data["embeddings"]  # labels list, (200, 384) array
+
+
+def embed_texts(texts, tokenizer, model, device, batch_size=32):
+    """Embed a list of texts using MiniLM-L6-v2."""
+    all_embs = []
+    for i in range(0, len(texts), batch_size):
+        batch = texts[i:i+batch_size]
+        inputs = tokenizer(batch, padding=True, truncation=True,
+                           max_length=128, return_tensors="pt").to(device)
+        with torch.no_grad():
+            outputs = model(**inputs)
+        mask = inputs["attention_mask"].unsqueeze(-1)
+        emb = (outputs.last_hidden_state * mask).sum(dim=1) / mask.sum(dim=1)
+        emb = torch.nn.functional.normalize(emb, dim=-1)
+        all_embs.append(emb)
+    return torch.cat(all_embs, dim=0)
+
+
 def run_vlm_classification(model_key, all_labels, gt_map, max_images=50):
-    """Run classification for VLM models using their native interface."""
+    """Run classification for VLM models: VLM describes image → MiniLM embeds → cosine match."""
     from common import MODEL_LOADERS, MODEL_ALIASES
 
     mn = MODEL_ALIASES.get(model_key, model_key)
@@ -251,17 +280,32 @@ def run_vlm_classification(model_key, all_labels, gt_map, max_images=50):
     elif is_p4:
         model, processor = loader()[0]
     elif is_llava:
-        return None  # LLaVA models need subprocess - skip for now
+        return None
     else:
         model, processor = loader()[0]
 
     import torch
     from PIL import Image
 
+    # Load pre-computed label embeddings
+    label_names, label_embs_np = load_label_embeddings()
+    label_embs = torch.tensor(label_embs_np).to(model.device)
+
+    # Load MiniLM text encoder for embedding VLM descriptions
+    print("  Loading MiniLM text encoder for semantic matching...")
+    from transformers import AutoModel as _AM, AutoTokenizer as _AT
+    mm_tokenizer = _AT.from_pretrained("sentence-transformers/all-MiniLM-L6-v2")
+    mm_model = _AM.from_pretrained("sentence-transformers/all-MiniLM-L6-v2").to(model.device).eval()
+
     val_dir = TINY_IMAGENET_DIR / "val" / "images"
     all_files = sorted([p.name for p in val_dir.glob("*.JPEG")])
     if max_images:
         all_files = all_files[:max_images]
+
+    cls_prompt = (
+        "Identify the specific species, breed, or type of object shown. "
+        "Be as specific as possible. Reply with just the name."
+    )
 
     results = []
     times = []
@@ -269,11 +313,6 @@ def run_vlm_classification(model_key, all_labels, gt_map, max_images=50):
     for fname in all_files:
         img_path = val_dir / fname
         gt_label = gt_map.get(fname, "")
-        prompt = (
-            f"Classify this image into one of the following categories. "
-            f"Reply with ONLY the category name, nothing else.\n\n"
-            f"Categories: {', '.join(all_labels)}"
-        )
 
         t0 = time.time()
         try:
@@ -283,7 +322,7 @@ def run_vlm_classification(model_key, all_labels, gt_map, max_images=50):
             elif is_q3:
                 messages = [{"role": "user", "content": [
                     {"type": "image", "image": image},
-                    {"type": "text", "text": prompt}
+                    {"type": "text", "text": cls_prompt}
                 ]}]
                 chat = processor.apply_chat_template(
                     messages, tokenize=False, add_generation_prompt=True,
@@ -301,28 +340,34 @@ def run_vlm_classification(model_key, all_labels, gt_map, max_images=50):
                     skip_special_tokens=True
                 ).strip()
             elif is_p4:
-                f4_prompt = f"<|user|><|image_1|>{prompt}<|end|><|assistant|>"
+                image = image.resize((224, 224), Image.BICUBIC)
+                multi_prompt = (
+                    "What are 5 possible things this image could show? "
+                    "List them separated by commas, most likely first."
+                )
+                f4_prompt = f"<|user|><|image_1|>{multi_prompt}<|end|><|assistant|>"
                 inputs = processor(text=f4_prompt, images=image,
                                    return_tensors="pt").to(model.device)
                 with torch.no_grad():
-                    out = model.generate(**inputs, max_new_tokens=32,
-                                         do_sample=False)
-                text = processor.decode(
+                    out = model.generate(**inputs, max_new_tokens=64,
+                                         do_sample=False, num_logits_to_keep=1)
+                text = processor.tokenizer.decode(
                     out[0][inputs["input_ids"].shape[1]:],
                     skip_special_tokens=True
                 ).strip()
             elif is_f2:
-                inputs = processor(text="<OD>", images=image,
+                f2_prompt = f"<CAPTION>{cls_prompt}</CAPTION>"
+                inputs = processor(text=f2_prompt, images=image,
                                    return_tensors="pt")
                 inputs = {k: v.to(model.device) if hasattr(v, 'to') else v
                           for k, v in inputs.items()}
                 with torch.no_grad():
                     out = model.generate(input_ids=inputs["input_ids"],
                                          pixel_values=inputs["pixel_values"],
-                                         max_new_tokens=256, num_beams=1)
+                                         max_new_tokens=32, num_beams=1)
                 text = processor.batch_decode(out, skip_special_tokens=True)[0]
             elif is_pg:
-                pg_prompt = f"Classify: {', '.join(all_labels)}. This is a photo of"
+                pg_prompt = f"<image>Describe this image in one word:"
                 inputs = processor(image, pg_prompt, return_tensors="pt").to(model.device)
                 with torch.no_grad():
                     out = model.generate(**inputs, max_new_tokens=16)
@@ -330,7 +375,7 @@ def run_vlm_classification(model_key, all_labels, gt_map, max_images=50):
             elif is_cm:
                 messages = [{"role": "user", "content": [
                     {"type": "image", "image": image},
-                    {"type": "text", "text": prompt}
+                    {"type": "text", "text": cls_prompt}
                 ]}]
                 inputs = processor.apply_chat_template(
                     messages, add_generation_prompt=True,
@@ -342,7 +387,7 @@ def run_vlm_classification(model_key, all_labels, gt_map, max_images=50):
                                         skip_special_tokens=True)
             elif is_ll:
                 messages = [{"role": "user", "content": [
-                    {"type": "image"}, {"type": "text", "text": prompt}
+                    {"type": "image"}, {"type": "text", "text": cls_prompt}
                 ]}]
                 chat = processor.apply_chat_template(messages,
                                                      add_generation_prompt=True,
@@ -356,7 +401,7 @@ def run_vlm_classification(model_key, all_labels, gt_map, max_images=50):
                 if chat in text:
                     text = text[len(chat):].strip()
             elif is_ph:
-                phi_prompt = f"<|user|>\n<|image_1|>\n{prompt}<|end|>\n<|assistant|>\n"
+                phi_prompt = f"<|user|>\n<|image_1|>\n{cls_prompt}<|end|>\n<|assistant|>\n"
                 inputs = processor(phi_prompt, image,
                                    return_tensors="pt").to(model.device)
                 with torch.no_grad():
@@ -369,22 +414,24 @@ def run_vlm_classification(model_key, all_labels, gt_map, max_images=50):
             else:
                 text = ""
 
-            text = text.strip().lower()
-            # Find best matching label
-            best_label = ""
-            best_score = 0
-            for label in all_labels:
-                ll = label.lower()
-                if ll in text or text in ll:
-                    if len(ll) > best_score:
-                        best_label = label
-                        best_score = len(ll)
-            if not best_label:
-                best_label = text
+            text = text.strip()
+            # Clean VLM output: take first line, strip trailing garbage
+            text = text.split('\n')[0].strip().rstrip('.').strip()
+            text = re.sub(r'\s*[<{].*', '', text).strip()
+            text = re.sub(r'\s*\|.*', '', text).strip()
+            text = text.replace('<|im_start|>', '').strip()
+
+            # Semantic matching: embed VLM output + all labels, find best cosine match
+            query_emb = embed_texts([text], mm_tokenizer, mm_model, model.device)
+            sims = (query_emb @ label_embs.T).squeeze(0)
+            top5_idx = torch.topk(sims, 5).indices.cpu().numpy()
+            top5_labels = [(label_names[i], round(float(sims[i]), 4)) for i in top5_idx]
+            best_label = top5_labels[0][0]
 
         except Exception as e:
             text = f"ERROR: {e}"
             best_label = text
+            top5_labels = []
 
         elapsed = time.time() - t0
         times.append(elapsed)
@@ -393,12 +440,16 @@ def run_vlm_classification(model_key, all_labels, gt_map, max_images=50):
             "prediction": best_label,
             "raw_text": text[:200],
             "gt": gt_label,
+            "top5": top5_labels[:5] if top5_labels else [],
         })
 
         if len(results) % 10 == 0:
             correct = sum(1 for r in results if r["prediction"] == r["gt"])
+            top5_correct = sum(1 for r in results
+                               if any(t[0] == r["gt"] for t in r.get("top5", [])))
             print(f"  [{len(results)}/{len(all_files)}] "
                   f"top1={correct/len(results):.1%} "
+                  f"top5={top5_correct/len(results):.1%} "
                   f"avg={sum(times)/len(times)*1000:.0f}ms",
                   flush=True)
 
@@ -491,8 +542,11 @@ def main():
         total = len(results_list)
         top1_correct = sum(1 for r in results_list
                            if r["prediction"].lower().strip() == r["gt"].lower().strip())
+        top5_correct = sum(1 for r in results_list
+                           if any(t[0].lower().strip() == r["gt"].lower().strip()
+                                  for t in r.get("top5", [])))
         acc_top1 = top1_correct / total if total > 0 else 0
-        acc_top5 = 0  # VLMs only produce one answer
+        acc_top5 = top5_correct / total if total > 0 else 0
         avg_time = total_time / total if total > 0 else 0
         fps = total / total_time if total_time > 0 else 0
     else:

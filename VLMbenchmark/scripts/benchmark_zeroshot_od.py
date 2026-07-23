@@ -56,12 +56,32 @@ def zeroshot_od_prompt(category_name):
     )
 
 
+def parse_phi4_boxes(text):
+    """Parse Phi-4 output format: ['label', [ymin, xmin, ymax, xmax]] in 0-1 normalized coords."""
+    import re as _re
+    import json as _json
+    boxes = []
+    # Match nested arrays like ["person", [0.2, 0.3, 0.5, 0.6]] or ["person", [200, 300, 500, 600]]
+    for m in _re.finditer(r'\[\s*"([^"]+)"\s*,\s*\[\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)\s*\]\s*\]', text):
+        label = m.group(1)
+        coords = [float(m.group(i)) for i in range(2, 6)]
+        boxes.append(coords)
+    if not boxes:
+        # Try alternate format with single quotes
+        for m in _re.finditer(r"\[\s*'([^']+)'\s*,\s*\[\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)\s*\]\s*\]", text):
+            coords = [float(m.group(i)) for i in range(2, 6)]
+            boxes.append(coords)
+    return boxes
+
+
 def parse_any_boxes(text):
     boxes = parse_loc_tokens(text)
     if not boxes:
         boxes = parse_box_tags(text)
     if not boxes:
         boxes = parse_json_detections(text)
+    if not boxes:
+        boxes = parse_phi4_boxes(text)
     if not boxes:
         boxes = extract_narrative_boxes(text)
     return boxes
@@ -295,7 +315,11 @@ def benchmark_zeroshot_od(model_name, max_images=100, verbose=True):
 
         elif is_p4:
             f4_prompt = (
-                f"<|user|><|image_1|>{prompt}<|end|><|assistant|>"
+                f"<|user|><|image_1|>"
+                f"Find all {cat_name} objects in this image. "
+                f"For each, output [ymin, xmin, ymax, xmax] in 0-1 normalized coordinates. "
+                f"List all bounding boxes you find."
+                f"<|end|><|assistant|>"
             )
             inputs = processor(text=f4_prompt, images=image, return_tensors="pt").to(model.device)
             with torch.no_grad():
@@ -303,7 +327,10 @@ def benchmark_zeroshot_od(model_name, max_images=100, verbose=True):
             text = processor.tokenizer.decode(out[0][inputs["input_ids"].shape[1]:],
                                     skip_special_tokens=True)
             for box in parse_any_boxes(text):
-                dets.append((auto_scale_boxes([box], w, h)[0], 0.8))
+                # Phi-4 outputs [ymin, xmin, ymax, xmax] — swap to [x1, y1, x2, y2]
+                ymin, xmin, ymax, xmax = box
+                scaled = auto_scale_boxes([[xmin, ymin, xmax, ymax]], w, h)[0]
+                dets.append((scaled, 0.8))
 
         elif is_ll:
             messages = [{"role": "user", "content": [
@@ -320,14 +347,43 @@ def benchmark_zeroshot_od(model_name, max_images=100, verbose=True):
                 dets.append((auto_scale_boxes([box], w, h)[0], 0.8))
 
         elif is_ph:
-            phi_prompt = f"<|user|>\n<|image_1|>\n{prompt}<|end|>\n<|assistant|>\n"
+            phi_od_prompt = (
+                f"Identify the location of '{cat_name}'. "
+                f"Thought: To find the object, I will look at its visual features. "
+                f"The areas to focus on in the image have bounding box coordinates:"
+            )
+            phi_prompt = f"<|user|>\n<|image_1|>\n{phi_od_prompt}<|end|>\n<|assistant|>\n"
             inputs = processor(phi_prompt, image, return_tensors="pt").to(model.device)
             with torch.no_grad():
-                out = model.generate(**inputs, max_new_tokens=256, temperature=0.1)
+                out = model.generate(**inputs, max_new_tokens=512)
             text = processor.tokenizer.decode(out[0][inputs["input_ids"].shape[1]:],
                                                skip_special_tokens=True)
-            for box in parse_any_boxes(text):
-                dets.append((auto_scale_boxes([box], w, h)[0], 0.8))
+            # Phi-3.5 outputs [ymin, xmin, ymax, xmax] — try 0-1000 scale first, then 0-1 floats
+            loc_vals_1000 = [int(x) for x in re.findall(r'\b(\d{2,4})\b', text.split('\n')[0])]
+            if len(loc_vals_1000) >= 4 and all(0 <= v <= 1000 for v in loc_vals_1000[:4]):
+                ymin, xmin, ymax, xmax = loc_vals_1000[:4]
+                x1 = xmin / 1000.0 * w
+                y1 = ymin / 1000.0 * h
+                x2 = xmax / 1000.0 * w
+                y2 = ymax / 1000.0 * h
+                dets.append(([x1, y1, x2, y2], 0.8))
+            else:
+                # Try 0-1 float coords: [a, b, c, d] or a,b,c,d
+                float_match = re.search(r'[\[\(]?\s*([\d.]+)\s*[,\s]\s*([\d.]+)\s*[,\s]\s*([\d.]+)\s*[,\s]\s*([\d.]+)\s*[\]\)]?', text.split('\n')[0])
+                if float_match:
+                    ymin, xmin, ymax, xmax = [float(x) for x in float_match.groups()]
+                    if all(0 <= v <= 1.0 for v in [ymin, xmin, ymax, xmax]):
+                        x1 = xmin * w
+                        y1 = ymin * h
+                        x2 = xmax * w
+                        y2 = ymax * h
+                        dets.append(([x1, y1, x2, y2], 0.8))
+                    elif all(0 <= v <= 100 for v in [ymin, xmin, ymax, xmax]):
+                        x1 = xmin / 100.0 * w
+                        y1 = ymin / 100.0 * h
+                        x2 = xmax / 100.0 * w
+                        y2 = ymax / 100.0 * h
+                        dets.append(([x1, y1, x2, y2], 0.8))
 
         elif is_q3:
             messages = [{"role": "user", "content": [

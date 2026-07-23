@@ -1,0 +1,12 @@
+{
+  "model": "phi_vision",
+  "model_key": "phi_vision",
+  "task": "classification",
+  "dataset": "tiny-imagenet-200",
+  "images": 50,
+  "top1_accuracy": 0.22,
+  "top5_accuracy": 0.26,
+  "total_inference_time_s": 32.27,
+  "avg_inference_ms": 645.3,
+  "fps": 1.55
+}

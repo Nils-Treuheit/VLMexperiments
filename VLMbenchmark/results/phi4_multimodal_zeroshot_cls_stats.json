@@ -1,0 +1,12 @@
+{
+  "model": "phi4_multimodal",
+  "model_key": "phi4_multimodal",
+  "task": "classification",
+  "dataset": "tiny-imagenet-200",
+  "images": 50,
+  "top1_accuracy": 0.28,
+  "top5_accuracy": 0.4,
+  "total_inference_time_s": 28.27,
+  "avg_inference_ms": 565.4,
+  "fps": 1.77
+}

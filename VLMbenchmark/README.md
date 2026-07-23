@@ -17,30 +17,64 @@ python3 generate_report.py
 
 Each model is automatically dispatched to its own virtual environment under `../VLMcollection/`.
 
+## Benchmark Results (Current)
+
+### Zero-Shot Object Detection (mAP@50, 100 COCO val2017 images)
+
+| Model | mAP@50 | mAP@50:95 | FPS |
+|-------|:------:|:---------:|:---:|
+| Florence-2-large-ft | 70.6% | 45.2% | 1.8 |
+| Qwen3-VL-8B-Instruct | 61.8% | 39.8% | 0.5 |
+| YOLO-World-M | 58.8% | 37.6% | 8.2 |
+| YOLO-World-L | 58.5% | 37.1% | 6.1 |
+| PaliGemma2-3B-mix | 45.8% | 28.3% | 1.2 |
+| Cosmos-Reason1-7B | 34.8% | 21.4% | 0.3 |
+| Qwen3-VL-8B-Thinking | 20.4% | 12.1% | 0.2 |
+| Phi-4-Multimodal-14B | 5.9% | 3.2% | 0.1 |
+| Phi-3.5-Vision-4.2B | 0.0% | 0.0% | 0.2 |
+
+### Zero-Shot Classification (Top-1/Top-5, Tiny ImageNet)
+
+| Model | Top-1 | Top-5 | Method |
+|-------|:-----:|:-----:|--------|
+| SigLIP2 (ZS) | 62.0% | 92.0% | Text-image similarity |
+| Phi-3.5-Vision-4.2B | 22.0% | 26.0% | Caption → MiniLM embed → cosine match |
+| Phi-4-Multimodal-14B | 28.0% | 40.0% | Multi-candidate + 224px upscale + semantic match |
+
+### Visual Embedding Quality (COCO 200 images)
+
+| Model | R@1 | R@5 | R@10 | mAP | NMI | ARI | Dim |
+|-------|:---:|:---:|:----:|:---:|:---:|:---:|:---:|
+| SigLIP2 | 0.535 | 0.750 | 0.835 | 0.376 | 0.604 | 0.059 | 768 |
+| DINOv3 | 0.490 | 0.750 | 0.780 | 0.333 | 0.615 | 0.062 | 384 |
+| MoonViT | 0.480 | 0.705 | 0.775 | 0.339 | 0.594 | 0.057 | 1152 |
+| DINOtool | 0.465 | 0.740 | 0.810 | 0.347 | 0.613 | 0.060 | 384 |
+
 ## Skill Matrix
 
-| Model | Det. | Pose | OBB | Ground | Caption | VQA | Class. | Seg. | Scene | Track | 6D Pose | OCR | Point | Count | Vis.Reas. | DocVQA | Emotion | HIR | DocUnd. | Embed | ZS-Det |
-|-------|:----:|:----:|:---:|:------:|:-------:|:---:|:------:|:----:|:-----:|:-----:|:-------:|:---:|:-----:|:----:|:---------:|:------:|:-------:|:---:|:-------:|:-----:|:------:|
-| LocateAnything-3B | ✓ | — | — | ✓ | — | — | — | ✓ | — | — | — | ✓ | ✓ | — | — | — | — | — | — | — | — |
-| LocateAnything-3B (TRT) | ✓ | — | — | ✓ | — | — | — | ✓ | — | — | — | ✓ | ✓ | — | — | — | — | — | — | — | — |
-| Qwen3-VL-8B-Instruct | ✓ | — | ✓ | ✓ | ✓ | ✓ | — | — | ✓ | — | — | — | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ |
-| Qwen3-VL-8B-Thinking | ✓ | — | ✓ | ✓ | ✓ | ✓ | — | — | ✓ | — | — | — | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ |
-| YOLO26n / YOLO11n | ✓ | ✓ | ✓ | — | — | — | — | — | — | ✓ | ✓ | — | — | — | — | — | — | — | — | — | — |
-| Florence-2-large-ft | ✓ | — | — | ✓ | ✓ | ✓ | — | ✓ | ✓ | — | — | ✓ | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ |
-| PaliGemma2-3B-mix | ✓* | — | — | — | ✓ | ✓ | — | — | ✓ | — | — | — | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ |
-| Llama-3.2-11B-Vision | — | — | — | — | ✓ | ✓ | — | — | ✓ | — | — | — | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ |
-| Phi-3.5-Vision-4.2B | — | — | — | — | ✓ | ✓ | — | — | ✓ | — | — | — | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ |
-| Cosmos-Reason1-7B | — | — | — | — | ✓ | ✓ | — | — | ✓ | — | — | — | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ |
-| LLaVA-v1.6-Mistral-7B | — | — | — | — | ✓ | ✓ | — | — | ✓ | — | — | — | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ |
-| LLaVA-OneVision-Qwen2-7B | — | — | — | — | ✓ | ✓ | — | — | ✓ | — | — | — | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ |
-| LLaVA-NeXT-Video-7B | — | — | — | — | ✓ | ✓ | — | — | ✓ | — | — | — | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ |
-| LLaVA-NeXT-Video-34B (4-bit) | — | — | — | — | ✓ | ✓ | — | — | ✓ | — | — | — | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ |
-| LLaVA-Phi-3-Mini-4B | — | — | — | — | ✓ | ✓ | — | — | ✓ | — | — | — | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ |
-| DiffusionGemma-26B | — | — | — | — | ✓ | ✓ | — | — | — | — | — | — | — | ✓ | — | — | — | — | — | — | ✓ |
-| SigLIP2 (ZS) | — | — | — | — | ✓† | — | ✓ | — | — | — | — | — | — | — | — | — | — | — | — | ✓ | — |
-| MoonViT (ZS) | — | — | — | — | ✓† | — | ✓ | — | — | — | — | — | — | — | — | — | — | — | — | ✓ | — |
-| DINOv3 (ZS) | — | — | — | — | ✓† | — | ✓ | — | — | — | — | — | — | — | — | — | — | — | — | ✓ | — |
-| DINOtool (ZS) | — | — | — | — | ✓† | — | ✓ | — | — | — | — | — | — | — | — | — | — | — | — | ✓ | — |
+| Model | Det. | Pose | OBB | Ground | Caption | VQA | Class. | Seg. | Scene | Track | 6D Pose | OCR | Point | Count | Vis.Reas. | DocVQA | Emotion | HIR | DocUnd. | Embed | ZS-Det | ZS-mAP | VEQ |
+|-------|:----:|:----:|:---:|:------:|:-------:|:---:|:------:|:----:|:-----:|:-----:|:-------:|:---:|:-----:|:----:|:---------:|:------:|:-------:|:---:|:-------:|:-----:|:------:|:------:|:---:|
+| LocateAnything-3B | ✓ | — | — | ✓ | — | — | — | ✓ | — | — | — | ✓ | ✓ | — | — | — | — | — | — | — | — | — | — |
+| LocateAnything-3B (TRT) | ✓ | — | — | ✓ | — | — | — | ✓ | — | — | — | ✓ | ✓ | — | — | — | — | — | — | — | — | — | — |
+| Qwen3-VL-8B-Instruct | ✓ | — | ✓ | ✓ | ✓ | ✓ | — | — | ✓ | — | — | — | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ | ✓ | — |
+| Qwen3-VL-8B-Thinking | ✓ | — | ✓ | ✓ | ✓ | ✓ | — | — | ✓ | — | — | — | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ | ✓ | — |
+| YOLO26n / YOLO11n | ✓ | ✓ | ✓ | — | — | — | — | — | — | ✓ | ✓ | — | — | — | — | — | — | — | — | — | — | — | — |
+| Florence-2-large-ft | ✓ | — | — | ✓ | ✓ | ✓ | — | ✓ | ✓ | — | — | ✓ | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ | ✓ | — |
+| PaliGemma2-3B-mix | ✓* | — | — | — | ✓ | ✓ | — | — | ✓ | — | — | — | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ | ✓ | — |
+| Llama-3.2-11B-Vision | — | — | — | — | ✓ | ✓ | — | — | ✓ | — | — | — | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ | — | — |
+| Phi-3.5-Vision-4.2B | — | — | — | — | ✓ | ✓ | ✓ | — | ✓ | — | — | — | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ | ✓ | — |
+| Phi-4-Multimodal-14B | ✓ | — | — | — | ✓ | ✓ | ✓ | — | ✓ | — | — | — | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ | ✓ | — |
+| Cosmos-Reason1-7B | — | — | — | — | ✓ | ✓ | — | — | ✓ | — | — | — | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ | — | — |
+| LLaVA-v1.6-Mistral-7B | — | — | — | — | ✓ | ✓ | — | — | ✓ | — | — | — | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ | — | — |
+| LLaVA-OneVision-Qwen2-7B | — | — | — | — | ✓ | ✓ | — | — | ✓ | — | — | — | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ | — | — |
+| LLaVA-NeXT-Video-7B | — | — | — | — | ✓ | ✓ | — | — | ✓ | — | — | — | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ | — | — |
+| LLaVA-NeXT-Video-34B (4-bit) | — | — | — | — | ✓ | ✓ | — | — | ✓ | — | — | — | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ | — | — |
+| LLaVA-Phi-3-Mini-4B | — | — | — | — | ✓ | ✓ | — | — | ✓ | — | — | — | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ | — | — |
+| DiffusionGemma-26B | — | — | — | — | ✓ | ✓ | — | — | — | — | — | — | — | ✓ | — | — | — | — | — | — | ✓ | — | — |
+| SigLIP2 (ZS) | — | — | — | — | ✓† | — | ✓ | — | — | — | — | — | — | — | — | — | — | — | — | ✓ | — | ✓ | ✓ |
+| MoonViT (ZS) | — | — | — | — | ✓† | — | ✓ | — | — | — | — | — | — | — | — | — | — | — | — | ✓ | — | ✓ | ✓ |
+| DINOv3 (ZS) | — | — | — | — | ✓† | — | ✓ | — | — | — | — | — | — | — | — | — | — | — | — | ✓ | — | ✓ | ✓ |
+| DINOtool (ZS) | — | — | — | — | ✓† | — | ✓ | — | — | — | — | — | — | — | — | — | — | — | — | ✓ | — | ✓ | ✓ |
 
 > `✓*` = PaliGemma OD is prompt-based (bbox tokens). `✓†` = Vision-only encoders output structured text, not freeform captions.
 
@@ -49,26 +83,30 @@ Each model is automatically dispatched to its own virtual environment under `../
 | Script | Task | Dataset | `--model` keys |
 |--------|------|---------|----------------|
 | `benchmark_od.py` | Object Detection | COCO val2017 | `locate_anything`, `locate_anything_trt`, `qwen3_native`, `qwen3_thinking`, `yolo26`, `yolo26s-yolo26x`, `yolo11-yolo11x`, `florence2`, `paligemma` |
+| `benchmark_zeroshot_od.py` | Zero-Shot OD (mAP) | COCO val2017 | `locate_anything`, `florence2`, `paligemma`, `phi_vision`, `phi4_multimodal`, `cosmos_nemotron`, `qwen3_native`, `qwen3_thinking`, `yolo_world*`, `yoloe*` |
 | `benchmark_pose.py` | Pose Estimation | COCO Keypoints | `yolo26_pose`, `yolo26s_pose`, `yolo11_pose`, `yolo11s_pose` |
 | `benchmark_obb.py` | Oriented BBox | DOTA-v1.0 | `yolo26_obb`, `yolo26s_obb`, `yolo11_obb`, `yolo11s_obb` |
 | `benchmark_grounding.py` | Phrase Grounding | COCO val2017 | `locate_anything`, `locate_anything_trt`, `qwen3_native`, `qwen3_thinking`, `florence2` |
-| `benchmark_caption.py` | Image Captioning | COCO Captions | `florence2`, `paligemma`, `llama_vision`, `phi_vision`, `cosmos_nemotron`, `qwen3_native`, `qwen3_thinking`, `diffusion_gemma*`, `siglip2`, `moonvit`, `dinov3`, `dinotool`, `llava_v16_mistral`, `llava_onevision`, `llava_next_video_7b`, `llava_next_video_34b`, `phi3_vision` |
-| `benchmark_vqa.py` | Visual QA | COCO val2017 | `florence2`, `paligemma`, `llama_vision`, `phi_vision`, `cosmos_nemotron`, `qwen3_native`, `qwen3_thinking`, `diffusion_gemma*`, `llava_v16_mistral`, `llava_onevision`, `llava_next_video_7b`, `llava_next_video_34b`, `phi3_vision` |
-| `benchmark_classification.py` | Zero-Shot Class. | Tiny ImageNet | `dinotool`, `dinov3`, `siglip2`, `moonvit` |
+| `benchmark_caption.py` | Image Captioning | COCO Captions | `florence2`, `paligemma`, `llama_vision`, `phi_vision`, `phi4_multimodal`, `cosmos_nemotron`, `qwen3_native`, `qwen3_thinking`, `diffusion_gemma*`, `siglip2`, `moonvit`, `dinov3`, `dinotool`, `llava*`, `phi3_vision` |
+| `benchmark_vqa.py` | Visual QA | COCO val2017 | `florence2`, `paligemma`, `llama_vision`, `phi_vision`, `phi4_multimodal`, `cosmos_nemotron`, `qwen3_native`, `qwen3_thinking`, `diffusion_gemma*`, `llava*`, `phi3_vision` |
+| `benchmark_zeroshot_cls.py` | Zero-Shot Class. v2 | Tiny ImageNet | `siglip2`, `florence2`, `paligemma`, `cosmos_nemotron`, `llama_vision`, `phi_vision`, `phi4_multimodal`, `qwen3_native`, `qwen3_thinking` |
+| `benchmark_classification.py` | Zero-Shot Class. v1 | Tiny ImageNet | `dinotool`, `dinov3`, `siglip2`, `moonvit` |
 | `benchmark_segmentation.py` | Segmentation | COCO val2017 | `florence2`, `locate_anything`, `locate_anything_trt` |
-| `benchmark_scene.py` | Scene Analysis | COCO val2017 | `florence2`, `paligemma`, `llama_vision`, `phi_vision`, `cosmos_nemotron`, `qwen3_native`, `qwen3_thinking`, `llava_v16_mistral`, `llava_onevision`, `llava_next_video_7b`, `llava_next_video_34b`, `phi3_vision` |
+| `benchmark_scene.py` | Scene Analysis | COCO val2017 | `florence2`, `paligemma`, `llama_vision`, `phi_vision`, `phi4_multimodal`, `cosmos_nemotron`, `qwen3_native`, `qwen3_thinking`, `llava*`, `phi3_vision` |
 | `benchmark_tracking.py` | Multi-Object Track | MOT17 | `yolo26`, `yolo26s-yolo26m`, `yolo11`, `yolo11s-yolo11m` |
 | `benchmark_6dpose.py` | 6D Pose Detection | Linemod | `yolo26`, `yolo26s-yolo26m`, `yolo11`, `yolo11s-yolo11m` |
 | `benchmark_ocr.py` | OCR / Text Det. | Synthetic COCO | `locate_anything`, `locate_anything_trt`, `florence2` |
 | `benchmark_pointing.py` | Pointing / 2D KP | COCO val2017 | `locate_anything`, `locate_anything_trt` |
-| `benchmark_counting.py` | Object Counting | COCO val2017 | `florence2`, `paligemma`, `llama_vision`, `phi_vision`, `cosmos_nemotron`, `qwen3_native`, `qwen3_thinking`, `diffusion_gemma*`, `llava*`, `phi3_vision` |
-| `benchmark_visual_reasoning.py` | Visual Reasoning | COCO val2017 | `florence2`, `paligemma`, `llama_vision`, `phi_vision`, `cosmos_nemotron`, `qwen3_native`, `qwen3_thinking`, `llava*`, `phi3_vision` |
-| `benchmark_docvqa.py` | Document VQA | COCO val2017 | `florence2`, `paligemma`, `llama_vision`, `phi_vision`, `cosmos_nemotron`, `qwen3_native`, `qwen3_thinking`, `llava*`, `phi3_vision` |
-| `benchmark_emotion.py` | Emotion Detection | COCO val2017 | `florence2`, `paligemma`, `llama_vision`, `phi_vision`, `cosmos_nemotron`, `qwen3_native`, `qwen3_thinking`, `llava*`, `phi3_vision` |
-| `benchmark_hir.py` | Human Intention Rec. | COCO val2017 | `florence2`, `paligemma`, `llama_vision`, `phi_vision`, `cosmos_nemotron`, `qwen3_native`, `qwen3_thinking`, `llava*`, `phi3_vision` |
-| `benchmark_doc_understanding.py` | Document Understanding | COCO val2017 | `florence2`, `paligemma`, `llama_vision`, `phi_vision`, `cosmos_nemotron`, `qwen3_native`, `qwen3_thinking`, `llava*`, `phi3_vision` |
+| `benchmark_counting.py` | Object Counting | COCO val2017 | `florence2`, `paligemma`, `llama_vision`, `phi_vision`, `phi4_multimodal`, `cosmos_nemotron`, `qwen3_native`, `qwen3_thinking`, `diffusion_gemma*`, `llava*`, `phi3_vision` |
+| `benchmark_visual_reasoning.py` | Visual Reasoning | COCO val2017 | `florence2`, `paligemma`, `llama_vision`, `phi_vision`, `phi4_multimodal`, `cosmos_nemotron`, `qwen3_native`, `qwen3_thinking`, `llava*`, `phi3_vision` |
+| `benchmark_docvqa.py` | Document VQA | COCO val2017 | `florence2`, `paligemma`, `llama_vision`, `phi_vision`, `phi4_multimodal`, `cosmos_nemotron`, `qwen3_native`, `qwen3_thinking`, `llava*`, `phi3_vision` |
+| `benchmark_emotion.py` | Emotion Detection | COCO val2017 | `florence2`, `paligemma`, `llama_vision`, `phi_vision`, `phi4_multimodal`, `cosmos_nemotron`, `qwen3_native`, `qwen3_thinking`, `llava*`, `phi3_vision` |
+| `benchmark_hir.py` | Human Intention Rec. | COCO val2017 | `florence2`, `paligemma`, `llama_vision`, `phi_vision`, `phi4_multimodal`, `cosmos_nemotron`, `qwen3_native`, `qwen3_thinking`, `llava*`, `phi3_vision` |
+| `benchmark_doc_understanding.py` | Document Understanding | COCO val2017 | `florence2`, `paligemma`, `llama_vision`, `phi_vision`, `phi4_multimodal`, `cosmos_nemotron`, `qwen3_native`, `qwen3_thinking`, `llava*`, `phi3_vision` |
 | `benchmark_embedding.py` | Embedding Extraction | COCO val2017 | `siglip2`, `dinov3`, `moonvit`, `dinotool` |
-| `benchmark_zeroshot_detection.py` | Zero-Shot Detection | COCO val2017 | `florence2`, `paligemma`, `llama_vision`, `phi_vision`, `cosmos_nemotron`, `qwen3_native`, `qwen3_thinking`, `diffusion_gemma*`, `llava*`, `phi3_vision` |
+| `benchmark_zeroshot_detection.py` | Zero-Shot Detection | COCO val2017 | `florence2`, `paligemma`, `llama_vision`, `phi_vision`, `phi4_multimodal`, `cosmos_nemotron`, `qwen3_native`, `qwen3_thinking`, `diffusion_gemma*`, `llava*`, `phi3_vision` |
+| `benchmark_veq.py` | VEQ (Vision Encoders) | COCO val2017 | `siglip2`, `dinov3`, `moonvit`, `dinotool` |
+| `benchmark_veq_vlm.py` | VEQ (VLMs) | COCO val2017 | `siglip2`, `dinov3`, `moonvit`, `dinotool`, `paligemma`, `florence2`, `cosmos_nemotron`, `llama_vision`, `qwen3_native`, `phi_vision`, `phi4_multimodal` |
 
 ## Model Reference
 
@@ -88,6 +126,7 @@ Each model is automatically dispatched to its own virtual environment under `../
 | `paligemma` | PaliGemma2-3B-mix | OD*, Caption, VQA, Scene | `paligemma/.venv` | |
 | `llama_vision` | Llama-3.2-11B-Vision | Caption, VQA, Scene | `llama-vision/.venv` | |
 | `phi_vision` | Phi-3.5-Vision-4.2B | Caption, VQA, Scene | `phi-vision/.venv` | |
+| `phi4_multimodal` | Phi-4-Multimodal-14B | OD, Caption, VQA, Class., Scene | `phi-4_multimodal/.venv` | |
 | `cosmos_nemotron` | Cosmos-Reason1-7B | Caption, VQA, Scene | `cosmos-nemotron/.venv` | |
 | `diffusion_gemma*` | DiffusionGemma-26B | Caption, VQA | `diffusion_gemma_vl/.venv` | Variants: `diffusion_gemma`, `_yolo`, `_yolo_pose`, `_yolo_obb`, `_siglip2`, `_moonvit` |
 | `llava_v16_mistral` | LLaVA-v1.6-Mistral-7B | Caption, VQA, Scene | `Llava/.venv` | Subprocess dispatch |
@@ -134,6 +173,9 @@ LLaVA models run via **subprocess dispatch**: `benchmark_all.py` calls `benchmar
 | `llava_next7b` | `llava_next_video_7b` |
 | `llava_next34b` | `llava_next_video_34b` |
 | `phi3v` | `phi3_vision` |
+| `phi4` / `phi4mm` | `phi4_multimodal` |
+| `yolo_world` | `yolo_world` |
+| `yoloe` | `yoloe` |
 
 ## Running a Single Model / Task
 
@@ -210,12 +252,14 @@ python3 generate_report.py
 | Task | Metrics |
 |------|---------|
 | Object Detection | mAP@50:95, mAP@50, FPS, avg inference time |
+| Zero-Shot OD (mAP) | mAP@50:95, mAP@50, Recall, Precision, per-category AP |
 | Pose Estimation | AP@50:95 (keypoints), AP@50 (keypoints), FPS |
 | OBB Detection | mAP@50:95, mAP@50, FPS |
 | Phrase Grounding | Acc@50 (IoU≥0.5), FPS |
 | Image Captioning | BLEU-4, ROUGE-L, CIDEr, FPS |
 | Visual Question Answering | Accuracy (exact match), FPS |
-| Classification | Top-1 accuracy, Top-5 accuracy, FPS |
+| Classification v1 | Top-1 accuracy, Top-5 accuracy, FPS (vision encoders only) |
+| Classification v2 | Top-1 accuracy, Top-5 accuracy, FPS (VLMs via semantic embedding match) |
 | Segmentation | mIoU, FPS |
 | Scene Analysis | Accuracy (exact label match), FPS |
 | Multi-Object Tracking | HOTA, MOTA, IDF1, FPS |
@@ -230,3 +274,5 @@ python3 generate_report.py
 | Document Understanding | Accuracy (document structure questions), FPS |
 | Embedding Extraction | FPS, embedding dimension, avg inference time |
 | Zero-Shot Detection | Acc@50 (IoU≥0.5), FPS, avg inference time |
+| VEQ (Vision Encoders) | Recall@1/5/10, mAP, NMI, ARI, Silhouette |
+| VEQ (VLMs) | Caption BLEU-4/ROUGE-L/CIDEr, Silhouette, Intra/Inter ratio, NMI, ARI, Token count |

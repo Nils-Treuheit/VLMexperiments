@@ -36,6 +36,20 @@ TASKS = {
         ],
         "dataset": "coco",
     },
+    "zeroshot_od": {
+        "script": "benchmark_zeroshot_od.py",
+        "title": "Zero-Shot OD mAP (COCO val2017, 100 images)",
+        "models": [
+            "locate_anything", "locate_anything_trt",
+            "florence2", "paligemma",
+            "phi_vision", "phi4_multimodal",
+            "cosmos_nemotron",
+            "qwen3_native", "qwen3_thinking",
+            "yolo_world", "yolo_worlds", "yolo_worldm", "yolo_worldl",
+            "yoloe", "yoloe_11l", "yoloe_26m", "yoloe_26n",
+        ],
+        "dataset": "coco",
+    },
     "pose": {
         "script": "benchmark_pose.py",
         "title": "Pose Estimation (COCO Keypoints)",
@@ -64,7 +78,7 @@ TASKS = {
             "cosmos_nemotron",
             "llama_vision",
             "qwen3_native", "qwen3_thinking",
-            "phi_vision",
+            "phi_vision", "phi4_multimodal",
             "llava_v16_mistral", "llava_onevision",
             "llava_next_video_7b", "phi3_vision",
             "llava_next_video_34b",
@@ -82,7 +96,7 @@ TASKS = {
             "cosmos_nemotron",
             "llama_vision",
             "qwen3_native", "qwen3_thinking",
-            "phi_vision",
+            "phi_vision", "phi4_multimodal",
             "llava_v16_mistral", "llava_onevision",
             "llava_next_video_7b", "phi3_vision",
             "llava_next_video_34b",
@@ -101,6 +115,36 @@ TASKS = {
                     "qwen3_native", "qwen3_thinking"],
         "dataset": None,
     },
+    "zeroshot_cls": {
+        "script": "benchmark_zeroshot_cls.py",
+        "title": "Zero-Shot Classification v2 (semantic match, Tiny ImageNet)",
+        "models": [
+            "siglip2",
+            "florence2", "paligemma",
+            "cosmos_nemotron", "llama_vision",
+            "phi_vision", "phi4_multimodal",
+            "qwen3_native", "qwen3_thinking",
+        ],
+        "dataset": None,
+    },
+    "veq": {
+        "script": "benchmark_veq.py",
+        "title": "Visual Embedding Quality (COCO 200 images)",
+        "models": ["siglip2", "dinov3", "moonvit", "dinotool"],
+        "dataset": "coco",
+    },
+    "veq_vlm": {
+        "script": "benchmark_veq_vlm.py",
+        "title": "VLM Visual Embedding Quality (COCO 200 images)",
+        "models": [
+            "siglip2", "dinov3", "moonvit", "dinotool",
+            "paligemma", "florence2",
+            "cosmos_nemotron", "llama_vision",
+            "qwen3_native",
+            "phi_vision", "phi4_multimodal",
+        ],
+        "dataset": "coco",
+    },
     "segmentation": {
         "script": "benchmark_segmentation.py",
         "title": "Segmentation (COCO)",
@@ -115,7 +159,7 @@ TASKS = {
             "cosmos_nemotron",
             "llama_vision",
             "qwen3_native", "qwen3_thinking",
-            "phi_vision",
+            "phi_vision", "phi4_multimodal",
             "llava_v16_mistral", "llava_onevision",
             "llava_next_video_7b", "phi3_vision",
             "llava_next_video_34b",
@@ -154,7 +198,7 @@ TASKS = {
             "cosmos_nemotron",
             "llama_vision",
             "qwen3_native", "qwen3_thinking",
-            "phi_vision",
+            "phi_vision", "phi4_multimodal",
             "llava_v16_mistral", "llava_onevision",
             "llava_next_video_7b", "phi3_vision",
             "llava_next_video_34b",
@@ -172,7 +216,7 @@ TASKS = {
             "cosmos_nemotron",
             "llama_vision",
             "qwen3_native", "qwen3_thinking",
-            "phi_vision",
+            "phi_vision", "phi4_multimodal",
             "llava_v16_mistral", "llava_onevision",
             "llava_next_video_7b", "phi3_vision",
             "llava_next_video_34b",
@@ -187,7 +231,7 @@ TASKS = {
             "cosmos_nemotron",
             "llama_vision",
             "qwen3_native", "qwen3_thinking",
-            "phi_vision",
+            "phi_vision", "phi4_multimodal",
             "llava_v16_mistral", "llava_onevision",
             "llava_next_video_7b", "phi3_vision",
             "llava_next_video_34b",
@@ -202,7 +246,7 @@ TASKS = {
             "cosmos_nemotron",
             "llama_vision",
             "qwen3_native", "qwen3_thinking",
-            "phi_vision",
+            "phi_vision", "phi4_multimodal",
             "llava_v16_mistral", "llava_onevision",
             "llava_next_video_7b", "phi3_vision",
             "llava_next_video_34b",
@@ -217,7 +261,7 @@ TASKS = {
             "cosmos_nemotron",
             "llama_vision",
             "qwen3_native", "qwen3_thinking",
-            "phi_vision",
+            "phi_vision", "phi4_multimodal",
             "llava_v16_mistral", "llava_onevision",
             "llava_next_video_7b", "phi3_vision",
             "llava_next_video_34b",
@@ -232,7 +276,7 @@ TASKS = {
             "cosmos_nemotron",
             "llama_vision",
             "qwen3_native", "qwen3_thinking",
-            "phi_vision",
+            "phi_vision", "phi4_multimodal",
             "llava_v16_mistral", "llava_onevision",
             "llava_next_video_7b", "phi3_vision",
             "llava_next_video_34b",
@@ -291,10 +335,19 @@ MODEL_VENV = {k: str(COLLECTION_DIR / v / ".venv" / "bin" / "python")
         "yolo11s_pose": "yolo11-26",
         "yolo11_obb": "yolo11-26",
         "yolo11s_obb": "yolo11-26",
+        "yolo_world": "yolo11-26",
+        "yolo_worlds": "yolo11-26",
+        "yolo_worldm": "yolo11-26",
+        "yolo_worldl": "yolo11-26",
+        "yoloe": "yolo11-26",
+        "yoloe_11l": "yolo11-26",
+        "yoloe_26m": "yolo11-26",
+        "yoloe_26n": "yolo11-26",
         "florence2": "florence-2",
         "paligemma": "paligemma",
         "llama_vision": "llama-vision",
         "phi_vision": "phi-vision",
+        "phi4_multimodal": "phi-4_multimodal",
         "cosmos_nemotron": "cosmos-nemotron",
         "diffusion_gemma": "diffusion_gemma_vl",
         "diffusion_gemma_yolo": "diffusion_gemma_vl",
@@ -391,6 +444,7 @@ def run_model(model, script, max_images, dataset=None, sample_file=None, max_ret
         "cosmos_nemotron": 12288, "llama_vision": 12288,
         "qwen3_native": 12288, "qwen3_thinking": 12288,
         "phi_vision": 12288,
+        "phi4_multimodal": 16384,
         # xlarge: diffusion_gemma, LLaVA
         "diffusion_gemma": 16384, "diffusion_gemma_yolo": 16384,
         "diffusion_gemma_yolo_pose": 16384, "diffusion_gemma_yolo_obb": 16384,
@@ -496,6 +550,14 @@ def extract_stats(model, script):
         fp = RESULTS_DIR / f"{prefix}_embedding_stats.json"
     elif "zeroshot_detection" in script:
         fp = RESULTS_DIR / f"{prefix}_zeroshot_detection_stats.json"
+    elif "veq_vlm" in script:
+        fp = RESULTS_DIR / f"{prefix}_veq_vlm_stats.json"
+    elif "veq" in script:
+        fp = RESULTS_DIR / f"{prefix}_veq_stats.json"
+    elif "zeroshot_od" in script:
+        fp = RESULTS_DIR / f"{prefix}_od_map_stats.json"
+    elif "zeroshot_cls" in script:
+        fp = RESULTS_DIR / f"{prefix}_zeroshot_cls_stats.json"
     else:
         fp = RESULTS_DIR / f"{prefix}_coco_od_stats.json"
         if fp.exists():

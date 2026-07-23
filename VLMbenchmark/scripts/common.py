@@ -929,6 +929,23 @@ TASK_ROWS = {
         ("clustering_ARI", "Clustering ARI", "{:.4f}"),
         ("images", "Images", "{}"),
     ],
+    "veq_vlm": [
+        ("fps", "FPS", "{:.2f}"),
+        ("avg_inference_ms", "Avg inference (ms)", "{:.1f}"),
+        ("raw_embedding_dim", "Raw dim", "{}"),
+        ("proj_embedding_dim", "Proj dim", "{}"),
+        ("avg_tokens_per_image", "Tokens/img", "{}"),
+        ("caption_bleu4", "Caption BLEU-4", "{:.4f}"),
+        ("caption_rouge_l", "Caption ROUGE-L", "{:.4f}"),
+        ("caption_cider", "Caption CIDEr", "{:.4f}"),
+        ("raw_silhouette", "Raw Silhouette", "{:.4f}"),
+        ("raw_intra_inter_ratio", "Raw Intra/Inter", "{:.4f}"),
+        ("raw_NMI", "Raw NMI", "{:.4f}"),
+        ("raw_ARI", "Raw ARI", "{:.4f}"),
+        ("proj_silhouette", "Proj Silhouette", "{:.4f}"),
+        ("proj_intra_inter_ratio", "Proj Intra/Inter", "{:.4f}"),
+        ("images", "Images", "{}"),
+    ],
 }
 
 

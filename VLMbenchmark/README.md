@@ -1,278 +1,235 @@
 # VLM Benchmark
 
-Multi-task benchmark for vision-language models on COCO, DOTA-v1.0, Tiny ImageNet, and MOT17.
+Multi-task benchmark suite for vision-language models, vision encoders, and object detectors.
+
+Tests 20+ benchmarks across object detection, captioning, VQA, classification, pose estimation, segmentation, embedding quality, and more on RTX 5090.
 
 ## Quick Start
 
 ```bash
-# Run all tasks with 50 images per model (takes hours)
+# Run all tasks with 50 images per model
 python3 scripts/benchmark_all.py --max-images 50
 
 # Run specific tasks
-python3 scripts/benchmark_all.py --tasks captioning vqa --max-images 50
+python3 scripts/benchmark_all.py --tasks zeroshot_od zeroshot_cls --max-images 100
 
-# Generate report after benchmark is complete
+# Generate report + charts after benchmarks complete
 python3 generate_report.py
 ```
 
 Each model is automatically dispatched to its own virtual environment under `../VLMcollection/`.
 
-## Benchmark Results (Current)
+## Benchmarks
 
-### Zero-Shot Object Detection (mAP@50, 100 COCO val2017 images)
+| # | Benchmark | Script | Dataset | Description |
+|---|-----------|--------|---------|-------------|
+| 1 | Object Detection | `benchmark_od.py` | COCO val2017 | [Instance Localization](benchmark_descriptions/InstanceLocalization.md) |
+| 2 | Zero-Shot OD | `benchmark_zeroshot_od.py` | COCO val2017 | [Zero-Shot Object Detection](benchmark_descriptions/0ShotObjDet.md) |
+| 3 | Pose Estimation | `benchmark_pose.py` | COCO Keypoints | 2D keypoint detection (YOLO only) |
+| 4 | Oriented BBox | `benchmark_obb.py` | DOTA-v1.0 | Rotated bounding box detection |
+| 5 | Phrase Grounding | `benchmark_grounding.py` | COCO val2017 | [Visual Grounding](benchmark_descriptions/VisualGrounding.md) |
+| 6 | Image Captioning | `benchmark_caption.py` | COCO Captions | [Image Captioning](benchmark_descriptions/ImageCaptioning.md) |
+| 7 | Visual QA | `benchmark_vqa.py` | COCO val2017 | [Visual QA](benchmark_descriptions/VQA.md) |
+| 8 | Zero-Shot Classification | `benchmark_zeroshot_cls.py` | Tiny ImageNet | [Zero-Shot Image Classification](benchmark_descriptions/0ShotImgClassify.md) |
+| 9 | Segmentation | `benchmark_segmentation.py` | COCO val2017 | [Image Segmentation](benchmark_descriptions/ImageSegmentation.md) |
+| 10 | Scene Analysis | `benchmark_scene.py` | COCO val2017 | [Semantic Scene Analysis](benchmark_descriptions/SemanticSceneAnalysis.md) |
+| 11 | Multi-Object Tracking | `benchmark_tracking.py` | MOT17 | ByteTrack multi-object tracking |
+| 12 | 6D Pose | `benchmark_6dpose.py` | Linemod | 6D object pose estimation |
+| 13 | OCR / Text Detection | `benchmark_ocr.py` | Synthetic COCO | Text detection on synthetic overlays |
+| 14 | Pointing / 2D KP | `benchmark_pointing.py` | COCO Keypoints | [Instance Localization](benchmark_descriptions/InstanceLocalization.md) |
+| 15 | Object Counting | `benchmark_counting.py` | COCO val2017 | [Object Counting](benchmark_descriptions/ObjectCounting.md) |
+| 16 | Visual Reasoning | `benchmark_visual_reasoning.py` | COCO val2017 | [Visual Reasoning](benchmark_descriptions/VisualReasoning.md) |
+| 17 | Document VQA | `benchmark_docvqa.py` | COCO val2017 | [Document VQA](benchmark_descriptions/DocumentVQA.md) |
+| 18 | Emotion Detection | `benchmark_emotion.py` | COCO val2017 | [Emotion Detection](benchmark_descriptions/EmotionDetection.md) |
+| 19 | Human Intention Rec. | `benchmark_hir.py` | COCO val2017 | [HIR](benchmark_descriptions/HIR.md) |
+| 20 | Document Understanding | `benchmark_doc_understanding.py` | COCO val2017 | [Document Understanding](benchmark_descriptions/DocumentUnderstanding.md) |
+| 21 | Embedding Extraction | `benchmark_embedding.py` | COCO val2017 | Vision encoder embedding extraction |
+| 22 | Zero-Shot Detection | `benchmark_zeroshot_detection.py` | COCO val2017 | Open-vocabulary detection (B3/Avg Acc@50) |
+| 23 | VEQ (Vision Encoders) | `benchmark_veq.py` | COCO val2017 | [Visual Embedding Quality](benchmark_descriptions/VEQ.md) |
+| 24 | VEQ (VLMs) | `benchmark_veq_vlm.py` | COCO val2017 | [Visual Embedding Quality](benchmark_descriptions/VEQ.md) |
 
-| Model | mAP@50 | mAP@50:95 | FPS |
-|-------|:------:|:---------:|:---:|
-| Florence-2-large-ft | 70.6% | 45.2% | 1.8 |
-| Qwen3-VL-8B-Instruct | 61.8% | 39.8% | 0.5 |
-| YOLO-World-M | 58.8% | 37.6% | 8.2 |
-| YOLO-World-L | 58.5% | 37.1% | 6.1 |
-| PaliGemma2-3B-mix | 45.8% | 28.3% | 1.2 |
-| Cosmos-Reason1-7B | 34.8% | 21.4% | 0.3 |
-| Qwen3-VL-8B-Thinking | 20.4% | 12.1% | 0.2 |
-| Phi-4-Multimodal-14B | 5.9% | 3.2% | 0.1 |
-| Phi-3.5-Vision-4.2B | 0.0% | 0.0% | 0.2 |
+## Models per Benchmark
 
-### Zero-Shot Classification (Top-1/Top-5, Tiny ImageNet)
+| Model | Det. | ZS-Det | Pose | OBB | Ground | Caption | VQA | ZS-Cls | Seg. | Scene | Track | 6D | OCR | Pt. | Count | Reas. | DocVQA | Emo. | HIR | Doc. | Emb. | ZS-Det(v2) | VEQ | VEQ-V |
+|-------|:----:|:------:|:----:|:---:|:------:|:-------:|:---:|:------:|:----:|:-----:|:-----:|:--:|:---:|:---:|:-----:|:-----:|:------:|:----:|:---:|:----:|:----:|:---------:|:---:|:-----:|
+| Florence-2 | ✓ | ✓ | — | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | — | ✓ | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ | — | — |
+| PaliGemma2 | ✓* | ✓ | — | — | — | ✓ | ✓ | ✓ | — | ✓ | — | — | — | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ | — | — |
+| Qwen3-Instruct | ✓ | ✓ | — | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ | — | — | — | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ | — | — |
+| Qwen3-Thinking | ✓ | ✓ | — | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ | — | — | — | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ | — | — |
+| Phi-4-Multimodal | ✓ | ✓ | — | — | — | ✓ | ✓ | ✓ | — | ✓ | — | — | — | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ | — | — |
+| Phi-3.5-Vision | — | ✓ | — | — | — | ✓ | ✓ | ✓ | — | ✓ | — | — | — | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ | — | — |
+| Cosmos-Reason1 | — | ✓ | — | — | — | ✓ | ✓ | ✓ | — | ✓ | — | — | — | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ | — | — |
+| Llama-3.2-11B | — | — | — | — | — | ✓ | ✓ | ✓ | — | ✓ | — | — | — | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ | — | — |
+| LLaVA-v1.6 | — | — | — | — | — | ✓ | ✓ | — | — | ✓ | — | — | — | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ | — | — |
+| LLaVA-OneVision | — | — | — | — | — | ✓ | ✓ | — | — | ✓ | — | — | — | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ | — | — |
+| LLaVA-NeXT-Video | — | — | — | — | — | ✓ | ✓ | — | — | ✓ | — | — | — | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ | — | — |
+| DiffusionGemma | — | — | — | — | — | ✓ | ✓ | — | — | — | — | — | — | — | ✓ | — | — | — | — | — | — | ✓ | — | — |
+| YOLO26/11 (Det) | ✓ | — | — | — | — | — | — | — | — | — | ✓ | ✓ | — | — | — | — | — | — | — | — | — | — | — | — |
+| YOLO26/11 (Pose) | — | — | ✓ | — | — | — | — | — | — | — | ✓ | — | — | — | — | — | — | — | — | — | — | — | — | — |
+| YOLO26/11 (OBB) | — | — | — | ✓ | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — |
+| YOLO-World | — | ✓ | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — |
+| YOLOE | — | ✓ | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — |
+| LocateAnything | ✓ | — | — | — | ✓ | — | — | — | ✓ | — | — | — | ✓ | ✓ | — | — | — | — | — | — | — | — | — | — |
+| LocateAnything (TRT) | ✓ | — | — | — | ✓ | — | — | — | ✓ | — | — | — | ✓ | ✓ | — | — | — | — | — | — | — | — | — | — |
+| SigLIP2 | — | — | — | — | — | ✓† | — | ✓ | — | — | — | — | — | — | — | — | — | — | — | — | ✓ | — | ✓ | ✓ |
+| MoonViT | — | — | — | — | — | ✓† | — | ✓ | — | — | — | — | — | — | — | — | — | — | — | — | ✓ | — | ✓ | ✓ |
+| DINOv3 | — | — | — | — | — | ✓† | — | ✓ | — | — | — | — | — | — | — | — | — | — | — | — | ✓ | — | ✓ | ✓ |
+| DINOtool | — | — | — | — | — | ✓† | — | ✓ | — | — | — | — | — | — | — | — | — | — | — | — | ✓ | — | ✓ | ✓ |
 
-| Model | Top-1 | Top-5 | Method |
-|-------|:-----:|:-----:|--------|
-| SigLIP2 (ZS) | 62.0% | 92.0% | Text-image similarity |
-| Phi-3.5-Vision-4.2B | 22.0% | 26.0% | Caption → MiniLM embed → cosine match |
-| Phi-4-Multimodal-14B | 28.0% | 40.0% | Multi-candidate + 224px upscale + semantic match |
+> `✓*` = PaliGemma OD is prompt-based. `✓†` = Vision encoders output structured text, not freeform captions.
 
-### Visual Embedding Quality (COCO 200 images)
+## Commands
 
-| Model | R@1 | R@5 | R@10 | mAP | NMI | ARI | Dim |
-|-------|:---:|:---:|:----:|:---:|:---:|:---:|:---:|
-| SigLIP2 | 0.535 | 0.750 | 0.835 | 0.376 | 0.604 | 0.059 | 768 |
-| DINOv3 | 0.490 | 0.750 | 0.780 | 0.333 | 0.615 | 0.062 | 384 |
-| MoonViT | 0.480 | 0.705 | 0.775 | 0.339 | 0.594 | 0.057 | 1152 |
-| DINOtool | 0.465 | 0.740 | 0.810 | 0.347 | 0.613 | 0.060 | 384 |
-
-## Skill Matrix
-
-| Model | Det. | Pose | OBB | Ground | Caption | VQA | Class. | Seg. | Scene | Track | 6D Pose | OCR | Point | Count | Vis.Reas. | DocVQA | Emotion | HIR | DocUnd. | Embed | ZS-Det | ZS-mAP | VEQ |
-|-------|:----:|:----:|:---:|:------:|:-------:|:---:|:------:|:----:|:-----:|:-----:|:-------:|:---:|:-----:|:----:|:---------:|:------:|:-------:|:---:|:-------:|:-----:|:------:|:------:|:---:|
-| LocateAnything-3B | ✓ | — | — | ✓ | — | — | — | ✓ | — | — | — | ✓ | ✓ | — | — | — | — | — | — | — | — | — | — |
-| LocateAnything-3B (TRT) | ✓ | — | — | ✓ | — | — | — | ✓ | — | — | — | ✓ | ✓ | — | — | — | — | — | — | — | — | — | — |
-| Qwen3-VL-8B-Instruct | ✓ | — | ✓ | ✓ | ✓ | ✓ | — | — | ✓ | — | — | — | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ | ✓ | — |
-| Qwen3-VL-8B-Thinking | ✓ | — | ✓ | ✓ | ✓ | ✓ | — | — | ✓ | — | — | — | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ | ✓ | — |
-| YOLO26n / YOLO11n | ✓ | ✓ | ✓ | — | — | — | — | — | — | ✓ | ✓ | — | — | — | — | — | — | — | — | — | — | — | — |
-| Florence-2-large-ft | ✓ | — | — | ✓ | ✓ | ✓ | — | ✓ | ✓ | — | — | ✓ | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ | ✓ | — |
-| PaliGemma2-3B-mix | ✓* | — | — | — | ✓ | ✓ | — | — | ✓ | — | — | — | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ | ✓ | — |
-| Llama-3.2-11B-Vision | — | — | — | — | ✓ | ✓ | — | — | ✓ | — | — | — | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ | — | — |
-| Phi-3.5-Vision-4.2B | — | — | — | — | ✓ | ✓ | ✓ | — | ✓ | — | — | — | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ | ✓ | — |
-| Phi-4-Multimodal-14B | ✓ | — | — | — | ✓ | ✓ | ✓ | — | ✓ | — | — | — | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ | ✓ | — |
-| Cosmos-Reason1-7B | — | — | — | — | ✓ | ✓ | — | — | ✓ | — | — | — | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ | — | — |
-| LLaVA-v1.6-Mistral-7B | — | — | — | — | ✓ | ✓ | — | — | ✓ | — | — | — | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ | — | — |
-| LLaVA-OneVision-Qwen2-7B | — | — | — | — | ✓ | ✓ | — | — | ✓ | — | — | — | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ | — | — |
-| LLaVA-NeXT-Video-7B | — | — | — | — | ✓ | ✓ | — | — | ✓ | — | — | — | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ | — | — |
-| LLaVA-NeXT-Video-34B (4-bit) | — | — | — | — | ✓ | ✓ | — | — | ✓ | — | — | — | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ | — | — |
-| LLaVA-Phi-3-Mini-4B | — | — | — | — | ✓ | ✓ | — | — | ✓ | — | — | — | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ | — | — |
-| DiffusionGemma-26B | — | — | — | — | ✓ | ✓ | — | — | — | — | — | — | — | ✓ | — | — | — | — | — | — | ✓ | — | — |
-| SigLIP2 (ZS) | — | — | — | — | ✓† | — | ✓ | — | — | — | — | — | — | — | — | — | — | — | — | ✓ | — | ✓ | ✓ |
-| MoonViT (ZS) | — | — | — | — | ✓† | — | ✓ | — | — | — | — | — | — | — | — | — | — | — | — | ✓ | — | ✓ | ✓ |
-| DINOv3 (ZS) | — | — | — | — | ✓† | — | ✓ | — | — | — | — | — | — | — | — | — | — | — | — | ✓ | — | ✓ | ✓ |
-| DINOtool (ZS) | — | — | — | — | ✓† | — | ✓ | — | — | — | — | — | — | — | — | — | — | — | — | ✓ | — | ✓ | ✓ |
-
-> `✓*` = PaliGemma OD is prompt-based (bbox tokens). `✓†` = Vision-only encoders output structured text, not freeform captions.
-
-## Tasks & Commands
-
-| Script | Task | Dataset | `--model` keys |
-|--------|------|---------|----------------|
-| `benchmark_od.py` | Object Detection | COCO val2017 | `locate_anything`, `locate_anything_trt`, `qwen3_native`, `qwen3_thinking`, `yolo26`, `yolo26s-yolo26x`, `yolo11-yolo11x`, `florence2`, `paligemma` |
-| `benchmark_zeroshot_od.py` | Zero-Shot OD (mAP) | COCO val2017 | `locate_anything`, `florence2`, `paligemma`, `phi_vision`, `phi4_multimodal`, `cosmos_nemotron`, `qwen3_native`, `qwen3_thinking`, `yolo_world*`, `yoloe*` |
-| `benchmark_pose.py` | Pose Estimation | COCO Keypoints | `yolo26_pose`, `yolo26s_pose`, `yolo11_pose`, `yolo11s_pose` |
-| `benchmark_obb.py` | Oriented BBox | DOTA-v1.0 | `yolo26_obb`, `yolo26s_obb`, `yolo11_obb`, `yolo11s_obb` |
-| `benchmark_grounding.py` | Phrase Grounding | COCO val2017 | `locate_anything`, `locate_anything_trt`, `qwen3_native`, `qwen3_thinking`, `florence2` |
-| `benchmark_caption.py` | Image Captioning | COCO Captions | `florence2`, `paligemma`, `llama_vision`, `phi_vision`, `phi4_multimodal`, `cosmos_nemotron`, `qwen3_native`, `qwen3_thinking`, `diffusion_gemma*`, `siglip2`, `moonvit`, `dinov3`, `dinotool`, `llava*`, `phi3_vision` |
-| `benchmark_vqa.py` | Visual QA | COCO val2017 | `florence2`, `paligemma`, `llama_vision`, `phi_vision`, `phi4_multimodal`, `cosmos_nemotron`, `qwen3_native`, `qwen3_thinking`, `diffusion_gemma*`, `llava*`, `phi3_vision` |
-| `benchmark_zeroshot_cls.py` | Zero-Shot Class. v2 | Tiny ImageNet | `siglip2`, `florence2`, `paligemma`, `cosmos_nemotron`, `llama_vision`, `phi_vision`, `phi4_multimodal`, `qwen3_native`, `qwen3_thinking` |
-| `benchmark_classification.py` | Zero-Shot Class. v1 | Tiny ImageNet | `dinotool`, `dinov3`, `siglip2`, `moonvit` |
-| `benchmark_segmentation.py` | Segmentation | COCO val2017 | `florence2`, `locate_anything`, `locate_anything_trt` |
-| `benchmark_scene.py` | Scene Analysis | COCO val2017 | `florence2`, `paligemma`, `llama_vision`, `phi_vision`, `phi4_multimodal`, `cosmos_nemotron`, `qwen3_native`, `qwen3_thinking`, `llava*`, `phi3_vision` |
-| `benchmark_tracking.py` | Multi-Object Track | MOT17 | `yolo26`, `yolo26s-yolo26m`, `yolo11`, `yolo11s-yolo11m` |
-| `benchmark_6dpose.py` | 6D Pose Detection | Linemod | `yolo26`, `yolo26s-yolo26m`, `yolo11`, `yolo11s-yolo11m` |
-| `benchmark_ocr.py` | OCR / Text Det. | Synthetic COCO | `locate_anything`, `locate_anything_trt`, `florence2` |
-| `benchmark_pointing.py` | Pointing / 2D KP | COCO val2017 | `locate_anything`, `locate_anything_trt` |
-| `benchmark_counting.py` | Object Counting | COCO val2017 | `florence2`, `paligemma`, `llama_vision`, `phi_vision`, `phi4_multimodal`, `cosmos_nemotron`, `qwen3_native`, `qwen3_thinking`, `diffusion_gemma*`, `llava*`, `phi3_vision` |
-| `benchmark_visual_reasoning.py` | Visual Reasoning | COCO val2017 | `florence2`, `paligemma`, `llama_vision`, `phi_vision`, `phi4_multimodal`, `cosmos_nemotron`, `qwen3_native`, `qwen3_thinking`, `llava*`, `phi3_vision` |
-| `benchmark_docvqa.py` | Document VQA | COCO val2017 | `florence2`, `paligemma`, `llama_vision`, `phi_vision`, `phi4_multimodal`, `cosmos_nemotron`, `qwen3_native`, `qwen3_thinking`, `llava*`, `phi3_vision` |
-| `benchmark_emotion.py` | Emotion Detection | COCO val2017 | `florence2`, `paligemma`, `llama_vision`, `phi_vision`, `phi4_multimodal`, `cosmos_nemotron`, `qwen3_native`, `qwen3_thinking`, `llava*`, `phi3_vision` |
-| `benchmark_hir.py` | Human Intention Rec. | COCO val2017 | `florence2`, `paligemma`, `llama_vision`, `phi_vision`, `phi4_multimodal`, `cosmos_nemotron`, `qwen3_native`, `qwen3_thinking`, `llava*`, `phi3_vision` |
-| `benchmark_doc_understanding.py` | Document Understanding | COCO val2017 | `florence2`, `paligemma`, `llama_vision`, `phi_vision`, `phi4_multimodal`, `cosmos_nemotron`, `qwen3_native`, `qwen3_thinking`, `llava*`, `phi3_vision` |
-| `benchmark_embedding.py` | Embedding Extraction | COCO val2017 | `siglip2`, `dinov3`, `moonvit`, `dinotool` |
-| `benchmark_zeroshot_detection.py` | Zero-Shot Detection | COCO val2017 | `florence2`, `paligemma`, `llama_vision`, `phi_vision`, `phi4_multimodal`, `cosmos_nemotron`, `qwen3_native`, `qwen3_thinking`, `diffusion_gemma*`, `llava*`, `phi3_vision` |
-| `benchmark_veq.py` | VEQ (Vision Encoders) | COCO val2017 | `siglip2`, `dinov3`, `moonvit`, `dinotool` |
-| `benchmark_veq_vlm.py` | VEQ (VLMs) | COCO val2017 | `siglip2`, `dinov3`, `moonvit`, `dinotool`, `paligemma`, `florence2`, `cosmos_nemotron`, `llama_vision`, `qwen3_native`, `phi_vision`, `phi4_multimodal` |
-
-## Model Reference
-
-| `--model` key | Model | Tasks | Venv | Notes |
-|---------------|-------|-------|------|-------|
-| `locate_anything` | LocateAnything-3B | OD, Ground, Seg, OCR, Point | `locate_anything/.venv` | |
-| `locate_anything_trt` | LocateAnything-3B (TRT) | OD, Ground, Seg, OCR, Point | `locate_anything/.venv` | TensorRT engine |
-| `qwen3_native` | Qwen3-VL-8B-Instruct | OD, OBB, Ground, Caption, VQA, Scene | `qwen3-vl_instruct/.venv` | |
-| `qwen3_thinking` | Qwen3-VL-8B-Thinking | OD, OBB, Ground, Caption, VQA, Scene | `qwen3-vl_thinking/.venv` | |
-| `yolo26` / `yolo26s/m/l/x` | YOLO26n/s/m/l/x (Detect) | OD, Track, 6D Pose | `yolo11-26/.venv` | |
-| `yolo11` / `yolo11s/m/l/x` | YOLO11n/s/m/l/x (Detect) | OD, Track, 6D Pose | `yolo11-26/.venv` | |
-| `yolo26_pose` / `yolo26s_pose` | YOLO26n/s (Pose) | Pose | `yolo11-26/.venv` | |
-| `yolo11_pose` / `yolo11s_pose` | YOLO11n/s (Pose) | Pose | `yolo11-26/.venv` | |
-| `yolo26_obb` / `yolo26s_obb` | YOLO26n/s (OBB) | OBB | `yolo11-26/.venv` | |
-| `yolo11_obb` / `yolo11s_obb` | YOLO11n/s (OBB) | OBB | `yolo11-26/.venv` | |
-| `florence2` | Florence-2-large-ft | OD, Ground, Caption, VQA, Seg, Scene, OCR, ZS-Det | `florence-2/.venv` | |
-| `paligemma` | PaliGemma2-3B-mix | OD*, Caption, VQA, Scene | `paligemma/.venv` | |
-| `llama_vision` | Llama-3.2-11B-Vision | Caption, VQA, Scene | `llama-vision/.venv` | |
-| `phi_vision` | Phi-3.5-Vision-4.2B | Caption, VQA, Scene | `phi-vision/.venv` | |
-| `phi4_multimodal` | Phi-4-Multimodal-14B | OD, Caption, VQA, Class., Scene | `phi-4_multimodal/.venv` | |
-| `cosmos_nemotron` | Cosmos-Reason1-7B | Caption, VQA, Scene | `cosmos-nemotron/.venv` | |
-| `diffusion_gemma*` | DiffusionGemma-26B | Caption, VQA | `diffusion_gemma_vl/.venv` | Variants: `diffusion_gemma`, `_yolo`, `_yolo_pose`, `_yolo_obb`, `_siglip2`, `_moonvit` |
-| `llava_v16_mistral` | LLaVA-v1.6-Mistral-7B | Caption, VQA, Scene | `Llava/.venv` | Subprocess dispatch |
-| `llava_onevision` | LLaVA-OneVision-Qwen2-7B | Caption, VQA, Scene | `Llava/.venv` | Subprocess dispatch |
-| `llava_next_video_7b` | LLaVA-NeXT-Video-7B | Caption, VQA, Scene | `Llava/.venv` | Subprocess dispatch |
-| `llava_next_video_34b` | LLaVA-NeXT-Video-34B-DPO | Caption, VQA, Scene | `Llava/.venv` | 4-bit quantized, subprocess dispatch |
-| `phi3_vision` | LLaVA-Phi-3-Mini-4B | Caption, VQA, Scene | `Llava/.venv` | Subprocess dispatch |
-| `siglip2` | SigLIP2 (ZS) | Caption, Class., Embed. | `siglip2/.venv` | |
-| `moonvit` | MoonViT (ZS) | Caption, Class., Embed. | `moonvit/.venv` | |
-| `dinov3` | DINOv2/v3 (ZS) | Caption, Class., Embed. | `dinov3/.venv` | |
-| `dinotool` | DINOtool | Caption, Class., Embed. | `DINOtool/.venv` | |
-
-### LLaVA Models
-
-LLaVA models run via **subprocess dispatch**: `benchmark_all.py` calls `benchmark_caption.py` (etc.) from the `Llava/.venv`, which then subprocess-calls `Llava/run.py` for each image. This means:
-
-- All 5 LLaVA models share one venv (`Llava/.venv`).
-- The 34B model uses 4-bit NF4 quantization (`--quantize` flag).
-- The 34B model takes ~20 min to load from HDD and ~80s per image.
-- Each image triggers a separate model load (no batching across images yet).
-
-### Aliases
-
-| Shortcut | Full key |
-|----------|----------|
-| `la` | `locate_anything` |
-| `qwen3` | `qwen3_native` |
-| `thinking` | `qwen3_thinking` |
-| `yolo` / `yolo26n` | `yolo26` |
-| `yolo11n` | `yolo11` |
-| `yolo_pose` | `yolo26_pose` |
-| `yolo_obb` | `yolo26_obb` |
-| `f2` / `florence` | `florence2` |
-| `pg` / `gemma` | `paligemma` |
-| `llama` / `llama3` | `llama_vision` |
-| `phi` / `phi3` | `phi_vision` |
-| `cosmos` / `nemotron` | `cosmos_nemotron` |
-| `dg` / `diffusion_gemma_vl` | `diffusion_gemma` |
-| `d3` / `dino` / `dinov3` | `dinov3` |
-| `s2` / `siglip` | `siglip2` |
-| `mv` / `moon` | `moonvit` |
-| `llava` / `llava_mistral` | `llava_v16_mistral` |
-| `llava_onevision` | `llava_onevision` |
-| `llava_next7b` | `llava_next_video_7b` |
-| `llava_next34b` | `llava_next_video_34b` |
-| `phi3v` | `phi3_vision` |
-| `phi4` / `phi4mm` | `phi4_multimodal` |
-| `yolo_world` | `yolo_world` |
-| `yoloe` | `yoloe` |
-
-## Running a Single Model / Task
-
-Each script must be run with the model's own venv Python. Examples:
+### Run all benchmarks
 
 ```bash
-# Captioning with Florence-2
-../VLMcollection/florence-2/.venv/bin/python \
-    scripts/benchmark_caption.py --model florence2 --max-images 100
-
-# Captioning with a LLaVA model (all share Llava venv)
-../VLMcollection/Llava/.venv/bin/python \
-    scripts/benchmark_caption.py --model phi3_vision --max-images 50
-
-# VQA with Qwen3
-../VLMcollection/qwen3-vl_instruct/.venv/bin/python \
-    scripts/benchmark_vqa.py --model qwen3_native --max-questions 100
-
-# Object Detection with YOLO26
-../VLMcollection/yolo11-26/.venv/bin/python \
-    scripts/benchmark_od.py --model yolo26 --max-images 100
-```
-
-## Run All Benchmarks
-
-```bash
-# Full run (50 images per model, all tasks)
 python3 scripts/benchmark_all.py --max-images 50
-
-# Or use any model venv (they all have the required benchmark dependencies)
-../VLMcollection/yolo11-26/.venv/bin/python \
-    scripts/benchmark_all.py --max-images 50
-
-# Selected tasks only
-python3 scripts/benchmark_all.py --tasks captioning vqa scene_analysis --max-images 50
 ```
 
-The orchestrator (`benchmark_all.py`) dispatches each model to its own `{collection}/.venv/bin/python`, so each model runs in its correct environment automatically.
-
-## Reproducibility
-
-Each benchmark script selects images deterministically:
-- **COCO-based tasks**: First `N` images from COCO val2017 annotations (fixed order).
-- **VQA**: Shuffled with `random.Random(42)` for a fixed split.
-- **Classification**: First `N` Tiny ImageNet validation images.
-- **OBB**: First `N` DOTA validation images.
-
-This ensures every model sees the same images for a given task.
-
-## Results
-
-Stored in `results/` as `{model}_{task}_stats.json`. Run `benchmark_all.py` to produce a combined summary at `results/all_benchmarks_summary.json`.
+### Run selected tasks
 
 ```bash
-# Generate report with charts after benchmark is done
+python3 scripts/benchmark_all.py --tasks captioning vqa zeroshot_od --max-images 50
+```
+
+### Run a single model on a single task
+
+Each model must be run with its own venv Python:
+
+```bash
+# Florence-2 captioning
+../VLMcollection/florence-2/.venv/bin/python scripts/benchmark_caption.py --model florence2 --max-images 100
+
+# Phi-4 zero-shot classification
+../VLMcollection/phi-4_multimodal/.venv/bin/python scripts/benchmark_zeroshot_cls.py --model phi4_multimodal --max-images 50
+
+# YOLO26 object detection
+../VLMcollection/yolo11-26/.venv/bin/python scripts/benchmark_od.py --model yolo26 --max-images 100
+
+# Qwen3 zero-shot OD
+../VLMcollection/qwen3-vl_instruct/.venv/bin/python scripts/benchmark_zeroshot_od.py --model qwen3_native --max-images 100
+
+# SigLIP2 VEQ
+../VLMcollection/siglip2/.venv/bin/python scripts/benchmark_veq.py --model siglip2 --max-images 200
+```
+
+### Generate report
+
+```bash
 python3 generate_report.py
 # Produces: Benchmark_Results.md, charts/*.png
 ```
+
+### Attention Implementation Benchmark
+
+```bash
+python3 attention_impl_results.json  # or run the benchmark directly
+```
+
+See [attention_implementation_benchmark.md](attention_implementation_benchmark.md) for flash-attn vs SDPA vs eager comparison results.
+
+## Model Reference
+
+| `--model` key | Model | Venv | VRAM |
+|---------------|-------|------|------|
+| `florence2` | Florence-2-large-ft | `florence-2/.venv` | ~4 GB |
+| `paligemma` | PaliGemma2-3B-mix | `paligemma/.venv` | ~4 GB |
+| `phi_vision` | Phi-3.5-Vision-4.2B | `phi-vision/.venv` | ~10 GB |
+| `phi4_multimodal` | Phi-4-Multimodal-14B | `phi-4_multimodal/.venv` | ~16 GB |
+| `qwen3_native` | Qwen3-VL-8B-Instruct | `qwen3-vl_instruct/.venv` | ~16 GB |
+| `qwen3_thinking` | Qwen3-VL-8B-Thinking | `qwen3-vl_thinking/.venv` | ~16 GB |
+| `cosmos_nemotron` | Cosmos-Reason1-7B | `cosmos-nemotron/.venv` | ~14 GB |
+| `llama_vision` | Llama-3.2-11B-Vision | `llama-vision/.venv` | ~12 GB |
+| `locate_anything` | LocateAnything-3B | `locate_anything/.venv` | ~8 GB |
+| `locate_anything_trt` | LocateAnything-3B (TRT) | `locate_anything/.venv` | ~6 GB |
+| `siglip2` | SigLIP2 | `siglip2/.venv` | ~2 GB |
+| `moonvit` | MoonViT | `moonvit/.venv` | ~2 GB |
+| `dinov3` | DINOv2/v3 | `dinov3/.venv` | ~1 GB |
+| `dinotool` | DINOtool | `DINOtool/.venv` | ~1 GB |
+| `yolo26` / `yolo11` | YOLO26/11 (Detect) | `yolo11-26/.venv` | ~1 GB |
+| `yolo26_pose` / `yolo11_pose` | YOLO26/11 (Pose) | `yolo11-26/.venv` | ~1 GB |
+| `yolo26_obb` / `yolo11_obb` | YOLO26/11 (OBB) | `yolo11-26/.venv` | ~1 GB |
+| `yolo_world` | YOLO-World-v2-x | `yolo11-26/.venv` | ~2 GB |
+| `yoloe` | YOLOE-26m | `yolo11-26/.venv` | ~1 GB |
+| `diffusion_gemma` | DiffusionGemma-26B | `diffusion_gemma_vl/.venv` | ~20 GB |
+| `llava_*` | LLaVA models (5) | `Llava/.venv` | ~14-34 GB |
+
+### Aliases
+
+| Shortcut | Full key | Shortcut | Full key |
+|----------|----------|----------|----------|
+| `f2` / `florence` | `florence2` | `la` | `locate_anything` |
+| `pg` / `gemma` | `paligemma` | `qwen3` | `qwen3_native` |
+| `phi` / `phi3` | `phi_vision` | `thinking` | `qwen3_thinking` |
+| `phi4` / `phi4mm` | `phi4_multimodal` | `cosmos` | `cosmos_nemotron` |
+| `llama` | `llama_vision` | `yolo` / `yolo26n` | `yolo26` |
+| `s2` / `siglip` | `siglip2` | `yolo11n` | `yolo11` |
+| `mv` / `moon` | `moonvit` | `yoloe` | `yoloe` |
+| `d3` / `dino` | `dinov3` | `yolo_world` | `yolo_world` |
+
+## Results
+
+Results are stored in `results/` as `{model}_{task}_stats.json`.
+
+```bash
+# View all results
+ls results/*_stats.json
+
+# Generate report + charts
+python3 generate_report.py
+```
+
+- **[Full Benchmark Results](Benchmark_Results.md)** — detailed metrics for all tasks
+- **[Attention Implementation Benchmark](attention_implementation_benchmark.md)** — flash-attn vs SDPA vs eager comparison
 
 ## Datasets
 
 | Dataset | Path | Content |
 |---------|------|---------|
 | COCO val2017 | `/mnt/HDD1/Project_Data/public_datasets/coco/` | 5000 images, 80 classes |
-| COCO Keypoints | `/mnt/HDD1/Project_Data/public_datasets/coco/` | 5000 images, 17 keypoints |
-| COCO Captions | `/mnt/HDD1/Project_Data/public_datasets/coco/annotations/captions_val2017.json` | 5000 images, 5 captions each |
+| COCO Keypoints | `/mnt/HDD1/Project_Data/public_datasets/coco/` | 17 keypoints per image |
+| COCO Captions | `/mnt/HDD1/Project_Data/public_datasets/coco/annotations/captions_val2017.json` | 5 captions per image |
 | DOTA-v1.0 | `/mnt/HDD1/Project_Data/public_datasets/dotav1/` | Aerial images, 15 classes |
 | Tiny ImageNet | `/mnt/HDD1/Project_Data/public_datasets/tiny-imagenet-200/` | 200 classes, 50 val each |
 | MOT17 | `/mnt/HDD1/Project_Data/public_datasets/MOT17/` | 7 sequences |
 | Linemod | `/mnt/HDD1/Project_Data/public_datasets/linemod/LINEMOD/` | 13 objects, 6D poses |
 
-## Metrics
+## Reproducibility
 
-| Task | Metrics |
-|------|---------|
-| Object Detection | mAP@50:95, mAP@50, FPS, avg inference time |
-| Zero-Shot OD (mAP) | mAP@50:95, mAP@50, Recall, Precision, per-category AP |
-| Pose Estimation | AP@50:95 (keypoints), AP@50 (keypoints), FPS |
-| OBB Detection | mAP@50:95, mAP@50, FPS |
-| Phrase Grounding | Acc@50 (IoU≥0.5), FPS |
-| Image Captioning | BLEU-4, ROUGE-L, CIDEr, FPS |
-| Visual Question Answering | Accuracy (exact match), FPS |
-| Classification v1 | Top-1 accuracy, Top-5 accuracy, FPS (vision encoders only) |
-| Classification v2 | Top-1 accuracy, Top-5 accuracy, FPS (VLMs via semantic embedding match) |
-| Segmentation | mIoU, FPS |
-| Scene Analysis | Accuracy (exact label match), FPS |
-| Multi-Object Tracking | HOTA, MOTA, IDF1, FPS |
-| 6D Pose Detection | ADD(-S) accuracy, FPS |
-| OCR / Text Detection | F1 (text spotting), FPS |
-| Pointing | Accuracy (pixel distance < threshold), FPS |
-| Object Counting | MAE, RMSE, Exact accuracy, FPS |
-| Visual Reasoning | Accuracy (multi-step reasoning), FPS |
-| Document VQA | Accuracy (document-oriented questions), FPS |
-| Emotion Detection | Accuracy (emotion class templates), FPS |
-| Human Intention Recognition | Accuracy (intention class templates), FPS |
-| Document Understanding | Accuracy (document structure questions), FPS |
-| Embedding Extraction | FPS, embedding dimension, avg inference time |
-| Zero-Shot Detection | Acc@50 (IoU≥0.5), FPS, avg inference time |
-| VEQ (Vision Encoders) | Recall@1/5/10, mAP, NMI, ARI, Silhouette |
-| VEQ (VLMs) | Caption BLEU-4/ROUGE-L/CIDEr, Silhouette, Intra/Inter ratio, NMI, ARI, Token count |
+Each benchmark script selects images deterministically:
+- **COCO-based tasks**: First `N` images from val2017 annotations (fixed order).
+- **VQA**: Shuffled with `random.Random(42)` for a fixed split.
+- **Classification**: First `N` Tiny ImageNet validation images.
+- **OBB**: First `N` DOTA validation images.
+
+This ensures every model sees the same images for a given task.
+
+## LLaVA Models
+
+LLaVA models run via **subprocess dispatch**: `benchmark_all.py` calls the benchmark script from `Llava/.venv`, which then subprocess-calls `Llava/run.py` for each image. All 5 LLaVA models share one venv. The 34B model uses 4-bit NF4 quantization.
+
+## Project Structure
+
+```
+VLMbenchmark/
+├── scripts/                     # All benchmark scripts
+│   ├── benchmark_all.py         # Main orchestrator
+│   ├── benchmark_od.py          # Object detection
+│   ├── benchmark_zeroshot_od.py # Zero-shot OD (mAP)
+│   ├── benchmark_zeroshot_cls.py # Zero-shot classification
+│   ├── benchmark_caption.py     # Image captioning
+│   ├── benchmark_vqa.py         # Visual QA
+│   ├── benchmark_veq.py         # VEQ (vision encoders)
+│   ├── benchmark_veq_vlm.py     # VEQ (VLMs)
+│   ├── common.py                # Shared model loaders, metrics, utilities
+│   └── ...
+├── benchmark_descriptions/      # Detailed benchmark descriptions
+├── results/                     # JSON stats per model per task
+├── charts/                      # Generated chart PNGs
+├── samples/                     # Sample images
+├── datasets/                    # Dataset download scripts
+├── Benchmark_Results.md         # Full benchmark results
+├── attention_implementation_benchmark.md  # Attn impl comparison
+├── generate_report.py           # Generates Benchmark_Results.md + charts
+└── run_benchmarks.sh            # Shell script to run all benchmarks
+```

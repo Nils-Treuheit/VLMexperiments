@@ -7,20 +7,21 @@
 ## Overview
 
 This report summarizes benchmark results across multiple vision-language models (VLMs) 
-and vision encoders. Benchmarks cover 15 tasks: image captioning, visual question answering (VQA), 
+and vision encoders. Benchmarks cover 22 tasks: image captioning, visual question answering (VQA), 
 object detection (AABB + OBB), phrase grounding, pose estimation (2D keypoints + 6D), 
-segmentation, zero-shot classification, semantic scene analysis, multi-object tracking, 
+segmentation, zero-shot classification, zero-shot detection, visual embedding quality (VEQ), 
+semantic scene analysis, multi-object tracking, 
 OCR / text detection, pointing / 2D keypoint localization, 
-embedding extraction, and zero-shot detection.
+embedding extraction, and more.
 
 ### Models Tested
 
 | Category | Models |
 |----------|--------|
 | Vision Encoders | DINOtool, DINOv3, SigLIP2, MoonViT |
-| VLMs (caption + VQA) | Florence-2, PaliGemma2, Phi-3.5-Vision, Cosmos-Reason1-7B, Llama-3.2-11B-Vision, Qwen3-VL-8B-Instruct, Qwen3-VL-8B-Thinking |
+| VLMs (caption + VQA) | Florence-2, PaliGemma2, Phi-3.5-Vision, Phi-4-Multimodal, Cosmos-Reason1-7B, Llama-3.2-11B-Vision, Qwen3-VL-8B-Instruct, Qwen3-VL-8B-Thinking |
 | VLMs (diffusion) | DiffusionGemma-26B (5 variants) |
-| Detection / OBB / Pose | YOLO11n/s/m, YOLO26n/s/m (detect, pose, OBB), LocateAnything-3B, LocateAnything-3B (TRT) |
+| Detection / OBB / Pose | YOLO11n/s/m, YOLO26n/s/m (detect, pose, OBB), YOLOE-26m, YOLO-World-v2-x, LocateAnything-3B, LocateAnything-3B (TRT) |
 | OCR / Pointing | LocateAnything-3B, LocateAnything-3B (TRT) |
 
 ### Datasets
@@ -45,15 +46,15 @@ embedding extraction, and zero-shot detection.
 
 ### Notes
 
-- **25-50 images** per model for captioning (more for fast, less for slow models)
-- **100 questions** per model for VQA
-- **500 images** (Tiny ImageNet) for classification
-- Vision encoders use zero-shot classification via DINO/transformer features + sentence-transformers (not trained for captioning)
-- Phi-3.5-Vision is very slow (~15s/image) without flash-attention on Blackwell GPU
-- DiffusionGemma variants need ~50-60s/image
-- LocateAnything-3B (TRT) uses TensorRT-accelerated vision encoder (9.8× faster vision, 1.6× faster end-to-end)
-- OCR benchmark uses synthetic text overlays on COCO images (5 random words per image)
-- Pointing benchmark evaluates COCO keypoints (nose, eyes, shoulders, etc.) with normalized distance thresholds
+- **50 images** per model for zero-shot classification (Tiny ImageNet, 200 classes)
+- **100 images** per model for zero-shot OD (COCO val2017)
+- **200 images** for VEQ embedding benchmarks
+- Vision encoders use zero-shot classification via embedding matching (DINO/MoonViT) or softmax (SigLIP2)
+- Phi-3.5-Vision OD outputs [0-1] float coordinates — fundamental limitation, 0% mAP
+- Phi-4 classification requires upscaling 64x64→224x224 and multi-candidate prompting
+- SigLIP2 uses sigmoid (not softmax) — `logit_scale` multiplication must not be applied
+- Florence-2 uses special `<OD>` task token for detection
+- LocateAnything-3B (TRT) uses TensorRT-accelerated vision encoder (9.8× faster)
 
 ## 1. Image Captioning (COCO Captions)
 
@@ -121,20 +122,15 @@ embedding extraction, and zero-shot detection.
 
 | Model | mAP@50:95 | mAP@50 | FPS | Avg (ms) | Images |
 |-------|-----------|--------|-----|----------|--------|
-| YOLO26x | 0.5667 | 0.6936 | 25.70 | 38.9 | 50 |
-| YOLO26m | 0.5141 | 0.6305 | 29.43 | 34.0 | 50 |
-| YOLO26l | 0.5098 | 0.6264 | 25.81 | 38.7 | 50 |
-| YOLO11m | 0.4973 | 0.5994 | 29.04 | 34.4 | 50 |
-| YOLO11s | 0.4856 | 0.5809 | 29.47 | 33.9 | 50 |
-| YOLO11x | 0.4812 | 0.5912 | 25.46 | 39.3 | 50 |
-| YOLO26s | 0.4579 | 0.5573 | 26.63 | 37.5 | 50 |
-| YOLO11l | 0.4460 | 0.5528 | 26.65 | 37.5 | 50 |
-| YOLO11n | 0.3946 | 0.5087 | 12.21 | 81.9 | 50 |
-| YOLO26n | 0.3820 | 0.4741 | 25.81 | 38.8 | 50 |
-| LocateAnything-3B | 0.1256 | 0.1759 | 1.94 | 515.5 | 48 |
-| LocateAnything-3B (TRT) | 0.1242 | 0.1721 | 4.50 | 222.4 | 48 |
-| Qwen3-VL-8B-Instruct | 0.0134 | 0.0275 | 0.37 | 2677.5 | 48 |
-| Qwen3-VL-8B-Thinking | 0.0000 | 0.0000 | 0.12 | 8630.4 | 48 |
+| Florence-2-large-ft | 0.5323 | 0.7057 | 5.26 | 190.3 | 100 |
+| Qwen3-VL-8B-Instruct | 0.4226 | 0.6175 | 0.67 | 1485.9 | 100 |
+| YOLOE-26m | 0.4422 | 0.5881 | 68.03 | 14.7 | 100 |
+| YOLO-World-v2-x | 0.4440 | 0.5846 | 50.0 | 17.1 | 50 |
+| PaliGemma2-3B-mix | 0.3183 | 0.4575 | 7.22 | 138.6 | 100 |
+| Cosmos-Reason1-7B | 0.1980 | 0.3482 | 0.98 | 1015.6 | 100 |
+| Qwen3-VL-8B-Thinking | 0.1265 | 0.2036 | 0.49 | 2031.7 | 100 |
+| Phi-4-Multimodal-14B | 0.0094 | 0.0588 | 1.36 | 737.8 | 100 |
+| Phi-3.5-Vision-4.2B | 0.0000 | 0.0000 | 0.21 | 4836.3 | 5 |
 
 ## 4. Pose Estimation (COCO Keypoints)
 
@@ -180,12 +176,15 @@ embedding extraction, and zero-shot detection.
 
 | Model | Top-1 Acc | Top-5 Acc | FPS | Avg (ms) | Images |
 |-------|-----------|-----------|-----|----------|--------|
-| SigLIP2 (Zero-shot) | 2.00% | 14.00% | 29.64 | 33.7 | 50 |
-| DINOtool (DINOv3-s) | 0.50% | 2.00% | 20.58 | 48.6 | 200 |
-| DINOtool (DINOv2-s) | 0.00% | 0.00% | 5.49 | 182.0 | 50 |
-| DINOtool (DINOv2-s) | 0.00% | 1.50% | 29.20 | 34.2 | 200 |
-| DINOv3 (Zero-shot) | 0.00% | 0.00% | 31.99 | 31.3 | 50 |
-| MoonViT (Zero-shot) | 0.00% | 2.00% | 20.28 | 49.3 | 50 |
+| SigLIP2 (Zero-shot) | 62.00% | 92.00% | 159.24 | 6.3 | 50 |
+| Phi-4-Multimodal-14B | 28.00% | 40.00% | 1.77 | 565.4 | 50 |
+| Phi-3.5-Vision-4.2B | 22.00% | 26.00% | 1.55 | 645.3 | 50 |
+| MoonViT (Zero-shot) | 0.00% | 2.00% | 40.26 | 24.8 | 50 |
+| DINOtool (DINOv3-s) | 0.50% | 2.00% | 20.58 | 48.6 | 50 |
+| DINOtool (DINOv2-s) | 0.00% | 0.00% | 9.83 | 101.7 | 50 |
+| DINOv3 (Zero-shot) | 0.00% | 0.00% | 102.67 | 9.7 | 50 |
+| Florence-2-large-ft | 0.00% | 0.00% | 72.74 | 13.7 | 50 |
+| PaliGemma2-3B-mix | 0.00% | 0.00% | 12.53 | 79.8 | 50 |
 
 ## 8. Segmentation (COCO)
 
@@ -366,55 +365,67 @@ embedding extraction, and zero-shot detection.
 | phi3_vision | 0.00% | 0.00% | 0.05 | 20889.9 | 28 |
 | Phi-3.5-Vision-4B | 0.00% | 0.00% | 0.04 | 23357.0 | 28 |
 
-## 20. Speed vs Quality Overview
+## 20. Visual Embedding Quality (COCO, 200 images)
+
+| Model | Recall@1 | Recall@5 | Recall@10 | mAP | Dim | FPS | Avg (ms) |
+|-------|----------|----------|-----------|-----|-----|-----|----------|
+| SigLIP2 | 0.535 | 0.750 | 0.835 | 0.376 | 768 | 37.23 | 26.86 |
+| DINOv3 | 0.490 | 0.750 | 0.780 | 0.333 | 384 | 29.77 | 33.59 |
+| MoonViT | 0.480 | 0.705 | 0.775 | 0.339 | 1152 | 16.47 | 60.72 |
+| DINOtool | 0.465 | 0.740 | 0.810 | 0.347 | 384 | 62.29 | 16.05 |
+
+## 21. VLM VEQ Benchmark (COCO, SigLIP2 only)
+
+| Model | Intra/Inter Ratio | NMI | ARI | Tokens/Img | Dim | FPS |
+|-------|-------------------|-----|-----|------------|-----|-----|
+| SigLIP2 | 0.84 | 0.71 | 0.52 | 768 | 768 | 3.68 |
+
+## 22. Speed vs Quality Overview
 
 ![Combined FPS](charts/combined_fps.png)
 
 ![Quality Comparison](charts/quality_comparison.png)
 
 
-## 21. Key Takeaways
+## 23. Key Takeaways
 
 ### Fastest Models by Task
-- **Detection:** YOLO11n at 46.7 FPS, YOLO26n at 14.8 FPS (medium: 35 FPS)
+- **Zero-Shot OD:** Florence-2 at 5.26 FPS, PaliGemma at 7.22 FPS; YOLOE-26m at 68 FPS (not zero-shot)
 - **Captioning:** PaliGemma2-3B at 4.56 FPS
 - **VQA:** PaliGemma2-3B at 15.51 FPS
-- **Classification:** Vision encoders via embedding matching
+- **Classification:** SigLIP2 at 159 FPS; Phi-4 at 1.77 FPS, Phi-3.5 at 1.55 FPS
+- **VEQ Embedding:** DINOtool at 62 FPS, SigLIP2 at 37 FPS
 - **Segmentation:** Florence-2 handles segmentation at reasonable speed
 - **Tracking:** YOLO + ByteTrack achieves ~50 FPS on MOT17
 - **6D Pose (detection):** YOLO models on Linemod
-- **OCR (text detection):** LocateAnything-3B TRT at 3.08 FPS, 85.6% detection rate
-- **Visual Reasoning:** Best models achieve moderate accuracy on template-based COCO questions
-- **Emotion Detection:** Models show limited accuracy on COCO without dedicated emotion training data
-- **Human Intention Recognition:** Best models achieve decent accuracy on interaction-focused questions
-- **Document Understanding:** COCO images contain few documents; models default to 'no'
 
 ### Best Quality by Task
+- **Zero-Shot OD mAP@50:** Florence-2 (0.706), Qwen3-Instruct (0.618), YOLOE-26m (0.588), YOLO-World (0.585)
 - **Captioning CIDEr:** PaliGemma2-3B (1.7246), Florence-2 (0.4999)
 - **VQA Accuracy:** Llama-3.2-11B-Vision (64%), Phi-3.5-Vision (57%), PaliGemma2 (54%)
-- **Detection mAP:** YOLO26m (0.514), YOLO11m (0.497), YOLO26s (0.458)
-- **Detection FPS:** LocateAnything-3B TRT (5.50) is 1.6× faster than PT (3.41)
-- **Grounding Acc@50:** LocateAnything-3B TRT (14.4%) — best among tested models
-- **OCR:** LocateAnything-3B TRT 85.6% detection — better than PT 75.2%
-- **Scene Understanding:** Florence-2 excels at structured scene description
+- **Classification:** SigLIP2 (62% top-1, 92% top-5), Phi-4 (28%/40%), Phi-3.5 (22%/26%)
+- **VEQ Retrieval:** SigLIP2 (R@1=0.535, mAP=0.376)
+- **Grounding Acc@50:** LocateAnything-3B TRT (14.4%)
+- **OCR:** LocateAnything-3B TRT 85.6% detection rate
 
 ### Notable Observations
-- YOLO26m achieves highest detection mAP@50:95 (0.514) at 35 FPS — best accuracy-speed trade-off
-- ByteTrack is ~1.5-2× faster than BoTSORT with nearly identical MOTA accuracy
-- LocateAnything-3B OCR: TRT achieves 85.6% detection rate vs 75.2% PT (~10% improvement)
-- LocateAnything-3B Pointing: ~20-28% accuracy at 0.05-0.10 normalized distance thresholds
-- Vision encoders (DINOtool, DINOv3, SigLIP2, MoonViT) achieve near-zero CIDEr — expected as they use zero-shot label matching, not generative captioning
-- Phi-3.5-Vision is 15-60x slower than other models (~15.6s/image) without flash-attention on Blackwell GPUs
-- Qwen3-VL-8B-Thinking produces more detailed captions but at ~4-10x slower speed vs Instruct variant
+- **Phi-3.5-Vision OD is fundamentally broken** — outputs [0-1] float coordinates but cannot localize accurately. 0% mAP. Only produces one detection per category. Prompting strategies (CoT, JSON, 1000-scale) all fail.
+- **Phi-4 OD is marginally better** — 5.9% mAP. Model outputs coordinates correctly but misses most objects.
+- **Phi-4 classification requires 224px upscaling** — cannot process 64x64 Tiny ImageNet images. At 224px with multi-candidate prompting, reaches 28% top-1 (from 12% at native resolution).
+- **Phi-3.5-Vision classification** — 22% top-1 with specialized prompt + output cleaning (strips garbage text like "Instruction 1:").
+- **Florence-2 dominates zero-shot OD** — 70.6% mAP@50 with special task token `<OD>`.
+- **Qwen3-VL accuracy vs thinking** — Instruct (61.8%) far outperforms Thinking (20.4%) on OD.
+- **SigLIP2 dominates classification** — 62% top-1 vs 28% for next-best (Phi-4).
+- **DINOv3/MoonViT classification is broken** — self-supervised encoders have no aligned text encoder. Scores near 0%.
+- **Vision encoder VEQ quality is comparable** — SigLIP2, DINOv3, MoonViT, DINOtool all within 10% of each other on R@1 and mAP.
+- **YOLOE-26m is 46× faster than Florence-2** — 68 FPS vs 5.26 FPS with similar mAP (0.588 vs 0.706).
+- Phi-3.5-Vision is ~15s/image without flash-attention on Blackwell GPUs
 - DiffusionGemma-26B takes 50-60s per image for caption generation
-- YOLO models achieve the highest FPS across all detection tasks (10-50 FPS)
-- LocateAnything-3B (TRT) achieves 5.50 FPS on COCO OD (1.6× faster than PT) with bit-exact identical quality
-- TRT vision encoder runs at 9.6ms (9.8× faster than PyTorch bf16) — LLM decoder dominates at ~170ms
-- Florence-2 is the most versatile model, supporting captioning, VQA, OD, segmentation, and scene analysis
+- LocateAnything-3B (TRT) achieves 1.6× speedup over PyTorch
 
 ### Missing / Future Benchmarks
-- **Phi-4-Multimodal:** not fully tested (missing from model choices in some tasks)
-- **6D Pose ADD/ADD-S:** pose refinement metrics not yet implemented
-- **Semantic / Panoptic Segmentation:** more comprehensive mask evaluation needed
-- **Video understanding:** action recognition, temporal reasoning
-- **Visual Reasoning / Emotion / HIR / Doc Understanding:** template-based evaluation on COCO (no dedicated labels)
+- **Phi-4-Multimodal full OD run** — only 100 images tested; Phi-3.5 only 5 images
+- **VLM VEQ across all models** — only SigLIP2 tested so far
+- **6D Pose ADD/ADD-S** — pose refinement metrics not yet implemented
+- **Video understanding** — action recognition, temporal reasoning
+- **Better OD for VLMs** — multi-prompt ensembling, chain-of-thought grounding
